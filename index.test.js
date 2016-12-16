@@ -71,6 +71,33 @@ describe('gcpMetadata', function () {
     getMetadata(PROPERTY, done)
   })
 
+  it('should accept an object with property and query fields', function (done) {
+    var BASE_URL = 'http://metadata.google.internal/computeMetadata/v1'
+    var TYPE = 'type'
+    var PROPERTY = 'property'
+    var QUERY = {
+      key: 'value'
+    }
+
+    var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
+
+    retryRequestOverride = function (reqOpts, callback) {
+      assert.deepEqual(reqOpts, {
+        uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
+        headers: {
+          'Metadata-Flavor': 'Google'
+        },
+        qs: QUERY
+      })
+      callback() // done()
+    }
+
+    getMetadata({
+      property: PROPERTY,
+      qs: QUERY
+    }, done)
+  })
+
   it('should extend the request options', function (done) {
     var BASE_URL = 'http://metadata.google.internal/computeMetadata/v1'
     var TYPE = 'type'
