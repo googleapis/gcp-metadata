@@ -44,7 +44,7 @@ describe('gcpMetadata', function () {
         headers: {
           'Metadata-Flavor': 'Google'
         }
-      });
+      })
       callback() // done()
     }
 
@@ -64,7 +64,7 @@ describe('gcpMetadata', function () {
         headers: {
           'Metadata-Flavor': 'Google'
         }
-      });
+      })
       callback() // done()
     }
 
@@ -85,7 +85,7 @@ describe('gcpMetadata', function () {
           'Metadata-Flavor': 'Google',
           'Custom-Header': 'Custom'
         }
-      });
+      })
       callback() // done()
     }
 
@@ -99,8 +99,8 @@ describe('gcpMetadata', function () {
     var originalOptions = extend(true, {}, options)
 
     getMetadata(options, function (err) {
-      assert.ifError(err);
-      assert.deepEqual(options, originalOptions); // wasn't modified
+      assert.ifError(err)
+      assert.deepEqual(options, originalOptions) // wasn't modified
       done()
     })
   })
