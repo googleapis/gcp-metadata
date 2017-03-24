@@ -2,6 +2,7 @@
   "name": "gcp-metadata",
   "version": "0.1.0",
   "description": "Get the metadata from a Google Cloud Platform environment",
+  "repository": "stephenplusplus/gcp-metadata",
   "main": "index.js",
   "files": [
     "index.js"
