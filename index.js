@@ -27,7 +27,17 @@ var gcpMetadata = {
       }, options)
       delete reqOpts.property
 
-      return request(reqOpts, callback)
+      return request(reqOpts, function (err, res, body) {
+        if (err) {
+          callback(err)
+        } else if (!res || res.headers['Metadata-Flavor'] !== 'Google') {
+          callback(new Error('Invalid response from metadata service'))
+        } else if (res.statusCode !== 200) {
+          callback(new Error('Unsuccessful response status code'), res)
+        } else {
+          callback(null, res, body)
+        }
+      })
     }
   }
 }
