@@ -4,6 +4,13 @@ var assert = require('assert')
 var extend = require('extend')
 var proxyquire = require('proxyquire')
 
+var VALID_RESPONSE = {
+  statusCode: 200,
+  headers: {
+    'Metadata-Flavor': 'Google'
+  }
+}
+
 describe('gcpMetadata', function () {
   var cachedGcpMetadata
   var gcpMetadata
@@ -45,7 +52,7 @@ describe('gcpMetadata', function () {
           'Metadata-Flavor': 'Google'
         }
       })
-      callback() // done()
+      callback(null, VALID_RESPONSE)
     }
 
     getMetadata(done)
@@ -65,7 +72,7 @@ describe('gcpMetadata', function () {
           'Metadata-Flavor': 'Google'
         }
       })
-      callback() // done()
+      callback(null, VALID_RESPONSE)
     }
 
     getMetadata(PROPERTY, done)
@@ -89,7 +96,7 @@ describe('gcpMetadata', function () {
         },
         qs: QUERY
       })
-      callback() // done()
+      callback(null, VALID_RESPONSE)
     }
 
     getMetadata({
@@ -113,7 +120,7 @@ describe('gcpMetadata', function () {
           'Custom-Header': 'Custom'
         }
       })
-      callback() // done()
+      callback(null, VALID_RESPONSE)
     }
 
     var options = {
@@ -128,6 +135,73 @@ describe('gcpMetadata', function () {
     getMetadata(options, function (err) {
       assert.ifError(err)
       assert.deepEqual(options, originalOptions) // wasn't modified
+      done()
+    })
+  })
+
+  it('should return the request error', function (done) {
+    var ERROR = 'fake error'
+    var TYPE = 'type'
+
+    var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
+
+    retryRequestOverride = function (reqOpts, callback) {
+      callback(ERROR)
+    }
+
+    getMetadata(function (err) {
+      assert.strictEqual(err, ERROR)
+      done()
+    })
+  })
+
+  it('should return error when res is empty', function (done) {
+    var TYPE = 'type'
+    var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
+
+    retryRequestOverride = function (reqOpts, callback) {
+      callback(null, null)
+    }
+
+    getMetadata(function (err) {
+      assert(err instanceof Error)
+      done()
+    })
+  })
+
+  it('should return error when flavor header is incorrect', function (done) {
+    var TYPE = 'type'
+    var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
+
+    retryRequestOverride = function (reqOpts, callback) {
+      callback(null, {
+        headers: {
+          'Metadata-Flavor': 'Hazelnut'
+        }
+      })
+    }
+
+    getMetadata(function (err) {
+      assert(err instanceof Error)
+      done()
+    })
+  })
+
+  it('should return error if statusCode is not 200', function (done) {
+    var TYPE = 'type'
+    var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
+
+    retryRequestOverride = function (reqOpts, callback) {
+      callback(null, {
+        headers: {
+          'Metadata-Flavor': 'Google'
+        },
+        statusCode: 418
+      })
+    }
+
+    getMetadata(function (err) {
+      assert(err instanceof Error)
       done()
     })
   })
