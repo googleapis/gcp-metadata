@@ -5,10 +5,7 @@ var extend = require('extend')
 var proxyquire = require('proxyquire')
 
 var VALID_RESPONSE = {
-  statusCode: 200,
-  headers: {
-    'Metadata-Flavor': 'Google'
-  }
+  statusCode: 200
 }
 
 describe('gcpMetadata', function () {
