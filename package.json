@@ -5,10 +5,14 @@
   "repository": "stephenplusplus/gcp-metadata",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "scripts": {
-    "test": "standard && mocha *.test.js"
+    "compile": "tsc",
+    "clean": "rm index.js index.d.ts",
+    "prepare": "npm run compile",
+    "test": "npm run compile && standard && mocha *.test.js"
   },
   "keywords": [
     "google cloud platform",
@@ -22,13 +26,18 @@
   "author": "Stephen Sawchuk",
   "license": "MIT",
   "dependencies": {
+    "@types/request": "^2.0.3",
     "extend": "^3.0.0",
     "retry-request": "^3.1.0"
   },
   "devDependencies": {
+    "@types/extend": "^2.0.30",
+    "@types/node": "^8.0.31",
+    "gts": "^0.3.1",
     "mocha": "^3.2.0",
     "proxyquire": "^1.7.10",
-    "standard": "^8.6.0"
+    "standard": "^8.6.0",
+    "typescript": "^2.5.3"
   },
   "engines": {
     "node": ">=4"

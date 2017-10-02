@@ -1,0 +1,9 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "sourceMap": false
+  },
+  "files": [
+    "index.ts"
+  ]
+}
