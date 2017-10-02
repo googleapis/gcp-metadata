@@ -1,52 +1,55 @@
-'use strict'
+import * as extend from 'extend'
+import * as _request from 'request' // for types only
+import * as request from 'retry-request'
 
-var extend = require('extend')
-var request = require('retry-request')
+const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1'
 
-var BASE_URL = 'http://metadata.google.internal/computeMetadata/v1'
+export type Options = _request.Options & { property?: string }
 
-var gcpMetadata = {
-  _buildMetadataAccessor: function (type) {
-    return function (options, callback) {
-      if (typeof options === 'function') {
-        callback = options
-        options = {}
-      }
+export type Callback = (error: Error | null,
+  response?: _request.RequestResponse, metadataProp?: string) => void
 
-      if (typeof options === 'string') {
-        options = {
-          property: options
-        }
-      }
-
-      var property = options.property ? '/' + options.property : ''
-
-      var reqOpts = extend(true, {
-        uri: BASE_URL + '/' + type + property,
-        headers: { 'Metadata-Flavor': 'Google' }
-      }, options)
-      delete reqOpts.property
-
-      var retryRequestOpts = {
-        noResponseRetries: 0
-      }
-
-      return request(reqOpts, retryRequestOpts, function (err, res, body) {
-        if (err) {
-          callback(err)
-        } else if (!res) {
-          callback(new Error('Invalid response from metadata service'))
-        } else if (res.statusCode !== 200) {
-          callback(new Error('Unsuccessful response status code'), res)
-        } else {
-          callback(null, res, body)
-        }
-      })
+export function _buildMetadataAccessor(type: string) {
+  return (options: string | Options | Callback, callback: Callback) => {
+    if (typeof options === 'function') {
+      callback = options
+      options = {} as any
     }
+
+    if (typeof options === 'string') {
+      options = {
+        property: options
+      } as any
+    }
+
+    let property = ''
+    if (typeof options === 'object' && options.property) {
+      property = '/' + options.property
+    }
+
+    const reqOpts = extend(true, {
+      uri: BASE_URL + '/' + type + property,
+      headers: { 'Metadata-Flavor': 'Google' }
+    }, options) as Options
+    delete reqOpts.property
+
+    const retryRequestOpts = {
+      noResponseRetries: 0
+    }
+
+    return request(reqOpts, retryRequestOpts, (err, res, body) => {
+      if (err) {
+        callback(err)
+      } else if (!res) {
+        callback(new Error('Invalid response from metadata service'))
+      } else if (res.statusCode !== 200) {
+        callback(new Error('Unsuccessful response status code'), res)
+      } else {
+        callback(null, res, body)
+      }
+    })
   }
 }
 
-gcpMetadata.instance = gcpMetadata._buildMetadataAccessor('instance')
-gcpMetadata.project = gcpMetadata._buildMetadataAccessor('project')
-
-module.exports = gcpMetadata
+export const instance = _buildMetadataAccessor('instance')
+export const project = _buildMetadataAccessor('project')
