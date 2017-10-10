@@ -26,13 +26,13 @@
   "author": "Stephen Sawchuk",
   "license": "MIT",
   "dependencies": {
-    "@types/request": "^2.0.3",
     "extend": "^3.0.0",
     "retry-request": "^3.1.0"
   },
   "devDependencies": {
     "@types/extend": "^2.0.30",
     "@types/node": "^8.0.31",
+    "@types/request": "^2.0.3",
     "gts": "^0.3.1",
     "mocha": "^3.2.0",
     "proxyquire": "^1.7.10",
