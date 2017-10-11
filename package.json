@@ -8,6 +8,7 @@
     "index.js",
     "index.d.ts"
   ],
+  "types": "index.d.ts",
   "scripts": {
     "compile": "tsc",
     "clean": "rm index.js index.d.ts",
