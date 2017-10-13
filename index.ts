@@ -4,22 +4,25 @@ import * as request from 'retry-request'
 
 const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1'
 
-export type Options = _request.Options & { property?: string }
+export type Options = _request.CoreOptions & {
+  property?: string,
+  uri?: string
+}
 
 export type Callback = (error: Error | null,
   response?: _request.RequestResponse, metadataProp?: string) => void
 
 export function _buildMetadataAccessor(type: string) {
-  return (options: string | Options | Callback, callback: Callback) => {
+  return function metadataAccessor(options: string | Options | Callback, callback?: Callback) {
     if (typeof options === 'function') {
       callback = options
-      options = {} as any
+      options = {}
     }
 
     if (typeof options === 'string') {
       options = {
         property: options
-      } as any
+      }
     }
 
     let property = ''
@@ -30,7 +33,7 @@ export function _buildMetadataAccessor(type: string) {
     const reqOpts = extend(true, {
       uri: BASE_URL + '/' + type + property,
       headers: { 'Metadata-Flavor': 'Google' }
-    }, options) as Options
+    }, options) as _request.Options & { property?: string }
     delete reqOpts.property
 
     const retryRequestOpts = {
@@ -38,14 +41,16 @@ export function _buildMetadataAccessor(type: string) {
     }
 
     return request(reqOpts, retryRequestOpts, (err, res, body) => {
-      if (err) {
-        callback(err)
-      } else if (!res) {
-        callback(new Error('Invalid response from metadata service'))
-      } else if (res.statusCode !== 200) {
-        callback(new Error('Unsuccessful response status code'), res)
-      } else {
-        callback(null, res, body)
+      if (callback) { // for type safety; this should already always be true
+        if (err) {
+          callback(err)
+        } else if (!res) {
+          callback(new Error('Invalid response from metadata service'))
+        } else if (res.statusCode !== 200) {
+          callback(new Error('Unsuccessful response status code'), res)
+        } else {
+          callback(null, res, body)
+        }
       }
     })
   }
