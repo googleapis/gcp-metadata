@@ -1,28 +1,25 @@
 import * as extend from 'extend';
-import * as _request from 'request'; // for types only
+import * as _request from 'request';  // for types only
 import * as request from 'retry-request';
 
 const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
 
-export type Options = _request.CoreOptions & {
-  property?: string,
-  uri?: string
-};
+export type Options = _request.CoreOptions & {property?: string, uri?: string};
 
-export type Callback = (error: Error | null,
-  response?: _request.RequestResponse, metadataProp?: string) => void;
+export type Callback =
+    (error: Error | null, response?: _request.RequestResponse,
+     metadataProp?: string) => void;
 
 export function _buildMetadataAccessor(type: string) {
-  return function metadataAccessor(options: string | Options | Callback, callback?: Callback) {
+  return function metadataAccessor(
+      options: string|Options|Callback, callback?: Callback) {
     if (typeof options === 'function') {
       callback = options;
       options = {};
     }
 
     if (typeof options === 'string') {
-      options = {
-        property: options
-      };
+      options = {property: options};
     }
 
     let property = '';
@@ -30,18 +27,19 @@ export function _buildMetadataAccessor(type: string) {
       property = '/' + options.property;
     }
 
-    const reqOpts = extend(true, {
-      uri: BASE_URL + '/' + type + property,
-      headers: { 'Metadata-Flavor': 'Google' }
-    }, options) as _request.Options & { property?: string };
+    const reqOpts = extend(
+                        true, {
+                          uri: BASE_URL + '/' + type + property,
+                          headers: {'Metadata-Flavor': 'Google'}
+                        },
+                        options) as _request.Options &
+        {property?: string};
     delete reqOpts.property;
 
-    const retryRequestOpts = {
-      noResponseRetries: 0
-    };
+    const retryRequestOpts = {noResponseRetries: 0};
 
     return request(reqOpts, retryRequestOpts, (err, res, body) => {
-      if (callback) { // for type safety; this should already always be true
+      if (callback) {  // for type safety; this should already always be true
         if (err) {
           callback(err);
         } else if (!res) {
