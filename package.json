@@ -11,9 +11,11 @@
   "types": "index.d.ts",
   "scripts": {
     "compile": "tsc",
+    "check": "gts check",
+    "fix": "gts fix",
     "clean": "rm index.js index.d.ts",
     "prepare": "npm run compile",
-    "test": "npm run compile && standard && mocha *.test.js"
+    "test": "npm run compile && npm run check && mocha *.test.js"
   },
   "keywords": [
     "google cloud platform",
@@ -37,7 +39,6 @@
     "gts": "^0.3.1",
     "mocha": "^3.2.0",
     "proxyquire": "^1.7.10",
-    "standard": "^8.6.0",
     "typescript": "^2.5.3"
   },
   "engines": {
