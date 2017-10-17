@@ -3,10 +3,11 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 
 // for types
-import * as _gcpMetadata from '.';
+import * as _gcpMetadata from './index';
 type GcpMetadata = typeof _gcpMetadata;
-type RetryRequest = (reqOpts: Object, opts: Object,
-    callback: (err?: any, request?: any) => void) => void;
+type RetryRequest =
+    (reqOpts: Object, opts: Object,
+     callback: (err?: any, request?: any) => void) => void;
 
 // tslint:disable-next-line:no-empty
 const noop = () => {};
@@ -19,22 +20,19 @@ describe('gcpMetadata', () => {
   let cachedGcpMetadata: GcpMetadata;
   let gcpMetadata: GcpMetadata;
 
-  let retryRequestOverride: RetryRequest | null;
+  let retryRequestOverride: RetryRequest|null;
   let fakeRetryRequest = (...args: any[]) => {
     return ((retryRequestOverride || noop) as Function)(...args);
   };
 
   before(() => {
-    cachedGcpMetadata = proxyquire('./index.js', {
-      'retry-request': fakeRetryRequest
-    });
+    cachedGcpMetadata =
+        proxyquire('./index.js', {'retry-request': fakeRetryRequest});
   });
 
   beforeEach(() => {
     retryRequestOverride = null;
-    gcpMetadata = proxyquire('./index.js', {
-      'retry-request': fakeRetryRequest
-    });
+    gcpMetadata = proxyquire('./index.js', {'retry-request': fakeRetryRequest});
     extend(gcpMetadata, cachedGcpMetadata);
   });
 
@@ -50,12 +48,9 @@ describe('gcpMetadata', () => {
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
 
     retryRequestOverride = (reqOpts, opts, callback) => {
-      assert.deepEqual(reqOpts, {
-        uri: BASE_URL + '/' + TYPE,
-        headers: {
-          'Metadata-Flavor': 'Google'
-        }
-      });
+      assert.deepEqual(
+          reqOpts,
+          {uri: BASE_URL + '/' + TYPE, headers: {'Metadata-Flavor': 'Google'}});
       callback(null, VALID_RESPONSE);
     };
 
@@ -72,9 +67,7 @@ describe('gcpMetadata', () => {
     retryRequestOverride = (reqOpts, opts, callback) => {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
-        headers: {
-          'Metadata-Flavor': 'Google'
-        }
+        headers: {'Metadata-Flavor': 'Google'}
       });
       callback(null, VALID_RESPONSE);
     };
@@ -86,27 +79,20 @@ describe('gcpMetadata', () => {
     const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
     const TYPE = 'type';
     const PROPERTY = 'property';
-    const QUERY = {
-      key: 'value'
-    };
+    const QUERY = {key: 'value'};
 
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
 
     retryRequestOverride = (reqOpts, opts, callback) => {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
-        headers: {
-          'Metadata-Flavor': 'Google'
-        },
+        headers: {'Metadata-Flavor': 'Google'},
         qs: QUERY
       });
       callback(null, VALID_RESPONSE);
     };
 
-    getMetadata({
-      property: PROPERTY,
-      qs: QUERY
-    }, done);
+    getMetadata({property: PROPERTY, qs: QUERY}, done);
   });
 
   it('should extend the request options', (done) => {
@@ -119,26 +105,18 @@ describe('gcpMetadata', () => {
     retryRequestOverride = (reqOpts, opts, callback) => {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
-        headers: {
-          'Metadata-Flavor': 'Google',
-          'Custom-Header': 'Custom'
-        }
+        headers: {'Metadata-Flavor': 'Google', 'Custom-Header': 'Custom'}
       });
       callback(null, VALID_RESPONSE);
     };
 
-    const options = {
-      property: PROPERTY,
-      headers: {
-        'Custom-Header': 'Custom'
-      }
-    };
+    const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
 
     const originalOptions = extend(true, {}, options);
 
     getMetadata(options, (err) => {
       assert.ifError(err);
-      assert.deepEqual(options, originalOptions); // wasn't modified
+      assert.deepEqual(options, originalOptions);  // wasn't modified
       done();
     });
   });
@@ -178,11 +156,7 @@ describe('gcpMetadata', () => {
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
 
     retryRequestOverride = (reqOpts, opts, callback) => {
-      callback(null, {
-        headers: {
-          'Metadata-Flavor': 'Hazelnut'
-        }
-      });
+      callback(null, {headers: {'Metadata-Flavor': 'Hazelnut'}});
     };
 
     getMetadata((err) => {
@@ -196,12 +170,7 @@ describe('gcpMetadata', () => {
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
 
     retryRequestOverride = (reqOpts, opts, callback) => {
-      callback(null, {
-        headers: {
-          'Metadata-Flavor': 'Google'
-        },
-        statusCode: 418
-      });
+      callback(null, {headers: {'Metadata-Flavor': 'Google'}, statusCode: 418});
     };
 
     getMetadata((err) => {
