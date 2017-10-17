@@ -4,6 +4,7 @@
     "sourceMap": false
   },
   "files": [
-    "index.ts"
+    "index.ts",
+    "index.test.ts"
   ]
 }
