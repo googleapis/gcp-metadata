@@ -3,6 +3,8 @@ import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
 
 // for types
+// Importing from './index' rather than '.' allows us to depend on
+// index.ts rather than index.d.ts
 import * as _gcpMetadata from './index';
 type GcpMetadata = typeof _gcpMetadata;
 type RetryRequest =
