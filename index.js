@@ -27,7 +27,7 @@ var gcpMetadata = {
       }, options)
       delete reqOpts.property
 
-      return request(reqOpts, {noResponseRetries: 0}, 
+      return request(reqOpts, {noResponseRetries: 0},
           function (err, res, body) {
             if (err) {
               callback(err)
@@ -38,7 +38,7 @@ var gcpMetadata = {
             } else {
               callback(null, res, body)
             }
-          });
+          })
     }
   }
 }
@@ -47,4 +47,3 @@ gcpMetadata.instance = gcpMetadata._buildMetadataAccessor('instance')
 gcpMetadata.project = gcpMetadata._buildMetadataAccessor('project')
 
 module.exports = gcpMetadata
-
