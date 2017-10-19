@@ -49,6 +49,9 @@ describe('gcpMetadata', function () {
           'Metadata-Flavor': 'Google'
         }
       })
+
+      assert.strictEqual(opts.noResponseRetries, 0)
+
       callback(null, VALID_RESPONSE)
     }
 
