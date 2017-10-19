@@ -1,9 +1,10 @@
 version: 2
 
 workflows:
+  version: 2
   tests:
     jobs:
-      - tests
+      - test:
         requires:
           - node4
           - node6
@@ -13,17 +14,17 @@ jobs:
   node4:
     docker:
       - image: node:4
-    <<: *tests
+    <<: *test
   node6:
     docker:
       - image: node:6
-    <<: *tests
+    <<: *test
   node8:
     docker:
       - image: node:8
-    <<: *tests
+    <<: *test
 
-tests: &tests
+test: &test
   steps:
     - checkout
     - run:
