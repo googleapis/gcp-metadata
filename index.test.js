@@ -42,13 +42,16 @@ describe('gcpMetadata', function () {
 
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE,
         headers: {
           'Metadata-Flavor': 'Google'
         }
       })
+
+      assert.strictEqual(opts.noResponseRetries, 0)
+
       callback(null, VALID_RESPONSE)
     }
 
@@ -62,7 +65,7 @@ describe('gcpMetadata', function () {
 
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
         headers: {
@@ -85,7 +88,7 @@ describe('gcpMetadata', function () {
 
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
         headers: {
@@ -109,7 +112,7 @@ describe('gcpMetadata', function () {
 
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       assert.deepEqual(reqOpts, {
         uri: BASE_URL + '/' + TYPE + '/' + PROPERTY,
         headers: {
@@ -142,7 +145,7 @@ describe('gcpMetadata', function () {
 
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       callback(ERROR)
     }
 
@@ -156,7 +159,7 @@ describe('gcpMetadata', function () {
     var TYPE = 'type'
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       callback(null, null)
     }
 
@@ -170,7 +173,7 @@ describe('gcpMetadata', function () {
     var TYPE = 'type'
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       callback(null, {
         headers: {
           'Metadata-Flavor': 'Hazelnut'
@@ -188,7 +191,7 @@ describe('gcpMetadata', function () {
     var TYPE = 'type'
     var getMetadata = gcpMetadata._buildMetadataAccessor(TYPE)
 
-    retryRequestOverride = function (reqOpts, callback) {
+    retryRequestOverride = function (reqOpts, opts, callback) {
       callback(null, {
         headers: {
           'Metadata-Flavor': 'Google'
