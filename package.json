@@ -5,10 +5,17 @@
   "repository": "stephenplusplus/gcp-metadata",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
+  "types": "index.d.ts",
   "scripts": {
-    "test": "standard && mocha *.test.js"
+    "compile": "tsc -p .",
+    "check": "gts check",
+    "fix": "gts fix",
+    "clean": "rm index.js index.d.ts",
+    "prepare": "npm run compile",
+    "test": "npm run check && npm run compile && mocha *.test.js"
   },
   "keywords": [
     "google cloud platform",
@@ -26,9 +33,16 @@
     "retry-request": "^3.1.0"
   },
   "devDependencies": {
+    "@types/extend": "^3.0.0",
+    "@types/mocha": "^2.2.43",
+    "@types/node": "^8.0.31",
+    "@types/proxyquire": "^1.3.28",
+    "@types/request": "^2.0.3",
+    "clang-format": "^1.1.0",
+    "gts": "^0.3.1",
     "mocha": "^3.2.0",
     "proxyquire": "^1.7.10",
-    "standard": "^8.6.0"
+    "typescript": "^2.5.3"
   },
   "engines": {
     "node": ">=4"
