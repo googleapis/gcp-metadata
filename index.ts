@@ -7,8 +7,8 @@ const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
 export type Options = _request.CoreOptions&{property?: string, uri?: string};
 
 export type Callback =
-    (error: Error|null, response?: _request.RequestResponse,
-     metadataProp?: string) => void;
+    (error: Error|NodeJS.ErrnoException|null,
+     response?: _request.RequestResponse, metadataProp?: string) => void;
 
 export function _buildMetadataAccessor(type: string) {
   return function metadataAccessor(
