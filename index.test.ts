@@ -124,7 +124,7 @@ describe('gcpMetadata', () => {
   });
 
   it('should return the request error', (done) => {
-    const ERROR = 'fake error';
+    const ERROR = Object.assign(new Error('fake error'), {code: 'ETEST'});
     const TYPE = 'type';
 
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
@@ -134,6 +134,9 @@ describe('gcpMetadata', () => {
     };
 
     getMetadata((err) => {
+      // TSC fails if code isn't defined on err.
+      assert.ok(err && typeof (err.code) === 'string');
+
       assert.strictEqual(err, ERROR);
       done();
     });
