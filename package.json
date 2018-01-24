@@ -3,19 +3,23 @@
   "version": "0.4.1",
   "description": "Get the metadata from a Google Cloud Platform environment",
   "repository": "stephenplusplus/gcp-metadata",
-  "main": "index.js",
+  "main": "./build/src/index.js",
+  "types": "./build/src/index.d.ts",
   "files": [
-    "index.js",
-    "index.d.ts"
+    "LICENSE",
+    "README.md",
+    "build/src",
+    "package.json"
   ],
-  "types": "index.d.ts",
   "scripts": {
     "compile": "tsc -p .",
     "check": "gts check",
     "fix": "gts fix",
-    "clean": "rm index.js index.d.ts",
+    "clean": "gts clean",
+    "pretest": "npm run compile",
+    "posttest": "npm run check",
     "prepare": "npm run compile",
-    "test": "npm run check && npm run compile && mocha *.test.js"
+    "test": "mocha build/test"
   },
   "keywords": [
     "google cloud platform",
@@ -46,15 +50,5 @@
   },
   "engines": {
     "node": ">=4"
-  },
-  "standard": {
-    "globals": [
-      "it",
-      "describe",
-      "before",
-      "after",
-      "beforeEach",
-      "afterEach"
-    ]
   }
 }
