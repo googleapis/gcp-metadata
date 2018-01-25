@@ -1,11 +1,8 @@
 import * as assert from 'assert';
 import * as extend from 'extend';
 import * as proxyquire from 'proxyquire';
+import * as _gcpMetadata from '../src';
 
-// for types
-// Importing from './index' rather than '.' allows us to depend on
-// index.ts rather than index.d.ts
-import * as _gcpMetadata from './index';
 type GcpMetadata = typeof _gcpMetadata;
 type RetryRequest =
     (reqOpts: Object, opts: Object,
@@ -29,12 +26,13 @@ describe('gcpMetadata', () => {
 
   before(() => {
     cachedGcpMetadata =
-        proxyquire('./index.js', {'retry-request': fakeRetryRequest});
+        proxyquire('../src/index.js', {'retry-request': fakeRetryRequest});
   });
 
   beforeEach(() => {
     retryRequestOverride = null;
-    gcpMetadata = proxyquire('./index.js', {'retry-request': fakeRetryRequest});
+    gcpMetadata =
+        proxyquire('../src/index.js', {'retry-request': fakeRetryRequest});
     extend(gcpMetadata, cachedGcpMetadata);
   });
 
