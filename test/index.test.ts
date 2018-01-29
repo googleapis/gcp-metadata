@@ -1,5 +1,7 @@
 import * as assert from 'assert';
+import * as extend from 'extend';
 import * as nock from 'nock';
+
 import * as gcpMetadata from '../src';
 
 const HOST = 'http://metadata.google.internal';
@@ -47,7 +49,7 @@ describe('gcpMetadata', () => {
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
     nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).query(QUERY).reply(200, {});
     getMetadata({property: PROPERTY, params: QUERY}, (err, res) => {
-      assert.equal(res!.config.params, QUERY);
+      assert.equal(JSON.stringify(res!.config.params), JSON.stringify(QUERY));
       assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
       assert.equal(res!.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
       done();
@@ -57,7 +59,7 @@ describe('gcpMetadata', () => {
   it('should extend the request options', (done) => {
     const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
     const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
-    const originalOptions = Object.assign({}, options);
+    const originalOptions = extend(true, {}, options);
     nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {});
     getMetadata(options, (err, res) => {
       assert.equal(res!.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
@@ -101,6 +103,15 @@ describe('gcpMetadata', () => {
     nock(HOST).get(PATH).reply(418, {}, {'Metadata-Flavor': 'Google'});
     getMetadata((err) => {
       assert(err instanceof Error);
+      done();
+    });
+  });
+
+  it('should throw if request options are passed', (done) => {
+    // tslint:disable-next-line no-any
+    (gcpMetadata as any).instance({qs: {one: 'two'}}, (err: Error) => {
+      assert.notEqual(err, null);
+      assert(err.message.startsWith('\'qs\' is not a valid'));
       done();
     });
   });

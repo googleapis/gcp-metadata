@@ -33,9 +33,11 @@
   "author": "Stephen Sawchuk",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "extend": "^3.0.1"
   },
   "devDependencies": {
+    "@types/extend": "^3.0.0",
     "@types/mocha": "^2.2.43",
     "@types/nock": "^9.1.2",
     "@types/node": "^8.0.31",
