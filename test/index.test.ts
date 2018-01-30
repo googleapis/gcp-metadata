@@ -107,7 +107,19 @@ describe('gcpMetadata', () => {
     });
   });
 
+  it('should retry if the initial request fails', (done) => {
+    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+    nock(HOST).get(`${PATH}/${TYPE}`).reply(500);
+    nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {});
+    getMetadata((err, res) => {
+      assert.equal(res!.config.url, `${BASE_URL}/${TYPE}`);
+      assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
+      done();
+    });
+  });
+
   it('should throw if request options are passed', (done) => {
+    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
     // tslint:disable-next-line no-any
     (gcpMetadata as any).instance({qs: {one: 'two'}}, (err: Error) => {
       assert.notEqual(err, null);

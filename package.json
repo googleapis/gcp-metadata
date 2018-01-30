@@ -34,7 +34,8 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.17.1",
-    "extend": "^3.0.1"
+    "extend": "^3.0.1",
+    "retry-axios": "0.0.1"
   },
   "devDependencies": {
     "@types/extend": "^3.0.0",

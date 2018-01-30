@@ -1,5 +1,6 @@
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as extend from 'extend';
+import * as rax from 'retry-axios';
 
 const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
 
@@ -29,10 +30,13 @@ function validate(options: any) {
   }
 }
 
-
 export function _buildMetadataAccessor(type: string) {
   return function metadataAccessor(
-      options: string|Options|Callback, callback?: Callback) {
+      options?: string|Options|Callback, callback?: Callback) {
+    if (!options) {
+      options = {};
+    }
+
     if (typeof options === 'function') {
       callback = options;
       options = {};
@@ -50,21 +54,27 @@ export function _buildMetadataAccessor(type: string) {
     try {
       validate(options);
     } catch (e) {
-      return callback!(e);
+      if (callback) {
+        callback!(e);
+      } else {
+        throw e;
+      }
     }
 
-    const reqOpts = extend(
-                        true, {
-                          url: `${BASE_URL}/${type}${property}`,
-                          headers: {'Metadata-Flavor': 'Google'}
-                        },
-                        options) as AxiosRequestConfig &
-        {property?: string};
+    const ax = axios.create();
+    rax.attach(ax);
+    const baseOpts = {
+      url: `${BASE_URL}/${type}${property}`,
+      headers: {'Metadata-Flavor': 'Google'}
+    };
+    const reqOpts = extend(true, baseOpts, options);
     delete reqOpts.property;
 
-    axios(reqOpts)
+    return ax.request(reqOpts)
         .then(res => {
-          callback!(null, res, res.data);
+          if (callback) {
+            callback(null, res, res.data);
+          }
         })
         .catch((err: AxiosError) => {
           let e: Error = err;
@@ -73,7 +83,11 @@ export function _buildMetadataAccessor(type: string) {
           } else if (err.code !== '200') {
             e = new Error('Unsuccessful response status code');
           }
-          return callback!(e);
+          if (callback) {
+            callback(e);
+          } else {
+            throw e;
+          }
         });
   };
 }
