@@ -12,10 +12,10 @@ export type Callback =
 
 // Accepts an options object passed from the user to the API.  In the
 // previous version of the API, it referred to a `Request` options object.
-// Now it refers to an Axiox Request Config object.  This is here to help
+// Now it refers to an Axios Request Config object.  This is here to help
 // ensure users don't pass invalid options when they upgrade from 0.4 to 0.5.
 // tslint:disable-next-line no-any
-function validate(options: any) {
+function validate(options: any, callback: (err?: Error) => void) {
   const vpairs = [
     {invalid: 'uri', expected: 'url'}, {invalid: 'json', expected: 'data'},
     {invalid: 'qs', expected: 'params'}
@@ -25,9 +25,10 @@ function validate(options: any) {
       const e = `'${
           pair.invalid}' is not a valid configuration option. Please use '${
           pair.expected}' instead. This library is using Axios for requests. Please see https://github.com/axios/axios to learn more about the valid request options.`;
-      throw new Error(e);
+      return callback(new Error(e));
     }
   }
+  callback();
 }
 
 export function _buildMetadataAccessor(type: string) {
@@ -51,44 +52,34 @@ export function _buildMetadataAccessor(type: string) {
       property = '/' + options.property;
     }
 
-    try {
-      validate(options);
-    } catch (e) {
-      if (callback) {
-        callback!(e);
-      } else {
-        throw e;
+    validate(options, err => {
+      if (err) {
+        return callback!(err);
       }
-    }
 
-    const ax = axios.create();
-    rax.attach(ax);
-    const baseOpts = {
-      url: `${BASE_URL}/${type}${property}`,
-      headers: {'Metadata-Flavor': 'Google'}
-    };
-    const reqOpts = extend(true, baseOpts, options);
-    delete reqOpts.property;
+      const ax = axios.create();
+      rax.attach(ax);
+      const baseOpts = {
+        url: `${BASE_URL}/${type}${property}`,
+        headers: {'Metadata-Flavor': 'Google'}
+      };
+      const reqOpts = extend(true, baseOpts, options);
+      delete (reqOpts as {property: string}).property;
 
-    return ax.request(reqOpts)
-        .then(res => {
-          if (callback) {
-            callback(null, res, res.data);
-          }
-        })
-        .catch((err: AxiosError) => {
-          let e: Error = err;
-          if (err.response && !err.response.data) {
-            e = new Error('Invalid response from metadata service');
-          } else if (err.code !== '200') {
-            e = new Error('Unsuccessful response status code');
-          }
-          if (callback) {
-            callback(e);
-          } else {
-            throw e;
-          }
-        });
+      ax.request(reqOpts)
+          .then(res => {
+            callback!(null, res, res.data);
+          })
+          .catch((err: AxiosError) => {
+            let e: Error = err;
+            if (err.response && !err.response.data) {
+              e = new Error('Invalid response from metadata service');
+            } else if (err.code !== '200') {
+              e = new Error('Unsuccessful response status code');
+            }
+            callback!(e);
+          });
+    });
   };
 }
 
