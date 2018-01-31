@@ -23,6 +23,10 @@ jobs:
     docker:
       - image: node:8
     <<: *install_and_test
+  test_node9:
+    docker:
+      - image: node:9
+    <<: *install_and_test
 
 workflows:
   version: 2
@@ -31,3 +35,4 @@ workflows:
       - test_node4
       - test_node6
       - test_node8
+      - test_node9
