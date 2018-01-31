@@ -54,7 +54,7 @@ export function _buildMetadataAccessor(type: string) {
 
     validate(options, err => {
       if (err) {
-        return callback!(err);
+        return setImmediate(callback!, err);
       }
 
       const ax = axios.create();
