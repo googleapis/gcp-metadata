@@ -4,7 +4,8 @@ import * as rax from 'retry-axios';
 
 const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
 
-export type Options = AxiosRequestConfig&{property?: string, uri?: string};
+export type Options = AxiosRequestConfig&
+    {[index: string]: {} | string | undefined, property?: string, uri?: string};
 
 export type Callback =
     (error: NodeJS.ErrnoException|null, response?: AxiosResponse<string>,
@@ -14,8 +15,7 @@ export type Callback =
 // previous version of the API, it referred to a `Request` options object.
 // Now it refers to an Axios Request Config object.  This is here to help
 // ensure users don't pass invalid options when they upgrade from 0.4 to 0.5.
-// tslint:disable-next-line no-any
-function validate(options: any) {
+function validate(options: Options) {
   const vpairs = [
     {invalid: 'uri', expected: 'url'}, {invalid: 'json', expected: 'data'},
     {invalid: 'qs', expected: 'params'}
@@ -82,6 +82,8 @@ export function _buildMetadataAccessor(type: string) {
         });
   };
 }
+
+
 
 export const instance = _buildMetadataAccessor('instance');
 export const project = _buildMetadataAccessor('project');
