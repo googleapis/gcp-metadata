@@ -1,18 +1,43 @@
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as extend from 'extend';
-import * as _request from 'request';  // for types only
-import * as request from 'retry-request';
+import * as rax from 'retry-axios';
 
 const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
 
-export type Options = _request.CoreOptions&{property?: string, uri?: string};
+export type Options = AxiosRequestConfig&
+    {[index: string]: {} | string | undefined, property?: string, uri?: string};
 
 export type Callback =
-    (error: NodeJS.ErrnoException|null, response?: _request.RequestResponse,
+    (error: NodeJS.ErrnoException|null, response?: AxiosResponse<string>,
      metadataProp?: string) => void;
+
+// Accepts an options object passed from the user to the API.  In the
+// previous version of the API, it referred to a `Request` options object.
+// Now it refers to an Axios Request Config object.  This is here to help
+// ensure users don't pass invalid options when they upgrade from 0.4 to 0.5.
+function validate(options: Options) {
+  const vpairs = [
+    {invalid: 'uri', expected: 'url'}, {invalid: 'json', expected: 'data'},
+    {invalid: 'qs', expected: 'params'}
+  ];
+  for (const pair of vpairs) {
+    if (options[pair.invalid]) {
+      const e = `'${
+          pair.invalid}' is not a valid configuration option. Please use '${
+          pair.expected}' instead. This library is using Axios for requests. Please see https://github.com/axios/axios to learn more about the valid request options.`;
+      return new Error(e);
+    }
+  }
+  return null;
+}
 
 export function _buildMetadataAccessor(type: string) {
   return function metadataAccessor(
       options: string|Options|Callback, callback?: Callback) {
+    if (!options) {
+      options = {};
+    }
+
     if (typeof options === 'function') {
       callback = options;
       options = {};
@@ -27,32 +52,39 @@ export function _buildMetadataAccessor(type: string) {
       property = '/' + options.property;
     }
 
-    const reqOpts = extend(
-                        true, {
-                          uri: BASE_URL + '/' + type + property,
-                          headers: {'Metadata-Flavor': 'Google'}
-                        },
-                        options) as _request.Options &
-        {property?: string};
-    delete reqOpts.property;
+    const err = validate(options);
+    if (err) {
+      setImmediate(callback!, err);
+      return;
+    }
 
-    const retryRequestOpts = {noResponseRetries: 0};
+    const ax = axios.create();
+    rax.attach(ax);
+    const baseOpts = {
+      url: `${BASE_URL}/${type}${property}`,
+      headers: {'Metadata-Flavor': 'Google'},
+      raxConfig: {noResponseRetries: 0}
+    };
+    const reqOpts = extend(true, baseOpts, options);
+    delete (reqOpts as {property: string}).property;
 
-    return request(reqOpts, retryRequestOpts, (err, res, body) => {
-      if (callback) {  // for type safety; this should already always be true
-        if (err) {
-          callback(err);
-        } else if (!res) {
-          callback(new Error('Invalid response from metadata service'));
-        } else if (res.statusCode !== 200) {
-          callback(new Error('Unsuccessful response status code'), res);
-        } else {
-          callback(null, res, body);
-        }
-      }
-    });
+    ax.request(reqOpts)
+        .then(res => {
+          callback!(null, res, res.data);
+        })
+        .catch((err: AxiosError) => {
+          let e: Error = err;
+          if (err.response && !err.response.data) {
+            e = new Error('Invalid response from metadata service');
+          } else if (err.code !== '200') {
+            e = new Error('Unsuccessful response status code');
+          }
+          callback!(e);
+        });
   };
 }
+
+
 
 export const instance = _buildMetadataAccessor('instance');
 export const project = _buildMetadataAccessor('project');

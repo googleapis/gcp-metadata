@@ -26,7 +26,7 @@ gcpMetadata.instance('hostname', function(err, response, metadata) {
 ```js
 gcpMetadata.instance({
   property: 'tags',
-  qs: { alt: 'text' }
+  params: { alt: 'text' }
 }, function(err, response, metadata) {
   // Tags as newline-delimited list
 })
