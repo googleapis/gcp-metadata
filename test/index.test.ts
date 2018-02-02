@@ -127,4 +127,14 @@ describe('gcpMetadata', () => {
       done();
     });
   });
+
+  it('should not retry on DNS errors', (done) => {
+    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+    nock(HOST).get(PATH).replyWithError({code: 'ETIMEDOUT'});
+    nock(HOST).get(PATH).reply(200, {});
+    getMetadata(err => {
+      assert(err instanceof Error);
+      done();
+    });
+  });
 });

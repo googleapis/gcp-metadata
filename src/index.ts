@@ -62,7 +62,8 @@ export function _buildMetadataAccessor(type: string) {
     rax.attach(ax);
     const baseOpts = {
       url: `${BASE_URL}/${type}${property}`,
-      headers: {'Metadata-Flavor': 'Google'}
+      headers: {'Metadata-Flavor': 'Google'},
+      raxConfig: {noResponseRetries: 0}
     };
     const reqOpts = extend(true, baseOpts, options);
     delete (reqOpts as {property: string}).property;
