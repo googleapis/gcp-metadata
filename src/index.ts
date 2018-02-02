@@ -2,7 +2,9 @@ import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as extend from 'extend';
 import * as rax from 'retry-axios';
 
-const BASE_URL = 'http://metadata.google.internal/computeMetadata/v1';
+export const HOST_ADDRESS = 'http://metadata.google.internal.';
+export const BASE_PATH = '/computeMetadata/v1';
+export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 
 export type Options = AxiosRequestConfig&
     {[index: string]: {} | string | undefined, property?: string, uri?: string};

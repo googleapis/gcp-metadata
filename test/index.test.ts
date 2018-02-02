@@ -4,9 +4,9 @@ import * as nock from 'nock';
 
 import * as gcpMetadata from '../src';
 
-const HOST = 'http://metadata.google.internal';
-const PATH = '/computeMetadata/v1';
-const BASE_URL = `${HOST}${PATH}`;
+const HOST = gcpMetadata.HOST_ADDRESS;
+const PATH = gcpMetadata.BASE_PATH;
+const BASE_URL = gcpMetadata.BASE_URL;
 const TYPE = 'type';
 const PROPERTY = 'property';
 
