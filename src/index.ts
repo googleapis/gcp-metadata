@@ -3,7 +3,7 @@ import * as extend from 'extend';
 import * as rax from 'retry-axios';
 
 export const HOST_ADDRESS = 'http://metadata.google.internal.';
-export const BASE_PATH = '/computeMetadata/v1';
+export const BASE_PATH = '/computeMetadata/v1beta1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 
 export type Options = AxiosRequestConfig&
