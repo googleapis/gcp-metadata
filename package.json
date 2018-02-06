@@ -19,7 +19,7 @@
     "pretest": "npm run compile",
     "posttest": "npm run check",
     "prepare": "npm run compile",
-    "test": "mocha build/test"
+    "test": "ava build/test"
   },
   "keywords": [
     "google cloud platform",
@@ -39,12 +39,13 @@
   },
   "devDependencies": {
     "@types/extend": "^3.0.0",
-    "@types/mocha": "^2.2.43",
     "@types/nock": "^9.1.2",
     "@types/node": "^8.0.31",
+    "@types/pify": "^3.0.0",
+    "ava": "^0.25.0",
     "gts": "^0.5.1",
-    "mocha": "^3.2.0",
     "nock": "^9.1.6",
+    "pify": "^3.0.0",
     "typescript": "^2.5.3"
   },
   "engines": {

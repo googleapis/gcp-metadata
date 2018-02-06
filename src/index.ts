@@ -64,29 +64,31 @@ export function _buildMetadataAccessor(type: string) {
     rax.attach(ax);
     const baseOpts = {
       url: `${BASE_URL}/${type}${property}`,
-      headers: {'Metadata-Flavor': 'Google'},
+      headers: {'metadata-flavor': 'Google'},
       raxConfig: {noResponseRetries: 0}
     };
     const reqOpts = extend(true, baseOpts, options);
     delete (reqOpts as {property: string}).property;
-
     ax.request(reqOpts)
         .then(res => {
-          callback!(null, res, res.data);
+          if (res.headers['metadata-flavor'] !== 'Google') {
+            callback!(new Error(
+                `The 'metadata-flavor' header is not set to 'Google'.`));
+          } else if (!res.data) {
+            callback!(new Error('Invalid response from the metadata service'));
+          } else {
+            callback!(null, res, res.data);
+          }
         })
         .catch((err: AxiosError) => {
-          let e: Error = err;
-          if (err.response && !err.response.data) {
-            e = new Error('Invalid response from metadata service');
-          } else if (err.code !== '200') {
-            e = new Error('Unsuccessful response status code');
+          if (err.response && err.response.status !== 200) {
+            callback!(new Error('Unsuccessful response status code'));
+          } else {
+            callback!(err);
           }
-          callback!(e);
         });
   };
 }
-
-
 
 export const instance = _buildMetadataAccessor('instance');
 export const project = _buildMetadataAccessor('project');

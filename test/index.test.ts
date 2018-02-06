@@ -1,6 +1,7 @@
-import * as assert from 'assert';
+import test from 'ava';
 import * as extend from 'extend';
 import * as nock from 'nock';
+import * as pify from 'pify';
 
 import * as gcpMetadata from '../src';
 
@@ -9,132 +10,137 @@ const PATH = gcpMetadata.BASE_PATH;
 const BASE_URL = gcpMetadata.BASE_URL;
 const TYPE = 'type';
 const PROPERTY = 'property';
+const HEADERS = {
+  'metadata-flavor': 'Google'
+};
 
-function createNock() {
-  nock(HOST).get(PATH).reply(200, {});
-}
+nock.disableNetConnect();
 
-describe('gcpMetadata', () => {
-  afterEach(() => {
-    nock.cleanAll();
-  });
+test.afterEach.always(async t => {
+  nock.cleanAll();
+});
 
-  it('should create the correct accessors', () => {
-    assert.strictEqual(typeof gcpMetadata.instance, 'function');
-    assert.strictEqual(typeof gcpMetadata.project, 'function');
-  });
+test.serial('should create the correct accessors', async t => {
+  t.is(typeof gcpMetadata.instance, 'function');
+  t.is(typeof gcpMetadata.project, 'function');
+  t.pass();
+});
 
-  it('should access all the metadata properly', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {});
-    getMetadata((err, res) => {
-      assert.equal(res!.config.url, `${BASE_URL}/${TYPE}`);
-      assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
-      done();
+test.serial('should access all the metadata properly', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+  const res = await pify(getMetadata)();
+  t.true(scope.isDone());
+  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
+  t.is(res.config.headers['metadata-flavor'], 'Google');
+  t.pass();
+});
+
+test.serial('should access a specific metadata property', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
+  const res = await pify(getMetadata)(PROPERTY);
+  t.true(scope.isDone());
+  t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
+  t.is(res.config.headers['metadata-flavor'], 'Google');
+  t.pass();
+});
+
+test.serial(
+    'should accept an object with property and query fields', async t => {
+      const QUERY = {key: 'value'};
+      const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+      const scope = nock(HOST)
+                        .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                        .query(QUERY)
+                        .reply(200, {}, HEADERS);
+      const res = await pify(getMetadata)({property: PROPERTY, params: QUERY});
+      t.true(scope.isDone());
+      t.is(JSON.stringify(res.config.params), JSON.stringify(QUERY));
+      t.is(res.config.headers['metadata-flavor'], 'Google');
+      t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
+      t.pass();
     });
-  });
 
-  it('should access a specific metadata property', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {});
-    getMetadata(PROPERTY, (err, res) => {
-      assert.equal(res!.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-      assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
-      done();
-    });
-  });
+test.serial('should extend the request options', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
+  const originalOptions = extend(true, {}, options);
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
+  const res = await pify(getMetadata)(options);
+  t.true(scope.isDone());
+  t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
+  t.is(res.config.headers['Custom-Header'], 'Custom');
+  t.deepEqual(options, originalOptions);  // wasn't modified
+  t.pass();
+});
 
-  it('should accept an object with property and query fields', (done) => {
-    const QUERY = {key: 'value'};
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).query(QUERY).reply(200, {});
-    getMetadata({property: PROPERTY, params: QUERY}, (err, res) => {
-      assert.equal(JSON.stringify(res!.config.params), JSON.stringify(QUERY));
-      assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
-      assert.equal(res!.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-      done();
-    });
-  });
+test.serial('should return the request error', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).times(2).reply(500, undefined, HEADERS);
+  await t.throws(pify(getMetadata)(), 'Unsuccessful response status code');
+  t.true(scope.isDone());
+  t.pass();
+});
 
-  it('should extend the request options', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
-    const originalOptions = extend(true, {}, options);
-    nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {});
-    getMetadata(options, (err, res) => {
-      assert.equal(res!.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-      // assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
-      assert.equal(res!.config.headers['Custom-Header'], 'Custom');
-      assert.ifError(err);
-      assert.deepEqual(options, originalOptions);  // wasn't modified
-      done();
-    });
-  });
+test.serial('should return error when res is empty', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, null, HEADERS);
+  await t.throws(pify(getMetadata)());
+  t.true(scope.isDone());
+  t.pass();
+});
 
-  it('should return the request error', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(500, {});
-    getMetadata(err => {
-      assert.strictEqual(err!.message, 'Unsuccessful response status code');
-      done();
-    });
+test.serial('should return error when flavor header is incorrect', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, {
+    'metadata-flavor': 'Hazelnut'
   });
+  await t.throws(
+      pify(getMetadata)(),
+      `The 'metadata-flavor' header is not set to 'Google'.`);
+  t.true(scope.isDone());
+  t.pass();
+});
 
-  it('should return error when res is empty', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(200, null);
-    getMetadata((err) => {
-      assert(err instanceof Error);
-      done();
-    });
-  });
+test.serial('should return error if statusCode is not 200', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
+  await t.throws(pify(getMetadata)(), 'Unsuccessful response status code');
+  t.true(scope.isDone());
+  t.pass();
+});
 
-  it('should return error when flavor header is incorrect', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(PATH).reply(200, {}, {'Metadata-Flavor': 'Hazelnut'});
-    getMetadata((err) => {
-      assert(err instanceof Error);
-      done();
-    });
-  });
+test.serial('should retry if the initial request fails', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scopes = [
+    nock(HOST).get(`${PATH}/${TYPE}`).reply(500),
+    nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS)
+  ];
+  const res = await pify(getMetadata)();
+  scopes.forEach(s => t.true(s.isDone()));
+  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
+  t.is(res.config.headers['metadata-flavor'], 'Google');
+  t.pass();
+});
 
-  it('should return error if statusCode is not 200', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(PATH).reply(418, {}, {'Metadata-Flavor': 'Google'});
-    getMetadata((err) => {
-      assert(err instanceof Error);
-      done();
-    });
+test.serial('should throw if request options are passed', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  // tslint:disable-next-line no-any
+  await t.throws(pify((gcpMetadata as any).instance)({qs: {one: 'two'}}), e => {
+    return e.message.startsWith('\'qs\' is not a valid');
   });
+  t.pass();
+});
 
-  it('should retry if the initial request fails', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(500);
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {});
-    getMetadata((err, res) => {
-      assert.equal(res!.config.url, `${BASE_URL}/${TYPE}`);
-      assert.equal(res!.config.headers['Metadata-Flavor'], 'Google');
-      done();
-    });
-  });
-
-  it('should throw if request options are passed', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    // tslint:disable-next-line no-any
-    (gcpMetadata as any).instance({qs: {one: 'two'}}, (err: Error) => {
-      assert.notEqual(err, null);
-      assert(err.message.startsWith('\'qs\' is not a valid'));
-      done();
-    });
-  });
-
-  it('should not retry on DNS errors', (done) => {
-    const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
-    nock(HOST).get(PATH).replyWithError({code: 'ETIMEDOUT'});
-    nock(HOST).get(PATH).reply(200, {});
-    getMetadata(err => {
-      assert(err instanceof Error);
-      done();
-    });
-  });
+test.serial('should not retry on DNS errors', async t => {
+  const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ETIMEDOUT'});
+  await t.throws(pify(getMetadata)());
+  t.true(scope.isDone());
+  t.pass();
 });
