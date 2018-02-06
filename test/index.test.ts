@@ -23,7 +23,6 @@ test.afterEach.always(async t => {
 test.serial('should create the correct accessors', async t => {
   t.is(typeof gcpMetadata.instance, 'function');
   t.is(typeof gcpMetadata.project, 'function');
-  t.pass();
 });
 
 test.serial('should access all the metadata properly', async t => {
@@ -43,7 +42,6 @@ test.serial('should access a specific metadata property', async t => {
   scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
   t.is(res.config.headers['metadata-flavor'], 'Google');
-  t.pass();
 });
 
 test.serial(
