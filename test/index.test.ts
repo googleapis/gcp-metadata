@@ -30,10 +30,9 @@ test.serial('should access all the metadata properly', async t => {
   const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
   const res = await pify(getMetadata)();
-  t.true(scope.isDone());
+  scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
   t.is(res.config.headers['metadata-flavor'], 'Google');
-  t.pass();
 });
 
 test.serial('should access a specific metadata property', async t => {
@@ -41,7 +40,7 @@ test.serial('should access a specific metadata property', async t => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
   const res = await pify(getMetadata)(PROPERTY);
-  t.true(scope.isDone());
+  scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
   t.is(res.config.headers['metadata-flavor'], 'Google');
   t.pass();
@@ -56,11 +55,10 @@ test.serial(
                         .query(QUERY)
                         .reply(200, {}, HEADERS);
       const res = await pify(getMetadata)({property: PROPERTY, params: QUERY});
-      t.true(scope.isDone());
+      scope.done();
       t.is(JSON.stringify(res.config.params), JSON.stringify(QUERY));
       t.is(res.config.headers['metadata-flavor'], 'Google');
       t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-      t.pass();
     });
 
 test.serial('should extend the request options', async t => {
@@ -70,11 +68,10 @@ test.serial('should extend the request options', async t => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
   const res = await pify(getMetadata)(options);
-  t.true(scope.isDone());
+  scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
   t.is(res.config.headers['Custom-Header'], 'Custom');
   t.deepEqual(options, originalOptions);  // wasn't modified
-  t.pass();
 });
 
 test.serial('should return the request error', async t => {
@@ -82,16 +79,14 @@ test.serial('should return the request error', async t => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).times(2).reply(500, undefined, HEADERS);
   await t.throws(pify(getMetadata)(), 'Unsuccessful response status code');
-  t.true(scope.isDone());
-  t.pass();
+  scope.done();
 });
 
 test.serial('should return error when res is empty', async t => {
   const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, null, HEADERS);
   await t.throws(pify(getMetadata)());
-  t.true(scope.isDone());
-  t.pass();
+  scope.done();
 });
 
 test.serial('should return error when flavor header is incorrect', async t => {
@@ -102,16 +97,14 @@ test.serial('should return error when flavor header is incorrect', async t => {
   await t.throws(
       pify(getMetadata)(),
       `The 'metadata-flavor' header is not set to 'Google'.`);
-  t.true(scope.isDone());
-  t.pass();
+  scope.done();
 });
 
 test.serial('should return error if statusCode is not 200', async t => {
   const getMetadata = gcpMetadata._buildMetadataAccessor(TYPE);
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
   await t.throws(pify(getMetadata)(), 'Unsuccessful response status code');
-  t.true(scope.isDone());
-  t.pass();
+  scope.done();
 });
 
 test.serial('should retry if the initial request fails', async t => {
@@ -121,10 +114,9 @@ test.serial('should retry if the initial request fails', async t => {
     nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS)
   ];
   const res = await pify(getMetadata)();
-  scopes.forEach(s => t.true(s.isDone()));
+  scopes.forEach(s => s.done());
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
   t.is(res.config.headers['metadata-flavor'], 'Google');
-  t.pass();
 });
 
 test.serial('should throw if request options are passed', async t => {
@@ -133,7 +125,6 @@ test.serial('should throw if request options are passed', async t => {
   await t.throws(pify((gcpMetadata as any).instance)({qs: {one: 'two'}}), e => {
     return e.message.startsWith('\'qs\' is not a valid');
   });
-  t.pass();
 });
 
 test.serial('should not retry on DNS errors', async t => {
@@ -141,6 +132,5 @@ test.serial('should not retry on DNS errors', async t => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ETIMEDOUT'});
   await t.throws(pify(getMetadata)());
-  t.true(scope.isDone());
-  t.pass();
+  scope.done();
 });
