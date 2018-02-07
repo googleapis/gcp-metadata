@@ -41,11 +41,9 @@
     "@types/extend": "^3.0.0",
     "@types/nock": "^9.1.2",
     "@types/node": "^8.0.31",
-    "@types/pify": "^3.0.0",
     "ava": "^0.25.0",
     "gts": "^0.5.1",
     "nock": "^9.1.6",
-    "pify": "^3.0.0",
     "typescript": "^2.5.3"
   },
   "engines": {

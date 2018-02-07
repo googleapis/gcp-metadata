@@ -5,29 +5,26 @@
 $ npm install --save gcp-metadata
 ```
 ```js
-var gcpMetadata = require('gcp-metadata')
+const gcpMetadata = require('gcp-metadata');
 ```
 
 #### Access all metadata
 ```js
-gcpMetadata.instance(function(err, response, metadata) {
-  // All metadata properties
-})
+const res = await gcpMetadata.instance();
+console.log(res.data); // ... All metadata properties
 ```
 
 #### Access specific properties
 ```js
-gcpMetadata.instance('hostname', function(err, response, metadata) {
-  // All metadata properties
-})
+const res = await gcpMetadata.instance('hostname');
+console.log(res.data) // ...All metadata properties
 ```
 
 #### Access specific properties with query parameters
 ```js
-gcpMetadata.instance({
+const res = await gcpMetadata.instance({
   property: 'tags',
   params: { alt: 'text' }
-}, function(err, response, metadata) {
-  // Tags as newline-delimited list
-})
+});
+console.log(res.data) // ...Tags as newline-delimited list
 ```
