@@ -13,7 +13,7 @@ const TYPE = 'type';
 const PROPERTY = 'property';
 const metadataFlavor = 'Metadata-Flavor';
 
-// NOTE: nodejs switches all header names to lower case.
+// NOTE: nodejs switches all incoming header names to lower case.
 const HEADERS = {
   'metadata-flavor': 'Google'
 };

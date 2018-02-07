@@ -71,7 +71,7 @@ export function _buildMetadataAccessor(type: string) {
     delete (reqOpts as {property: string}).property;
     ax.request(reqOpts)
         .then(res => {
-          // NOTE: node.js converts all response headers to lower case.
+          // NOTE: node.js converts all incoming headers to lower case.
           if (res.headers['metadata-flavor'] !== 'Google') {
             callback!(new Error(
                 `Invalid response from metadata service: incorrect Metadata-Flavor header.`));
