@@ -5,13 +5,10 @@ import * as rax from 'retry-axios';
 export const HOST_ADDRESS = 'http://metadata.google.internal';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
+export const HEADER_NAME = 'Metadata-Flavor';
 
 export type Options = AxiosRequestConfig&
     {[index: string]: {} | string | undefined, property?: string, uri?: string};
-
-export type Callback =
-    (error: NodeJS.ErrnoException|null, response?: AxiosResponse<string>,
-     metadataProp?: string) => void;
 
 // Accepts an options object passed from the user to the API.  In the
 // previous version of the API, it referred to a `Request` options object.
@@ -27,69 +24,53 @@ function validate(options: Options) {
       const e = `'${
           pair.invalid}' is not a valid configuration option. Please use '${
           pair.expected}' instead. This library is using Axios for requests. Please see https://github.com/axios/axios to learn more about the valid request options.`;
-      return new Error(e);
+      throw new Error(e);
     }
   }
-  return null;
 }
 
-export function _buildMetadataAccessor(type: string) {
-  return function metadataAccessor(
-      options: string|Options|Callback, callback?: Callback) {
-    if (!options) {
-      options = {};
-    }
-
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-
-    if (typeof options === 'string') {
-      options = {property: options};
-    }
-
-    let property = '';
-    if (typeof options === 'object' && options.property) {
-      property = '/' + options.property;
-    }
-
-    const err = validate(options);
-    if (err) {
-      setImmediate(callback!, err);
-      return;
-    }
-
-    const ax = axios.create();
-    rax.attach(ax);
-    const baseOpts = {
-      url: `${BASE_URL}/${type}${property}`,
-      headers: {'Metadata-Flavor': 'Google'},
-      raxConfig: {noResponseRetries: 0}
-    };
-    const reqOpts = extend(true, baseOpts, options);
-    delete (reqOpts as {property: string}).property;
-    ax.request(reqOpts)
-        .then(res => {
-          // NOTE: node.js converts all incoming headers to lower case.
-          if (res.headers['metadata-flavor'] !== 'Google') {
-            callback!(new Error(
-                `Invalid response from metadata service: incorrect Metadata-Flavor header.`));
-          } else if (!res.data) {
-            callback!(new Error('Invalid response from the metadata service'));
-          } else {
-            callback!(null, res, res.data);
-          }
-        })
-        .catch((err: AxiosError) => {
-          if (err.response && err.response.status !== 200) {
-            callback!(new Error('Unsuccessful response status code'));
-          } else {
-            callback!(err);
-          }
-        });
+async function metadataAccessor(type: string, options?: string|Options) {
+  options = options || {};
+  if (typeof options === 'string') {
+    options = {property: options};
+  }
+  let property = '';
+  if (typeof options === 'object' && options.property) {
+    property = '/' + options.property;
+  }
+  validate(options);
+  const ax = axios.create();
+  rax.attach(ax);
+  const baseOpts = {
+    url: `${BASE_URL}/${type}${property}`,
+    headers: {'Metadata-Flavor': 'Google'},
+    raxConfig: {noResponseRetries: 0}
   };
+  const reqOpts = extend(true, baseOpts, options);
+  delete (reqOpts as {property: string}).property;
+  return ax.request(reqOpts)
+      .then(res => {
+        // NOTE: node.js converts all incoming headers to lower case.
+        if (res.headers[HEADER_NAME.toLowerCase()] !== 'Google') {
+          throw new Error(`Invalid response from metadata service: incorrect ${
+              HEADER_NAME} header.`);
+        } else if (!res.data) {
+          throw new Error('Invalid response from the metadata service');
+        }
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        if (err.response && err.response.status !== 200) {
+          throw new Error('Unsuccessful response status code');
+        }
+        throw err;
+      });
 }
 
-export const instance = _buildMetadataAccessor('instance');
-export const project = _buildMetadataAccessor('project');
+export function instance(options?: string|Options) {
+  return metadataAccessor('instance', options);
+}
+
+export function project(options?: string|Options) {
+  return metadataAccessor('project', options);
+}
