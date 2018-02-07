@@ -64,16 +64,17 @@ export function _buildMetadataAccessor(type: string) {
     rax.attach(ax);
     const baseOpts = {
       url: `${BASE_URL}/${type}${property}`,
-      headers: {'metadata-flavor': 'Google'},
+      headers: {'Metadata-Flavor': 'Google'},
       raxConfig: {noResponseRetries: 0}
     };
     const reqOpts = extend(true, baseOpts, options);
     delete (reqOpts as {property: string}).property;
     ax.request(reqOpts)
         .then(res => {
+          // NOTE: node.js converts all response headers to lower case.
           if (res.headers['metadata-flavor'] !== 'Google') {
             callback!(new Error(
-                `The 'metadata-flavor' header is not set to 'Google'.`));
+                `The 'Metadata-Flavor' header is not set to 'Google'.`));
           } else if (!res.data) {
             callback!(new Error('Invalid response from the metadata service'));
           } else {

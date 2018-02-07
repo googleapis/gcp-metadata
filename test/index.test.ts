@@ -1,4 +1,5 @@
 import test from 'ava';
+import {AxiosResponse} from 'axios';
 import * as extend from 'extend';
 import * as nock from 'nock';
 import * as pify from 'pify';
@@ -10,6 +11,9 @@ const PATH = gcpMetadata.BASE_PATH;
 const BASE_URL = gcpMetadata.BASE_URL;
 const TYPE = 'type';
 const PROPERTY = 'property';
+const metadataFlavor = 'Metadata-Flavor';
+
+// NOTE: nodejs switches all header names to lower case.
 const HEADERS = {
   'metadata-flavor': 'Google'
 };
@@ -31,7 +35,8 @@ test.serial('should access all the metadata properly', async t => {
   const res = await pify(getMetadata)();
   scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
-  t.is(res.config.headers['metadata-flavor'], 'Google');
+  t.is(res.config.headers[metadataFlavor], 'Google');
+  t.is(res.headers[metadataFlavor.toLowerCase()], 'Google');
 });
 
 test.serial('should access a specific metadata property', async t => {
@@ -41,7 +46,6 @@ test.serial('should access a specific metadata property', async t => {
   const res = await pify(getMetadata)(PROPERTY);
   scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-  t.is(res.config.headers['metadata-flavor'], 'Google');
 });
 
 test.serial(
@@ -55,7 +59,6 @@ test.serial(
       const res = await pify(getMetadata)({property: PROPERTY, params: QUERY});
       scope.done();
       t.is(JSON.stringify(res.config.params), JSON.stringify(QUERY));
-      t.is(res.config.headers['metadata-flavor'], 'Google');
       t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
     });
 
@@ -94,7 +97,7 @@ test.serial('should return error when flavor header is incorrect', async t => {
   });
   await t.throws(
       pify(getMetadata)(),
-      `The 'metadata-flavor' header is not set to 'Google'.`);
+      `The 'Metadata-Flavor' header is not set to 'Google'.`);
   scope.done();
 });
 
@@ -114,7 +117,6 @@ test.serial('should retry if the initial request fails', async t => {
   const res = await pify(getMetadata)();
   scopes.forEach(s => s.done());
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
-  t.is(res.config.headers['metadata-flavor'], 'Google');
 });
 
 test.serial('should throw if request options are passed', async t => {
