@@ -5,6 +5,7 @@ import * as rax from 'retry-axios';
 export const HOST_ADDRESS = 'http://metadata.google.internal';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
+export const HEADER_NAME = 'Metadata-Flavor';
 
 export type Options = AxiosRequestConfig&
     {[index: string]: {} | string | undefined, property?: string, uri?: string};
@@ -50,9 +51,9 @@ async function metadataAccessor(type: string, options?: string|Options) {
   return ax.request(reqOpts)
       .then(res => {
         // NOTE: node.js converts all incoming headers to lower case.
-        if (res.headers['metadata-flavor'] !== 'Google') {
-          throw new Error(
-              `Invalid response from metadata service: incorrect Metadata-Flavor header.`);
+        if (res.headers[HEADER_NAME.toLowerCase()] !== 'Google') {
+          throw new Error(`Invalid response from metadata service: incorrect ${
+              HEADER_NAME} header.`);
         } else if (!res.data) {
           throw new Error('Invalid response from the metadata service');
         }
@@ -65,8 +66,6 @@ async function metadataAccessor(type: string, options?: string|Options) {
         throw err;
       });
 }
-
-
 
 export function instance(options?: string|Options) {
   return metadataAccessor('instance', options);

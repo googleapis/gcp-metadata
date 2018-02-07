@@ -1,5 +1,4 @@
 import test from 'ava';
-import {AxiosResponse} from 'axios';
 import * as extend from 'extend';
 import * as nock from 'nock';
 import * as gcp from '../src';
@@ -7,9 +6,9 @@ import * as gcp from '../src';
 const HOST = gcp.HOST_ADDRESS;
 const PATH = gcp.BASE_PATH;
 const BASE_URL = gcp.BASE_URL;
+const HEADER_NAME = gcp.HEADER_NAME;
 const TYPE = 'instance';
 const PROPERTY = 'property';
-const metadataFlavor = 'Metadata-Flavor';
 
 // NOTE: nodejs switches all incoming header names to lower case.
 const HEADERS = {
@@ -32,8 +31,8 @@ test.serial('should access all the metadata properly', async t => {
   const res = await gcp.instance();
   scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
-  t.is(res.config.headers[metadataFlavor], 'Google');
-  t.is(res.headers[metadataFlavor.toLowerCase()], 'Google');
+  t.is(res.config.headers[HEADER_NAME], 'Google');
+  t.is(res.headers[HEADER_NAME.toLowerCase()], 'Google');
 });
 
 test.serial('should access a specific metadata property', async t => {
