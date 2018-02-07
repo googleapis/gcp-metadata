@@ -97,7 +97,7 @@ test.serial('should return error when flavor header is incorrect', async t => {
   });
   await t.throws(
       pify(getMetadata)(),
-      `The 'Metadata-Flavor' header is not set to 'Google'.`);
+      `Invalid response from metadata service: incorrect Metadata-Flavor header.`);
   scope.done();
 });
 

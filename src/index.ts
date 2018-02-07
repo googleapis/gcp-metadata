@@ -74,7 +74,7 @@ export function _buildMetadataAccessor(type: string) {
           // NOTE: node.js converts all response headers to lower case.
           if (res.headers['metadata-flavor'] !== 'Google') {
             callback!(new Error(
-                `The 'Metadata-Flavor' header is not set to 'Google'.`));
+                `Invalid response from metadata service: incorrect Metadata-Flavor header.`));
           } else if (!res.data) {
             callback!(new Error('Invalid response from the metadata service'));
           } else {
