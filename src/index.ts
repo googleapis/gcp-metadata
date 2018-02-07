@@ -69,24 +69,27 @@ export function _buildMetadataAccessor(type: string) {
     };
     const reqOpts = extend(true, baseOpts, options);
     delete (reqOpts as {property: string}).property;
-
     ax.request(reqOpts)
         .then(res => {
-          callback!(null, res, res.data);
+          // NOTE: node.js converts all incoming headers to lower case.
+          if (res.headers['metadata-flavor'] !== 'Google') {
+            callback!(new Error(
+                `Invalid response from metadata service: incorrect Metadata-Flavor header.`));
+          } else if (!res.data) {
+            callback!(new Error('Invalid response from the metadata service'));
+          } else {
+            callback!(null, res, res.data);
+          }
         })
         .catch((err: AxiosError) => {
-          let e: Error = err;
-          if (err.response && !err.response.data) {
-            e = new Error('Invalid response from metadata service');
-          } else if (err.code !== '200') {
-            e = new Error('Unsuccessful response status code');
+          if (err.response && err.response.status !== 200) {
+            callback!(new Error('Unsuccessful response status code'));
+          } else {
+            callback!(err);
           }
-          callback!(e);
         });
   };
 }
-
-
 
 export const instance = _buildMetadataAccessor('instance');
 export const project = _buildMetadataAccessor('project');
