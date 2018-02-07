@@ -74,3 +74,18 @@ export function instance(options?: string|Options) {
 export function project(options?: string|Options) {
   return metadataAccessor('project', options);
 }
+
+/**
+ * Determine if the metadata server is currently available.
+ */
+export async function isAvailable() {
+  try {
+    // Attempt to read instance metadata. As configured, this will
+    // retry 3 times if there is a valid response, and fail fast
+    // if there is an ETIMEDOUT or ENOTFOUND error.
+    await instance();
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
