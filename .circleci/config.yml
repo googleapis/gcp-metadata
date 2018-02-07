@@ -9,6 +9,10 @@ install_and_test: &install_and_test
     - run:
         name: Test
         command: npm test
+    - run:
+        name: Submit coverage data to codecov.
+        command: npm run codecov
+        when: always
 
 jobs:
   test_node4:

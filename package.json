@@ -19,7 +19,8 @@
     "pretest": "npm run compile",
     "posttest": "npm run check",
     "prepare": "npm run compile",
-    "test": "ava build/test"
+    "test": "nyc ava build/test",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json"
   },
   "keywords": [
     "google cloud platform",
@@ -42,8 +43,10 @@
     "@types/nock": "^9.1.2",
     "@types/node": "^8.0.31",
     "ava": "^0.25.0",
+    "codecov": "^3.0.0",
     "gts": "^0.5.1",
     "nock": "^9.1.6",
+    "nyc": "^11.4.1",
     "typescript": "^2.5.3"
   },
   "engines": {

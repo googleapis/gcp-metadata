@@ -1,6 +1,8 @@
 # gcp-metadata
 > Get the metadata from a Google Cloud Platform environment
 
+[![codecov][codecov-image]][codecov-url]
+
 ```sh
 $ npm install --save gcp-metadata
 ```
@@ -28,3 +30,6 @@ const res = await gcpMetadata.instance({
 });
 console.log(res.data) // ...Tags as newline-delimited list
 ```
+
+[codecov-image]: https://codecov.io/gh/stephenplusplus/gcp-metadata/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/stephenplusplus/gcp-metadata
