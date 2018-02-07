@@ -120,3 +120,23 @@ test.serial('should not retry on DNS errors', async t => {
   await t.throws(gcp.instance());
   scope.done();
 });
+
+test.serial(
+    'should report isGCE if the server returns a 500 first', async t => {
+      const scopes = [
+        nock(HOST).get(`${PATH}/${TYPE}`).reply(500),
+        nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS)
+      ];
+      const isGCE = await gcp.isAvailable();
+      scopes.forEach(s => s.done());
+      t.true(isGCE);
+    });
+
+test.serial(
+    'should fail fast on isAvailable if a network err is returned', async t => {
+      const scope =
+          nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
+      const isGCE = await gcp.isAvailable();
+      scope.done();
+      t.false(isGCE);
+    });
