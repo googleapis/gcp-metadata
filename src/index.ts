@@ -6,6 +6,10 @@ export const HOST_ADDRESS = 'http://metadata.google.internal';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 export const HEADER_NAME = 'Metadata-Flavor';
+export const HEADER_VALUE = 'Google';
+export const HEADERS = {
+  [HEADER_NAME]: HEADER_VALUE
+};
 
 export type Options = AxiosRequestConfig&
     {[index: string]: {} | string | undefined, property?: string, uri?: string};
@@ -43,7 +47,7 @@ async function metadataAccessor(type: string, options?: string|Options) {
   rax.attach(ax);
   const baseOpts = {
     url: `${BASE_URL}/${type}${property}`,
-    headers: {'Metadata-Flavor': 'Google'},
+    headers: HEADERS,
     raxConfig: {noResponseRetries: 0}
   };
   const reqOpts = extend(true, baseOpts, options);
@@ -51,7 +55,7 @@ async function metadataAccessor(type: string, options?: string|Options) {
   return ax.request(reqOpts)
       .then(res => {
         // NOTE: node.js converts all incoming headers to lower case.
-        if (res.headers[HEADER_NAME.toLowerCase()] !== 'Google') {
+        if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
           throw new Error(`Invalid response from metadata service: incorrect ${
               HEADER_NAME} header.`);
         } else if (!res.data) {
