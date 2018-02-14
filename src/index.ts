@@ -7,9 +7,7 @@ export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
-export const HEADERS = Object.freeze({
-  [HEADER_NAME]: HEADER_VALUE
-});
+export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
 
 export type Options = AxiosRequestConfig&
     {[index: string]: {} | string | undefined, property?: string, uri?: string};
@@ -47,7 +45,7 @@ async function metadataAccessor(type: string, options?: string|Options) {
   rax.attach(ax);
   const baseOpts = {
     url: `${BASE_URL}/${type}${property}`,
-    headers: HEADERS,
+    headers: Object.assign({}, HEADERS),
     raxConfig: {noResponseRetries: 0}
   };
   const reqOpts = extend(true, baseOpts, options);
