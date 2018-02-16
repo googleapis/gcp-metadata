@@ -70,7 +70,7 @@ test.serial('should extend the request options', async t => {
 
 test.serial('should return the request error', async t => {
   const scope =
-      nock(HOST).get(`${PATH}/${TYPE}`).times(2).reply(500, undefined, HEADERS);
+      nock(HOST).get(`${PATH}/${TYPE}`).times(4).reply(500, undefined, HEADERS);
   await t.throws(gcp.instance(), 'Unsuccessful response status code');
   scope.done();
 });
@@ -99,12 +99,14 @@ test.serial('should return error if statusCode is not 200', async t => {
 });
 
 test.serial('should retry if the initial request fails', async t => {
-  const scopes = [
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(500),
-    nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS)
-  ];
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`)
+                    .times(2)
+                    .reply(500)
+                    .get(`${PATH}/${TYPE}`)
+                    .reply(200, {}, HEADERS);
   const res = await gcp.instance();
-  scopes.forEach(s => s.done());
+  scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
 });
 
@@ -124,12 +126,14 @@ test.serial('should not retry on DNS errors', async t => {
 
 test.serial(
     'should report isGCE if the server returns a 500 first', async t => {
-      const scopes = [
-        nock(HOST).get(`${PATH}/${TYPE}`).reply(500),
-        nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS)
-      ];
+      const scope = nock(HOST)
+                        .get(`${PATH}/${TYPE}`)
+                        .twice()
+                        .reply(500)
+                        .get(`${PATH}/${TYPE}`)
+                        .reply(200, {}, HEADERS);
       const isGCE = await gcp.isAvailable();
-      scopes.forEach(s => s.done());
+      scope.done();
       t.true(isGCE);
     });
 

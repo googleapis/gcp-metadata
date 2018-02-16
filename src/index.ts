@@ -46,7 +46,7 @@ async function metadataAccessor(type: string, options?: string|Options) {
   const baseOpts = {
     url: `${BASE_URL}/${type}${property}`,
     headers: Object.assign({}, HEADERS),
-    raxConfig: {noResponseRetries: 0}
+    raxConfig: {noResponseRetries: 0, instance: ax}
   };
   const reqOpts = extend(true, baseOpts, options);
   delete (reqOpts as {property: string}).property;
