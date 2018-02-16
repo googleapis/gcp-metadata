@@ -12,7 +12,7 @@ const PROPERTY = 'property';
 
 // NOTE: nodejs switches all incoming header names to lower case.
 const HEADERS = {
-  'metadata-flavor': 'Google'
+  [gcp.HEADER_NAME.toLowerCase()]: gcp.HEADER_VALUE
 };
 
 nock.disableNetConnect();
@@ -31,8 +31,8 @@ test.serial('should access all the metadata properly', async t => {
   const res = await gcp.instance();
   scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
-  t.is(res.config.headers[HEADER_NAME], 'Google');
-  t.is(res.headers[HEADER_NAME.toLowerCase()], 'Google');
+  t.is(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
+  t.is(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
 });
 
 test.serial('should access a specific metadata property', async t => {
@@ -82,9 +82,10 @@ test.serial('should return error when res is empty', async t => {
 });
 
 test.serial('should return error when flavor header is incorrect', async t => {
-  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, {
-    'metadata-flavor': 'Hazelnut'
-  });
+  const scope =
+      nock(HOST)
+          .get(`${PATH}/${TYPE}`)
+          .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
   await t.throws(
       gcp.instance(),
       `Invalid response from metadata service: incorrect Metadata-Flavor header.`);
