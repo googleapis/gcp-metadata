@@ -18,7 +18,7 @@
     "clean": "gts clean",
     "pretest": "npm run compile",
     "posttest": "npm run check",
-    "prepare": "npm run compile",
+    "prepublishOnly": "npm run compile",
     "test": "ava build/test"
   },
   "keywords": [
