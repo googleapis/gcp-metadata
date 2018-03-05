@@ -31,7 +31,8 @@ function validate(options: Options) {
   }
 }
 
-async function metadataAccessor(type: string, options?: string|Options) {
+async function metadataAccessor(
+    type: string, options?: string|Options, noResponseRetries = 3) {
   options = options || {};
   if (typeof options === 'string') {
     options = {property: options};
@@ -46,7 +47,7 @@ async function metadataAccessor(type: string, options?: string|Options) {
   const baseOpts = {
     url: `${BASE_URL}/${type}${property}`,
     headers: Object.assign({}, HEADERS),
-    raxConfig: {noResponseRetries: 0, instance: ax}
+    raxConfig: {noResponseRetries, instance: ax}
   };
   const reqOpts = extend(true, baseOpts, options);
   delete (reqOpts as {property: string}).property;
@@ -85,7 +86,7 @@ export async function isAvailable() {
     // Attempt to read instance metadata. As configured, this will
     // retry 3 times if there is a valid response, and fail fast
     // if there is an ETIMEDOUT or ENOTFOUND error.
-    await instance();
+    await metadataAccessor('instance', undefined, 0);
     return true;
   } catch (err) {
     return false;

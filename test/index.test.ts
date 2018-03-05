@@ -117,11 +117,15 @@ test.serial('should throw if request options are passed', async t => {
   });
 });
 
-test.serial('should not retry on DNS errors', async t => {
-  const scope =
-      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ETIMEDOUT'});
-  await t.throws(gcp.instance());
+test.serial('should retry on DNS errors', async t => {
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`)
+                    .replyWithError({code: 'ETIMEDOUT'})
+                    .get(`${PATH}/${TYPE}`)
+                    .reply(200, {}, HEADERS);
+  const res = await gcp.instance();
   scope.done();
+  t.truthy(res.data);
 });
 
 test.serial(
