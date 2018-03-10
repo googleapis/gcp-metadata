@@ -1,6 +1,8 @@
 import test from 'ava';
+import {AxiosError} from 'axios';
 import * as extend from 'extend';
 import * as nock from 'nock';
+
 import * as gcp from '../src';
 
 const HOST = gcp.HOST_ADDRESS;
@@ -71,7 +73,10 @@ test.serial('should extend the request options', async t => {
 test.serial('should return the request error', async t => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).times(4).reply(500, undefined, HEADERS);
-  await t.throws(gcp.instance(), 'Unsuccessful response status code');
+  await t.throws(gcp.instance(), (err: AxiosError) => {
+    return err.message.startsWith('Unsuccessful response status code') &&
+        err.response!.status === 500;
+  });
   scope.done();
 });
 
@@ -94,7 +99,10 @@ test.serial('should return error when flavor header is incorrect', async t => {
 
 test.serial('should return error if statusCode is not 200', async t => {
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
-  await t.throws(gcp.instance(), 'Unsuccessful response status code');
+  await t.throws(gcp.instance(), (err: AxiosError) => {
+    return err.message.startsWith('Unsuccessful response status code') &&
+        err.response!.status === 418;
+  });
   scope.done();
 });
 
