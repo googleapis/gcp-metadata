@@ -64,7 +64,7 @@ async function metadataAccessor(
       })
       .catch((err: AxiosError) => {
         if (err.response && err.response.status !== 200) {
-          throw new Error('Unsuccessful response status code');
+          err.message = 'Unsuccessful response status code. ' + err.message;
         }
         throw err;
       });
