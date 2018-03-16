@@ -5,6 +5,7 @@ import * as rax from 'retry-axios';
 export const HOST_ADDRESS = 'http://metadata.google.internal';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
+export const DEFAULT_NO_RESPONSE_RETRIES = 3;
 export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
@@ -32,7 +33,7 @@ function validate(options: Options) {
 }
 
 async function metadataAccessor(
-    type: string, options?: string|Options, noResponseRetries = 3) {
+    type: string, options?: string|Options, noResponseRetries?: number) {
   options = options || {};
   if (typeof options === 'string') {
     options = {property: options};
@@ -70,12 +71,14 @@ async function metadataAccessor(
       });
 }
 
-export function instance(options?: string|Options) {
-  return metadataAccessor('instance', options);
+export function instance(
+    options?: string|Options, noResponseRetries = DEFAULT_NO_RESPONSE_RETRIES) {
+  return metadataAccessor('instance', options, noResponseRetries);
 }
 
-export function project(options?: string|Options) {
-  return metadataAccessor('project', options);
+export function project(
+    options?: string|Options, noResponseRetries = DEFAULT_NO_RESPONSE_RETRIES) {
+  return metadataAccessor('project', options, noResponseRetries);
 }
 
 /**
@@ -83,10 +86,10 @@ export function project(options?: string|Options) {
  */
 export async function isAvailable() {
   try {
-    // Attempt to read instance metadata. As configured, this will
-    // retry 3 times if there is a valid response, and fail fast
-    // if there is an ETIMEDOUT or ENOTFOUND error.
-    await metadataAccessor('instance', undefined, 0);
+    // Attempt to read instance metadata.
+    // Unlike other exported metadata accessors, this fails immediately if there
+    // is an ETIMEDOUT or ENOTFOUND error, instead of retrying.
+    await metadataAccessor('instance', undefined);
     return true;
   } catch (err) {
     return false;
