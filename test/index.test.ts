@@ -28,11 +28,20 @@ test.serial('should create the correct accessors', async t => {
   t.is(typeof gcp.project, 'function');
 });
 
-test.serial('should access all the metadata properly', async t => {
-  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+test.serial('should access all the instance metadata properly', async t => {
+  const scope = nock(HOST).get(`${PATH}/instance`).reply(200, {}, HEADERS);
   const res = await gcp.instance();
   scope.done();
-  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
+  t.is(res.config.url, `${BASE_URL}/instance`);
+  t.is(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
+  t.is(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
+});
+
+test.serial('should access all the project metadata properly', async t => {
+  const scope = nock(HOST).get(`${PATH}/project`).reply(200, {}, HEADERS);
+  const res = await gcp.project();
+  scope.done();
+  t.is(res.config.url, `${BASE_URL}/project`);
   t.is(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
   t.is(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
 });
