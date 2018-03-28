@@ -2,5 +2,8 @@
   "extends": [
     "config:base"
   ],
-  "pinVersions": false
+  "automerge": true,
+  "pinDigests": false,
+  "pinVersions": false,
+  "rebaseStalePrs": true
 }
