@@ -17,19 +17,19 @@ install_and_test: &install_and_test
 jobs:
   test_node4:
     docker:
-      - image: node:4
+      - image: node:4@sha256:9afac44734b937476ed9656e6ecf64cde4c271025228a9939d2bde76d426169d
     <<: *install_and_test
   test_node6:
     docker:
-      - image: node:6
+      - image: node:6@sha256:6c882b9ae7b8569c2e5f9fe30b43387fafad8bb280cf797d669010a895c65dea
     <<: *install_and_test
   test_node8:
     docker:
-      - image: node:8
+      - image: node:8@sha256:d1a97c68e06df6ab34974996fe5479d417316c97d6b333704453fac3549cc08f
     <<: *install_and_test
   test_node9:
     docker:
-      - image: node:9
+      - image: node:9@sha256:0b02160d1dc9d2afcdd17ab2c106884b656604f763fd905cbde51c31ecc7d795
     <<: *install_and_test
 
 workflows:
