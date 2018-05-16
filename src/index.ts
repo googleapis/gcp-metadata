@@ -1,5 +1,5 @@
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
-import * as extend from 'extend';
+import extend from 'extend';
 import * as rax from 'retry-axios';
 
 export const HOST_ADDRESS = 'http://metadata.google.internal';

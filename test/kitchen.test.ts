@@ -2,7 +2,7 @@ import test from 'ava';
 import * as cp from 'child_process';
 import * as fs from 'fs';
 import {ncp} from 'ncp';
-import * as pify from 'pify';
+import pify from 'pify';
 import * as tmp from 'tmp';
 
 const rename = pify(fs.rename);
