@@ -10,6 +10,11 @@ $ npm install --save gcp-metadata
 const gcpMetadata = require('gcp-metadata');
 ```
 
+#### Check to see if the metadata server is available
+```js
+const isAvailable = await gcpMetadata.isAvailable();
+```
+
 #### Access all metadata
 ```js
 const res = await gcpMetadata.instance();
