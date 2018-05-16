@@ -28,11 +28,20 @@ test.serial('should create the correct accessors', async t => {
   t.is(typeof gcp.project, 'function');
 });
 
-test.serial('should access all the metadata properly', async t => {
-  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+test.serial('should access all the instance metadata properly', async t => {
+  const scope = nock(HOST).get(`${PATH}/instance`).reply(200, {}, HEADERS);
   const res = await gcp.instance();
   scope.done();
-  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
+  t.is(res.config.url, `${BASE_URL}/instance`);
+  t.is(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
+  t.is(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
+});
+
+test.serial('should access all the project metadata properly', async t => {
+  const scope = nock(HOST).get(`${PATH}/project`).reply(200, {}, HEADERS);
+  const res = await gcp.project();
+  scope.done();
+  t.is(res.config.url, `${BASE_URL}/project`);
   t.is(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
   t.is(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
 });
@@ -106,7 +115,7 @@ test.serial('should return error if statusCode is not 200', async t => {
   scope.done();
 });
 
-test.serial('should retry if the initial request fails', async t => {
+test.serial('should retry 3 times if the initial request fails', async t => {
   const scope = nock(HOST)
                     .get(`${PATH}/${TYPE}`)
                     .times(2)
@@ -114,6 +123,18 @@ test.serial('should retry if the initial request fails', async t => {
                     .get(`${PATH}/${TYPE}`)
                     .reply(200, {}, HEADERS);
   const res = await gcp.instance();
+  scope.done();
+  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
+});
+
+test.serial('should accept a param to set the number of retries', async t => {
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`)
+                    .times(3)
+                    .reply(500)
+                    .get(`${PATH}/${TYPE}`)
+                    .reply(200, {}, HEADERS);
+  const res = await gcp.instance(undefined, 4);
   scope.done();
   t.is(res.config.url, `${BASE_URL}/${TYPE}`);
 });
