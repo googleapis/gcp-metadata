@@ -1,7 +1,7 @@
 import test from 'ava';
 import {AxiosError} from 'axios';
-import * as extend from 'extend';
-import * as nock from 'nock';
+import extend from 'extend';
+import nock from 'nock';
 
 import * as gcp from '../src';
 
