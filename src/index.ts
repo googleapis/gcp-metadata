@@ -89,6 +89,11 @@ export async function isAvailable() {
     await metadataAccessor('instance', undefined, 0);
     return true;
   } catch (err) {
-    return false;
+    // Failure to resolve the metadata service means that it is not available.
+    if (err.code && (err.code === 'ENOTFOUND' || err.code === 'ENOENT')) {
+      return false;
+    }
+    // Throw unexpected errors.
+    throw err;
   }
 }
