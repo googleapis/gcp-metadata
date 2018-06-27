@@ -150,10 +150,26 @@ test.serial(
     });
 
 test.serial(
-    'should fail fast on isAvailable if a network err is returned', async t => {
+    'should fail fast on isAvailable if ENOTFOUND is returned', async t => {
       const scope =
           nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
       const isGCE = await gcp.isAvailable();
       scope.done();
       t.false(isGCE);
     });
+
+test.serial(
+    'should fail fast on isAvailable if ENOENT is returned', async t => {
+      const scope =
+          nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOENT'});
+      const isGCE = await gcp.isAvailable();
+      scope.done();
+      t.false(isGCE);
+    });
+
+test.serial('should throw on unexpected errors', async t => {
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: '🤡'});
+  await t.throws(gcp.isAvailable());
+  scope.done();
+});
