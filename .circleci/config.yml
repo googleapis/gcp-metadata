@@ -80,7 +80,7 @@ jobs:
       - run: npm run check
   publish_npm:
     docker:
-      - image: node8
+      - image: node:8
         user: node
     steps:
       - checkout
