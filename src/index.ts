@@ -1,5 +1,4 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
-import extend from 'extend';
 import * as rax from 'retry-axios';
 
 export const HOST_ADDRESS = 'http://metadata.google.internal';
@@ -46,33 +45,28 @@ async function metadataAccessor<T>(
   validate(options);
   const ax = axios.create();
   rax.attach(ax);
-  const baseOpts = {
+  const reqOpts = {
     url: `${BASE_URL}/${type}${property}`,
     headers: Object.assign({}, HEADERS),
-    raxConfig: {noResponseRetries, instance: ax}
+    raxConfig: {noResponseRetries, instance: ax},
+    params: options.params
   };
-  const reqOpts = extend(true, baseOpts, options);
-  delete (reqOpts as {property: string}).property;
-  const res =
-      await ax.request<T>(reqOpts)
-          .then(res => {
-            // NOTE: node.js converts all incoming headers to lower case.
-            if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
-              throw new Error(
-                  `Invalid response from metadata service: incorrect ${
-                      HEADER_NAME} header.`);
-            } else if (!res.data) {
-              throw new Error('Invalid response from the metadata service');
-            }
-            return res;
-          })
-          .catch((err: AxiosError) => {
-            if (err.response && err.response.status !== 200) {
-              err.message = 'Unsuccessful response status code. ' + err.message;
-            }
-            throw err;
-          });
-  return res.data;
+  try {
+    const res = await ax.request<T>(reqOpts);
+    // NOTE: node.js converts all incoming headers to lower case.
+    if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
+      throw new Error(`Invalid response from metadata service: incorrect ${
+          HEADER_NAME} header.`);
+    } else if (!res.data) {
+      throw new Error('Invalid response from the metadata service');
+    }
+    return res.data;
+  } catch (e) {
+    if (e.response && e.response.status !== 200) {
+      e.message = `Unsuccessful response status code. ${e.message}`;
+    }
+    throw e;
+  }
 }
 
 // tslint:disable-next-line no-any
