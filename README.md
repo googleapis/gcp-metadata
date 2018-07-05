@@ -19,23 +19,23 @@ const isAvailable = await gcpMetadata.isAvailable();
 
 #### Access all metadata
 ```js
-const res = await gcpMetadata.instance();
-console.log(res.data); // ... All metadata properties
+const data = await gcpMetadata.instance();
+console.log(data); // ... All metadata properties
 ```
 
 #### Access specific properties
 ```js
-const res = await gcpMetadata.instance('hostname');
-console.log(res.data) // ...All metadata properties
+const data = await gcpMetadata.instance('hostname');
+console.log(data) // ...All metadata properties
 ```
 
 #### Access specific properties with query parameters
 ```js
-const res = await gcpMetadata.instance({
+const data = await gcpMetadata.instance({
   property: 'tags',
   params: { alt: 'text' }
 });
-console.log(res.data) // ...Tags as newline-delimited list
+console.log(data) // ...Tags as newline-delimited list
 ```
 
 [circle]: https://circleci.com/gh/stephenplusplus/gcp-metadata

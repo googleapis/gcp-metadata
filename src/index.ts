@@ -15,17 +15,6 @@ export interface Options {
   property?: string;
 }
 
-export interface Response<T> {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: http.OutgoingHttpHeaders;
-  config: {
-    url: string; headers: http.OutgoingHttpHeaders;
-    params: {[index: string]: string};
-  };
-}
-
 // Accepts an options object passed from the user to the API.  In the
 // previous version of the API, it referred to a `Request` options object.
 // Now it refers to an Axios Request Config object.  This is here to help
@@ -46,8 +35,7 @@ function validate(options: Options) {
 }
 
 async function metadataAccessor<T>(
-    type: string, options?: string|Options,
-    noResponseRetries = 3): Promise<Response<T>> {
+    type: string, options?: string|Options, noResponseRetries = 3): Promise<T> {
   options = options || {};
   if (typeof options === 'string') {
     options = {property: options};
@@ -85,7 +73,7 @@ async function metadataAccessor<T>(
             }
             throw err;
           });
-  return normalizeResponse<T>(res);
+  return res.data;
 }
 
 // tslint:disable-next-line no-any
@@ -116,22 +104,4 @@ export async function isAvailable() {
     // Throw unexpected errors.
     throw err;
   }
-}
-
-/**
- * Converts an Axios response to a normal response.
- * @param orig The original response from Axios.
- */
-function normalizeResponse<T>(orig: AxiosResponse<T>): Response<T> {
-  return {
-    data: orig.data,
-    status: orig.status,
-    statusText: orig.statusText,
-    headers: orig.headers,
-    config: {
-      url: orig.config.url!,
-      headers: orig.config.headers,
-      params: orig.config.params
-    }
-  };
 }
