@@ -9,6 +9,6 @@ async function main() {
   const v = await gcp.instance('/somepath');
 }
 
-gcp.project('something').then(x => console.log);
+gcp.project('something').then(console.log);
 
 main().catch(console.error);

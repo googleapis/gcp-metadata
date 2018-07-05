@@ -28,7 +28,8 @@ it('should create the correct accessors', async () => {
 });
 
 it('should access all the metadata properly', async () => {
-  const scope = nock(HOST).get(`${PATH}/${TYPE}`, undefined, HEADERS)
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`, undefined, HEADERS)
                     .reply(200, {}, HEADERS);
   await gcp.instance();
   scope.done();
@@ -44,12 +45,12 @@ it('should access a specific metadata property', async () => {
 it('should accept an object with property and query fields', async () => {
   const QUERY = {key: 'value'};
   const scope = nock(HOST)
-                        .get(`${PATH}/${TYPE}/${PROPERTY}`)
-                        .query(QUERY)
-                        .reply(200, {}, HEADERS);
-    await gcp.instance({property: PROPERTY, params: QUERY});
+                    .get(`${PATH}/project/${PROPERTY}`)
+                    .query(QUERY)
+                    .reply(200, {}, HEADERS);
+  await gcp.project({property: PROPERTY, params: QUERY});
   scope.done();
-    });
+});
 
 it('should return the request error', async () => {
   const scope =
@@ -92,10 +93,17 @@ it('should retry if the initial request fails', async () => {
   scope.done();
 });
 
-it('should throw if request options are passed', async t => {
+it('should throw if request options are passed', async () => {
   await assert.rejects(
       // tslint:disable-next-line no-any
-      gcp.instance({qs: {one: 'two'}} as any), /\'qs\' is not a valid/);
+      gcp.instance({qs: {one: 'two'}} as any),
+      /\'qs\' is not a valid configuration option. Please use \'params\' instead\./);
+});
+
+it('should throw if invalid options are passed', async () => {
+  await assert.rejects(
+      // tslint:disable-next-line no-any
+      gcp.instance({fake: 'news'} as any), /\'fake\' is not a valid/);
 });
 
 it('should retry on DNS errors', async () => {
@@ -109,38 +117,35 @@ it('should retry on DNS errors', async () => {
   assert(data);
 });
 
-it(
-    'should report isGCE if the server returns a 500 first', async t => {
-      const scope = nock(HOST)
-                        .get(`${PATH}/${TYPE}`)
-                        .twice()
-                        .reply(500)
-                        .get(`${PATH}/${TYPE}`)
-                        .reply(200, {}, HEADERS);
-      const isGCE = await gcp.isAvailable();
-      scope.done();
-      assert.equal(isGCE, true);
-    });
+it('should report isGCE if the server returns a 500 first', async () => {
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`)
+                    .twice()
+                    .reply(500)
+                    .get(`${PATH}/${TYPE}`)
+                    .reply(200, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  scope.done();
+  assert.equal(isGCE, true);
+});
 
-it(
-    'should fail fast on isAvailable if ENOTFOUND is returned', async t => {
-      const scope =
-          nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
-      const isGCE = await gcp.isAvailable();
-      scope.done();
-      assert.equal(false, isGCE);
-    });
+it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
+  const isGCE = await gcp.isAvailable();
+  scope.done();
+  assert.equal(false, isGCE);
+});
 
-it(
-    'should fail fast on isAvailable if ENOENT is returned', async t => {
-      const scope =
-          nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOENT'});
-      const isGCE = await gcp.isAvailable();
-      scope.done();
-      assert.equal(false, isGCE);
-    });
+it('should fail fast on isAvailable if ENOENT is returned', async () => {
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOENT'});
+  const isGCE = await gcp.isAvailable();
+  scope.done();
+  assert.equal(false, isGCE);
+});
 
-it('should throw on unexpected errors', async t => {
+it('should throw on unexpected errors', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: '🤡'});
   await assert.rejects(gcp.isAvailable());
