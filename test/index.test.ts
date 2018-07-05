@@ -52,22 +52,8 @@ it('should accept an object with property and query fields', async () => {
                     .get(`${PATH}/project/${PROPERTY}`)
                     .query(QUERY)
                     .reply(200, {}, HEADERS);
-  const res = await gcp.project({property: PROPERTY, params: QUERY});
+  await gcp.project({property: PROPERTY, params: QUERY});
   scope.done();
-  assert(JSON.stringify(res.config.params), JSON.stringify(QUERY));
-  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-});
-
-it('should extend the request options', async () => {
-  const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
-  const originalOptions = extend(true, {}, options);
-  const scope =
-      nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
-  const res = await gcp.instance(options);
-  scope.done();
-  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-  assert(res.config.headers['Custom-Header'], 'Custom');
-  assert.deepStrictEqual(options, originalOptions);  // wasn't modified
 });
 
 it('should return the request error', async () => {

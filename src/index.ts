@@ -1,5 +1,6 @@
-import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosResponse} from 'axios';
 import extend from 'extend';
+import * as http from 'http';
 import * as rax from 'retry-axios';
 
 export const HOST_ADDRESS = 'http://metadata.google.internal';
@@ -9,30 +10,44 @@ export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
 
-export type Options = AxiosRequestConfig&
-    {[index: string]: {} | string | undefined, property?: string, uri?: string};
+export interface Options {
+  params?: {[index: string]: string};
+  property?: string;
+}
+
+export interface Response<T> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: http.OutgoingHttpHeaders;
+  config: {
+    url: string; headers: http.OutgoingHttpHeaders;
+    params: {[index: string]: string};
+  };
+}
 
 // Accepts an options object passed from the user to the API.  In the
 // previous version of the API, it referred to a `Request` options object.
 // Now it refers to an Axios Request Config object.  This is here to help
 // ensure users don't pass invalid options when they upgrade from 0.4 to 0.5.
 function validate(options: Options) {
-  const vpairs = [
-    {invalid: 'uri', expected: 'url'}, {invalid: 'json', expected: 'data'},
-    {invalid: 'qs', expected: 'params'}
-  ];
-  for (const pair of vpairs) {
-    if (options[pair.invalid]) {
-      const e = `'${
-          pair.invalid}' is not a valid configuration option. Please use '${
-          pair.expected}' instead. This library is using Axios for requests. Please see https://github.com/axios/axios to learn more about the valid request options.`;
-      throw new Error(e);
+  Object.keys(options).forEach(key => {
+    switch (key) {
+      case 'params':
+      case 'property':
+        break;
+      case 'qs':
+        throw new Error(
+            `'qs' is not a valid configuration option. Please use 'params' instead.`);
+      default:
+        throw new Error(`'${key}' is not a valid configuration option.`);
     }
-  }
+  });
 }
 
-async function metadataAccessor(
-    type: string, options?: string|Options, noResponseRetries = 3) {
+async function metadataAccessor<T>(
+    type: string, options?: string|Options,
+    noResponseRetries = 3): Promise<Response<T>> {
   options = options || {};
   if (typeof options === 'string') {
     options = {property: options};
@@ -51,31 +66,36 @@ async function metadataAccessor(
   };
   const reqOpts = extend(true, baseOpts, options);
   delete (reqOpts as {property: string}).property;
-  return ax.request(reqOpts)
-      .then(res => {
-        // NOTE: node.js converts all incoming headers to lower case.
-        if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
-          throw new Error(`Invalid response from metadata service: incorrect ${
-              HEADER_NAME} header.`);
-        } else if (!res.data) {
-          throw new Error('Invalid response from the metadata service');
-        }
-        return res;
-      })
-      .catch((err: AxiosError) => {
-        if (err.response && err.response.status !== 200) {
-          err.message = 'Unsuccessful response status code. ' + err.message;
-        }
-        throw err;
-      });
+  const res =
+      await ax.request<T>(reqOpts)
+          .then(res => {
+            // NOTE: node.js converts all incoming headers to lower case.
+            if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
+              throw new Error(
+                  `Invalid response from metadata service: incorrect ${
+                      HEADER_NAME} header.`);
+            } else if (!res.data) {
+              throw new Error('Invalid response from the metadata service');
+            }
+            return res;
+          })
+          .catch((err: AxiosError) => {
+            if (err.response && err.response.status !== 200) {
+              err.message = 'Unsuccessful response status code. ' + err.message;
+            }
+            throw err;
+          });
+  return normalizeResponse<T>(res);
 }
 
-export function instance(options?: string|Options) {
-  return metadataAccessor('instance', options);
+// tslint:disable-next-line no-any
+export function instance<T = any>(options?: string|Options) {
+  return metadataAccessor<T>('instance', options);
 }
 
-export function project(options?: string|Options) {
-  return metadataAccessor('project', options);
+// tslint:disable-next-line no-any
+export function project<T = any>(options?: string|Options) {
+  return metadataAccessor<T>('project', options);
 }
 
 /**
@@ -96,4 +116,22 @@ export async function isAvailable() {
     // Throw unexpected errors.
     throw err;
   }
+}
+
+/**
+ * Converts an Axios response to a normal response.
+ * @param orig The original response from Axios.
+ */
+function normalizeResponse<T>(orig: AxiosResponse<T>): Response<T> {
+  return {
+    data: orig.data,
+    status: orig.status,
+    statusText: orig.statusText,
+    headers: orig.headers,
+    config: {
+      url: orig.config.url!,
+      headers: orig.config.headers,
+      params: orig.config.params
+    }
+  };
 }
