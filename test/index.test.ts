@@ -1,9 +1,10 @@
-import test from 'ava';
-import {AxiosError} from 'axios';
+import assert from 'assert';
 import extend from 'extend';
 import nock from 'nock';
 
 import * as gcp from '../src';
+
+assert.rejects = require('assert-rejects');
 
 const HOST = gcp.HOST_ADDRESS;
 const PATH = gcp.BASE_PATH;
@@ -19,94 +20,87 @@ const HEADERS = {
 
 nock.disableNetConnect();
 
-test.afterEach.always(async t => {
+afterEach(() => {
   nock.cleanAll();
 });
 
-test.serial('should create the correct accessors', async t => {
-  t.is(typeof gcp.instance, 'function');
-  t.is(typeof gcp.project, 'function');
+it('should create the correct accessors', async () => {
+  assert(typeof gcp.instance, 'function');
+  assert(typeof gcp.project, 'function');
 });
 
-test.serial('should access all the metadata properly', async t => {
+it('should access all the metadata properly', async () => {
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
   const res = await gcp.instance();
   scope.done();
-  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
-  t.is(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
-  t.is(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
+  assert(res.config.url, `${BASE_URL}/${TYPE}`);
+  assert(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
+  assert(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
 });
 
-test.serial('should access a specific metadata property', async t => {
+it('should access a specific metadata property', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
   const res = await gcp.instance(PROPERTY);
   scope.done();
-  t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
+  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
 });
 
-test.serial(
-    'should accept an object with property and query fields', async t => {
-      const QUERY = {key: 'value'};
-      const scope = nock(HOST)
-                        .get(`${PATH}/${TYPE}/${PROPERTY}`)
-                        .query(QUERY)
-                        .reply(200, {}, HEADERS);
-      const res = await gcp.instance({property: PROPERTY, params: QUERY});
-      scope.done();
-      t.is(JSON.stringify(res.config.params), JSON.stringify(QUERY));
-      t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-    });
+it('should accept an object with property and query fields', async () => {
+  const QUERY = {key: 'value'};
+  const scope = nock(HOST)
+                    .get(`${PATH}/project/${PROPERTY}`)
+                    .query(QUERY)
+                    .reply(200, {}, HEADERS);
+  const res = await gcp.project({property: PROPERTY, params: QUERY});
+  scope.done();
+  assert(JSON.stringify(res.config.params), JSON.stringify(QUERY));
+  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
+});
 
-test.serial('should extend the request options', async t => {
+it('should extend the request options', async () => {
   const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
   const originalOptions = extend(true, {}, options);
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
   const res = await gcp.instance(options);
   scope.done();
-  t.is(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-  t.is(res.config.headers['Custom-Header'], 'Custom');
-  t.deepEqual(options, originalOptions);  // wasn't modified
+  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
+  assert(res.config.headers['Custom-Header'], 'Custom');
+  assert.deepStrictEqual(options, originalOptions);  // wasn't modified
 });
 
-test.serial('should return the request error', async t => {
+it('should return the request error', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).times(4).reply(500, undefined, HEADERS);
-  await t.throws(gcp.instance(), (err: AxiosError) => {
-    return err.message.startsWith('Unsuccessful response status code') &&
-        err.response!.status === 500;
-  });
+  await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
 });
 
-test.serial('should return error when res is empty', async t => {
+it('should return error when res is empty', async () => {
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, null, HEADERS);
-  await t.throws(gcp.instance());
+  await assert.rejects(gcp.instance());
   scope.done();
 });
 
-test.serial('should return error when flavor header is incorrect', async t => {
+it('should return error when flavor header is incorrect', async () => {
   const scope =
       nock(HOST)
           .get(`${PATH}/${TYPE}`)
           .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
-  await t.throws(
+  await assert.rejects(
       gcp.instance(),
-      `Invalid response from metadata service: incorrect Metadata-Flavor header.`);
+      /Invalid response from metadata service: incorrect Metadata-Flavor header./);
   scope.done();
 });
 
-test.serial('should return error if statusCode is not 200', async t => {
+it('should return error if statusCode is not 200', async () => {
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
-  await t.throws(gcp.instance(), (err: AxiosError) => {
-    return err.message.startsWith('Unsuccessful response status code') &&
-        err.response!.status === 418;
-  });
+  await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
 });
 
-test.serial('should retry if the initial request fails', async t => {
+it('should retry if the initial request fails', async () => {
   const scope = nock(HOST)
                     .get(`${PATH}/${TYPE}`)
                     .times(2)
@@ -115,17 +109,16 @@ test.serial('should retry if the initial request fails', async t => {
                     .reply(200, {}, HEADERS);
   const res = await gcp.instance();
   scope.done();
-  t.is(res.config.url, `${BASE_URL}/${TYPE}`);
+  assert(res.config.url, `${BASE_URL}/${TYPE}`);
 });
 
-test.serial('should throw if request options are passed', async t => {
-  // tslint:disable-next-line no-any
-  await t.throws((gcp as any).instance({qs: {one: 'two'}}), e => {
-    return e.message.startsWith('\'qs\' is not a valid');
-  });
+it('should throw if request options are passed', async () => {
+  await assert.rejects(
+      // tslint:disable-next-line no-any
+      (gcp as any).instance({qs: {one: 'two'}}), /\'qs\' is not a valid/);
 });
 
-test.serial('should retry on DNS errors', async t => {
+it('should retry on DNS errors', async () => {
   const scope = nock(HOST)
                     .get(`${PATH}/${TYPE}`)
                     .replyWithError({code: 'ETIMEDOUT'})
@@ -133,43 +126,40 @@ test.serial('should retry on DNS errors', async t => {
                     .reply(200, {}, HEADERS);
   const res = await gcp.instance();
   scope.done();
-  t.truthy(res.data);
+  assert(res.data);
 });
 
-test.serial(
-    'should report isGCE if the server returns a 500 first', async t => {
-      const scope = nock(HOST)
-                        .get(`${PATH}/${TYPE}`)
-                        .twice()
-                        .reply(500)
-                        .get(`${PATH}/${TYPE}`)
-                        .reply(200, {}, HEADERS);
-      const isGCE = await gcp.isAvailable();
-      scope.done();
-      t.true(isGCE);
-    });
+it('should report isGCE if the server returns a 500 first', async () => {
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`)
+                    .twice()
+                    .reply(500)
+                    .get(`${PATH}/${TYPE}`)
+                    .reply(200, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  scope.done();
+  assert(isGCE);
+});
 
-test.serial(
-    'should fail fast on isAvailable if ENOTFOUND is returned', async t => {
-      const scope =
-          nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
-      const isGCE = await gcp.isAvailable();
-      scope.done();
-      t.false(isGCE);
-    });
+it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
+  const isGCE = await gcp.isAvailable();
+  scope.done();
+  assert.equal(isGCE, false);
+});
 
-test.serial(
-    'should fail fast on isAvailable if ENOENT is returned', async t => {
-      const scope =
-          nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOENT'});
-      const isGCE = await gcp.isAvailable();
-      scope.done();
-      t.false(isGCE);
-    });
+it('should fail fast on isAvailable if ENOENT is returned', async () => {
+  const scope =
+      nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOENT'});
+  const isGCE = await gcp.isAvailable();
+  scope.done();
+  assert.equal(isGCE, false);
+});
 
-test.serial('should throw on unexpected errors', async t => {
+it('should throw on unexpected errors', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: '🤡'});
-  await t.throws(gcp.isAvailable());
+  await assert.rejects(gcp.isAvailable());
   scope.done();
 });
