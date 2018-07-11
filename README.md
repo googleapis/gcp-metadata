@@ -26,7 +26,7 @@ console.log(data); // ... All metadata properties
 #### Access specific properties
 ```js
 const data = await gcpMetadata.instance('hostname');
-console.log(data) // ...All metadata properties
+console.log(data) // ...Instance hostname
 ```
 
 #### Access specific properties with query parameters

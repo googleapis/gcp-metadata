@@ -1,4 +1,4 @@
-import axios, {AxiosError, AxiosResponse} from 'axios';
+import axios from 'axios';
 import * as rax from 'retry-axios';
 
 export const HOST_ADDRESS = 'http://metadata.google.internal';
@@ -13,10 +13,11 @@ export interface Options {
   property?: string;
 }
 
-// Accepts an options object passed from the user to the API.  In the
-// previous version of the API, it referred to a `Request` options object.
-// Now it refers to an Axios Request Config object.  This is here to help
-// ensure users don't pass invalid options when they upgrade from 0.4 to 0.5.
+// Accepts an options object passed from the user to the API. In previous
+// versions of the API, it referred to a `Request` or an `Axios` request
+// options object.  Now it refers to an object with very limited property
+// names. This is here to help ensure users don't pass invalid options when
+// they  upgrade from 0.4 to 0.5 to 0.8.
 function validate(options: Options) {
   Object.keys(options).forEach(key => {
     switch (key) {
