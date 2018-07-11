@@ -1,7 +1,5 @@
 import assert from 'assert';
-import extend from 'extend';
 import nock from 'nock';
-
 import * as gcp from '../src';
 
 assert.rejects = require('assert-rejects');
@@ -30,20 +28,18 @@ it('should create the correct accessors', async () => {
 });
 
 it('should access all the metadata properly', async () => {
-  const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
-  const res = await gcp.instance();
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}`, undefined, HEADERS)
+                    .reply(200, {}, HEADERS);
+  await gcp.instance();
   scope.done();
-  assert(res.config.url, `${BASE_URL}/${TYPE}`);
-  assert(res.config.headers[HEADER_NAME], gcp.HEADER_VALUE);
-  assert(res.headers[HEADER_NAME.toLowerCase()], gcp.HEADER_VALUE);
 });
 
 it('should access a specific metadata property', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
-  const res = await gcp.instance(PROPERTY);
+  await gcp.instance(PROPERTY);
   scope.done();
-  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
 });
 
 it('should accept an object with property and query fields', async () => {
@@ -52,22 +48,8 @@ it('should accept an object with property and query fields', async () => {
                     .get(`${PATH}/project/${PROPERTY}`)
                     .query(QUERY)
                     .reply(200, {}, HEADERS);
-  const res = await gcp.project({property: PROPERTY, params: QUERY});
+  await gcp.project({property: PROPERTY, params: QUERY});
   scope.done();
-  assert(JSON.stringify(res.config.params), JSON.stringify(QUERY));
-  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-});
-
-it('should extend the request options', async () => {
-  const options = {property: PROPERTY, headers: {'Custom-Header': 'Custom'}};
-  const originalOptions = extend(true, {}, options);
-  const scope =
-      nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {}, HEADERS);
-  const res = await gcp.instance(options);
-  scope.done();
-  assert(res.config.url, `${BASE_URL}/${TYPE}/${PROPERTY}`);
-  assert(res.config.headers['Custom-Header'], 'Custom');
-  assert.deepStrictEqual(options, originalOptions);  // wasn't modified
 });
 
 it('should return the request error', async () => {
@@ -107,15 +89,21 @@ it('should retry if the initial request fails', async () => {
                     .reply(500)
                     .get(`${PATH}/${TYPE}`)
                     .reply(200, {}, HEADERS);
-  const res = await gcp.instance();
+  await gcp.instance();
   scope.done();
-  assert(res.config.url, `${BASE_URL}/${TYPE}`);
 });
 
 it('should throw if request options are passed', async () => {
   await assert.rejects(
       // tslint:disable-next-line no-any
-      (gcp as any).instance({qs: {one: 'two'}}), /\'qs\' is not a valid/);
+      gcp.instance({qs: {one: 'two'}} as any),
+      /\'qs\' is not a valid configuration option. Please use \'params\' instead\./);
+});
+
+it('should throw if invalid options are passed', async () => {
+  await assert.rejects(
+      // tslint:disable-next-line no-any
+      gcp.instance({fake: 'news'} as any), /\'fake\' is not a valid/);
 });
 
 it('should retry on DNS errors', async () => {
@@ -124,9 +112,9 @@ it('should retry on DNS errors', async () => {
                     .replyWithError({code: 'ETIMEDOUT'})
                     .get(`${PATH}/${TYPE}`)
                     .reply(200, {}, HEADERS);
-  const res = await gcp.instance();
+  const data = await gcp.instance();
   scope.done();
-  assert(res.data);
+  assert(data);
 });
 
 it('should report isGCE if the server returns a 500 first', async () => {
@@ -138,7 +126,7 @@ it('should report isGCE if the server returns a 500 first', async () => {
                     .reply(200, {}, HEADERS);
   const isGCE = await gcp.isAvailable();
   scope.done();
-  assert(isGCE);
+  assert.equal(isGCE, true);
 });
 
 it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
@@ -146,7 +134,7 @@ it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
       nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOTFOUND'});
   const isGCE = await gcp.isAvailable();
   scope.done();
-  assert.equal(isGCE, false);
+  assert.equal(false, isGCE);
 });
 
 it('should fail fast on isAvailable if ENOENT is returned', async () => {
@@ -154,7 +142,7 @@ it('should fail fast on isAvailable if ENOENT is returned', async () => {
       nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: 'ENOENT'});
   const isGCE = await gcp.isAvailable();
   scope.done();
-  assert.equal(isGCE, false);
+  assert.equal(false, isGCE);
 });
 
 it('should throw on unexpected errors', async () => {

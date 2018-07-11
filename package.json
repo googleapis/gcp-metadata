@@ -33,11 +33,9 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
-    "extend": "^3.0.1",
     "retry-axios": "0.3.2"
   },
   "devDependencies": {
-    "@types/extend": "^3.0.0",
     "@types/mocha": "^5.2.4",
     "@types/ncp": "^2.0.1",
     "@types/nock": "^9.1.3",
