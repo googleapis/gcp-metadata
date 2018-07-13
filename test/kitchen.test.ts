@@ -1,7 +1,7 @@
 import * as cp from 'child_process';
 import * as fs from 'fs';
 import {ncp} from 'ncp';
-import pify from 'pify';
+import * as pify from 'pify';
 import * as tmp from 'tmp';
 
 const rename = pify(fs.rename);

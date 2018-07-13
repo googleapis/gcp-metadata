@@ -1,8 +1,8 @@
-import assert from 'assert';
-import nock from 'nock';
+import * as assert from 'assert';
+import * as nock from 'nock';
 import * as gcp from '../src';
 
-assert.rejects = require('assert-rejects');
+const assertRejects = require('assert-rejects');
 
 const HOST = gcp.HOST_ADDRESS;
 const PATH = gcp.BASE_PATH;
@@ -55,13 +55,13 @@ it('should accept an object with property and query fields', async () => {
 it('should return the request error', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).times(4).reply(500, undefined, HEADERS);
-  await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
+  await assertRejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
 });
 
 it('should return error when res is empty', async () => {
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, null, HEADERS);
-  await assert.rejects(gcp.instance());
+  await assertRejects(gcp.instance());
   scope.done();
 });
 
@@ -70,7 +70,7 @@ it('should return error when flavor header is incorrect', async () => {
       nock(HOST)
           .get(`${PATH}/${TYPE}`)
           .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
-  await assert.rejects(
+  await assertRejects(
       gcp.instance(),
       /Invalid response from metadata service: incorrect Metadata-Flavor header./);
   scope.done();
@@ -78,7 +78,7 @@ it('should return error when flavor header is incorrect', async () => {
 
 it('should return error if statusCode is not 200', async () => {
   const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
-  await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
+  await assertRejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
 });
 
@@ -94,14 +94,14 @@ it('should retry if the initial request fails', async () => {
 });
 
 it('should throw if request options are passed', async () => {
-  await assert.rejects(
+  await assertRejects(
       // tslint:disable-next-line no-any
       gcp.instance({qs: {one: 'two'}} as any),
       /\'qs\' is not a valid configuration option. Please use \'params\' instead\./);
 });
 
 it('should throw if invalid options are passed', async () => {
-  await assert.rejects(
+  await assertRejects(
       // tslint:disable-next-line no-any
       gcp.instance({fake: 'news'} as any), /\'fake\' is not a valid/);
 });
@@ -148,6 +148,6 @@ it('should fail fast on isAvailable if ENOENT is returned', async () => {
 it('should throw on unexpected errors', async () => {
   const scope =
       nock(HOST).get(`${PATH}/${TYPE}`).replyWithError({code: '🤡'});
-  await assert.rejects(gcp.isAvailable());
+  await assertRejects(gcp.isAvailable());
   scope.done();
 });
