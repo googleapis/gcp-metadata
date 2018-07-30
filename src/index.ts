@@ -1,3 +1,10 @@
+/**
+ * Copyright 2018 Google LLC
+ *
+ * Distributed under MIT license.
+ * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ */
+
 import axios from 'axios';
 import * as rax from 'retry-axios';
 
