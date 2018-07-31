@@ -1,3 +1,10 @@
+/**
+ * Copyright 2018 Google LLC
+ *
+ * Distributed under MIT license.
+ * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ */
+
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as gcp from '../src';
