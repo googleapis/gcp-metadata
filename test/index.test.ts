@@ -49,6 +49,16 @@ it('should access a specific metadata property', async () => {
   scope.done();
 });
 
+it('should deal with large numbers', async () => {
+  const BIG_NUMBER_STRING = `3279739563200103600`;
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, BIG_NUMBER_STRING, HEADERS);
+  const property = await gcp.instance(PROPERTY);
+  assert.strictEqual(property, BIG_NUMBER_STRING);
+  scope.done();
+});
+
 it('should accept an object with property and query fields', async () => {
   const QUERY = {key: 'value'};
   const scope = nock(HOST)

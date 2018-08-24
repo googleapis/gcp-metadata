@@ -51,7 +51,9 @@ async function metadataAccessor<T>(
     property = '/' + options.property;
   }
   validate(options);
-  const ax = axios.create();
+  const ax = axios.create({
+    transformResponse: [ t => t ]  // Do not JSON.parse strings.
+  });
   rax.attach(ax);
   const reqOpts = {
     url: `${BASE_URL}/${type}${property}`,
