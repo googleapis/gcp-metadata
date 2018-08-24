@@ -59,6 +59,31 @@ it('should deal with large numbers', async () => {
   scope.done();
 });
 
+it('should not JSON.parse text responses', async () => {
+  const RESPONSE = '["Iggety, ziggety, zaggety, ZOOM!", 3279739563200103600]';
+  const headersWithJsonContent =
+      Object.assign({}, HEADERS, {'content-type': 'application/text'});
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, RESPONSE, headersWithJsonContent);
+  const property = await gcp.instance(PROPERTY);
+  assert.deepStrictEqual(property, RESPONSE);
+  scope.done();
+});
+
+it('should JSON.parse json responses', async () => {
+  const RESPONSE = '["Iggety, ziggety, zaggety, ZOOM!", 3279739563200103600]';
+  const headersWithJsonContent =
+      Object.assign({}, HEADERS, {'content-type': 'application/json'});
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, RESPONSE, headersWithJsonContent);
+  const property = await gcp.instance(PROPERTY);
+  console.log(property);
+  assert.deepStrictEqual(property, JSON.parse(RESPONSE));
+  scope.done();
+});
+
 it('should accept an object with property and query fields', async () => {
   const QUERY = {key: 'value'};
   const scope = nock(HOST)

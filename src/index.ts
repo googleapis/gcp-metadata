@@ -70,6 +70,14 @@ async function metadataAccessor<T>(
     } else if (!res.data) {
       throw new Error('Invalid response from the metadata service');
     }
+    if (res.headers['content-type'] === 'application/json' &&
+        typeof res.data === 'string') {
+      try {
+        return JSON.parse(res.data);
+      } catch {
+        /* ignore */
+      }
+    }
     return res.data;
   } catch (e) {
     if (e.response && e.response.status !== 200) {
