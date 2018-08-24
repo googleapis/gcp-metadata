@@ -52,7 +52,7 @@ async function metadataAccessor<T>(
   }
   validate(options);
   const ax = axios.create({
-    transformResponse: [ t => t ]  // Do not JSON.parse strings.
+    transformResponse: [t => t]  // Do not JSON.parse strings.
   });
   rax.attach(ax);
   const reqOpts = {
