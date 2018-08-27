@@ -1,0 +1,19 @@
+{
+  "description": "Samples for the gcp-metadata npm module.",
+  "license": "MIT",
+  "author": "Google LLC",
+  "engines": {
+    "node": ">=8"
+  },
+  "repository": "GoogleCloudPlatform/gcp-metadata",
+  "private": true,
+  "scripts": {
+    "test": "mocha system-test"
+  },
+  "dependencies": {
+    "gcp-metadata": "*"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
