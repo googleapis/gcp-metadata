@@ -48,7 +48,7 @@ it('should be able to use the d.ts', async () => {
   await rename(tarball, `${stagingPath}/${pkg.name}.tgz`);
   await ncpp('test/fixtures/kitchen', `${stagingPath}/`);
   await spawnp('npm', ['install'], {cwd: `${stagingPath}/`});
-}).timeout(20000);
+}).timeout(60000);
 
 /**
  * CLEAN UP - remove the staging directory when done.
