@@ -21,7 +21,8 @@
     "system-test": "mocha build/system-test",
     "test-only": "nyc mocha build/test",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
-    "docs": "echo no docs 👻"
+    "docs": "echo no docs 👻",
+    "lint": "npm run check"
   },
   "keywords": [
     "google cloud platform",
