@@ -37,6 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
+    "json-bigint": "^0.3.0",
     "retry-axios": "0.3.2"
   },
   "devDependencies": {

@@ -49,38 +49,36 @@ it('should access a specific metadata property', async () => {
   scope.done();
 });
 
-it('should deal with large numbers', async () => {
+it('should return large numbers as BigNumber values', async () => {
   const BIG_NUMBER_STRING = `3279739563200103600`;
   const scope = nock(HOST)
                     .get(`${PATH}/${TYPE}/${PROPERTY}`)
                     .reply(200, BIG_NUMBER_STRING, HEADERS);
   const property = await gcp.instance(PROPERTY);
-  assert.strictEqual(property, BIG_NUMBER_STRING);
+  // property should be a BigNumber.
+  assert.strictEqual(property.valueOf(), BIG_NUMBER_STRING);
   scope.done();
 });
 
-it('should not JSON.parse text responses', async () => {
-  const RESPONSE = '["Iggety, ziggety, zaggety, ZOOM!", 3279739563200103600]';
-  const headersWithJsonContent =
-      Object.assign({}, HEADERS, {'content-type': 'application/text'});
+it('should return small numbers normally', async () => {
+  const NUMBER = 32797;
   const scope = nock(HOST)
                     .get(`${PATH}/${TYPE}/${PROPERTY}`)
-                    .reply(200, RESPONSE, headersWithJsonContent);
+                    .reply(200, `${NUMBER}`, HEADERS);
   const property = await gcp.instance(PROPERTY);
-  assert.deepStrictEqual(property, RESPONSE);
+  assert.strictEqual(typeof property, 'number');
+  assert.strictEqual(property, NUMBER);
   scope.done();
 });
 
-it('should JSON.parse json responses', async () => {
-  const RESPONSE = '["Iggety, ziggety, zaggety, ZOOM!", 3279739563200103600]';
-  const headersWithJsonContent =
-      Object.assign({}, HEADERS, {'content-type': 'application/json'});
+it('should deal with nested large numbers', async () => {
+  const BIG_NUMBER_STRING = `3279739563200103600`;
+  const RESPONSE = `{ "v1": true, "v2": ${BIG_NUMBER_STRING} }`;
   const scope = nock(HOST)
                     .get(`${PATH}/${TYPE}/${PROPERTY}`)
-                    .reply(200, RESPONSE, headersWithJsonContent);
-  const property = await gcp.instance(PROPERTY);
-  console.log(property);
-  assert.deepStrictEqual(property, JSON.parse(RESPONSE));
+                    .reply(200, RESPONSE, HEADERS);
+  const response = await gcp.instance(PROPERTY);
+  assert.strictEqual(response.v2.valueOf(), BIG_NUMBER_STRING);
   scope.done();
 });
 

@@ -8,6 +8,8 @@
 import axios from 'axios';
 import * as rax from 'retry-axios';
 
+const JSONbig = require('json-bigint');
+
 export const HOST_ADDRESS = 'http://metadata.google.internal';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
@@ -52,7 +54,7 @@ async function metadataAccessor<T>(
   }
   validate(options);
   const ax = axios.create({
-    transformResponse: [t => t]  // Do not JSON.parse strings.
+    transformResponse: [t => t]  // Do not use default JSON.parse.
   });
   rax.attach(ax);
   const reqOpts = {
@@ -70,10 +72,9 @@ async function metadataAccessor<T>(
     } else if (!res.data) {
       throw new Error('Invalid response from the metadata service');
     }
-    if (res.headers['content-type'] === 'application/json' &&
-        typeof res.data === 'string') {
+    if (typeof res.data === 'string') {
       try {
-        return JSON.parse(res.data);
+        return JSONbig.parse(res.data);
       } catch {
         /* ignore */
       }
