@@ -2,7 +2,7 @@
   "name": "gcp-metadata",
   "version": "0.7.0",
   "description": "Get the metadata from a Google Cloud Platform environment",
-  "repository": "GoogleCloudPlatform/gcp-metadata",
+  "repository": "googleapis/gcp-metadata",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "files": [

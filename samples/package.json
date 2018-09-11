@@ -5,7 +5,7 @@
   "engines": {
     "node": ">=8"
   },
-  "repository": "GoogleCloudPlatform/gcp-metadata",
+  "repository": "googleapis/gcp-metadata",
   "private": true,
   "scripts": {
     "test": "mocha system-test"
