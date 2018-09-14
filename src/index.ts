@@ -8,7 +8,7 @@
 import axios from 'axios';
 import * as rax from 'retry-axios';
 
-const JSONbig = require('json-bigint');
+const jsonBigint = require('json-bigint');
 
 export const HOST_ADDRESS = 'http://metadata.google.internal';
 export const BASE_PATH = '/computeMetadata/v1';
@@ -74,7 +74,7 @@ async function metadataAccessor<T>(
     }
     if (typeof res.data === 'string') {
       try {
-        return JSONbig.parse(res.data);
+        return jsonBigint.parse(res.data);
       } catch {
         /* ignore */
       }
