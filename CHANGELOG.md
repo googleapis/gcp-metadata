@@ -16,6 +16,15 @@ The `instance()` and `project()` methods are much more selective about which pro
 
 The only accepted properties are `params` and `properties`.  The `instance()` and `project()` methods also now directly return the data instead of a response object.
 
+#### Changes in how large number valued properties are handled
+
+Previously large number-valued properties were being silently losing precision when
+returned by this library (as a number). In the cases where a number valued property
+returned by the metadata service is too large to represent as a JavaScript number, we
+will now return the value as a BigNumber (from the bignumber.js) library. Numbers that
+do fit into the JavaScript number range will continue to be returned as numbers.
+For more details see [#74](https://github.com/googleapis/gcp-metadata/pull/74).
+
 ### Breaking Changes
 - chore: drop support for node.js 4 and 9 ([#68](https://github.com/googleapis/gcp-metadata/pull/68))
 - fix: quarantine axios config ([#62](https://github.com/googleapis/gcp-metadata/pull/62))
