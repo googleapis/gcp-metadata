@@ -38,6 +38,21 @@ const data = await gcpMetadata.instance({
 console.log(data) // ...Tags as newline-delimited list
 ```
 
+### Take care with large number valued properties
+
+In some cases number valued properties returned by the Metadata Service may be
+too large to be representable as JavaScript numbers. In such cases we return
+those values as `BigNumber` objects (from the [bignumber.js][] library). Numbers
+that fit within the JavaScript number range will be returned as normal number
+values.
+
+```js
+const id = await gcpMetadata.instance('id');
+console.log(id)  // ... BigNumber { s: 1, e: 18, c: [ 45200, 31799277581759 ] }
+console.log(id.toString()) // ... 4520031799277581759
+```
+
+[bignumber.js]: https://github.com/MikeMcl/bignumber.js
 [circle]: https://circleci.com/gh/stephenplusplus/gcp-metadata
 [circleimg]: https://circleci.com/gh/stephenplusplus/gcp-metadata.svg?style=shield
 [codecov-image]: https://codecov.io/gh/stephenplusplus/gcp-metadata/branch/master/graph/badge.svg

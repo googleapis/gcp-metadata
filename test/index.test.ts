@@ -49,6 +49,39 @@ it('should access a specific metadata property', async () => {
   scope.done();
 });
 
+it('should return large numbers as BigNumber values', async () => {
+  const BIG_NUMBER_STRING = `3279739563200103600`;
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, BIG_NUMBER_STRING, HEADERS);
+  const property = await gcp.instance(PROPERTY);
+  // property should be a BigNumber.
+  assert.strictEqual(property.valueOf(), BIG_NUMBER_STRING);
+  scope.done();
+});
+
+it('should return small numbers normally', async () => {
+  const NUMBER = 32797;
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, `${NUMBER}`, HEADERS);
+  const property = await gcp.instance(PROPERTY);
+  assert.strictEqual(typeof property, 'number');
+  assert.strictEqual(property, NUMBER);
+  scope.done();
+});
+
+it('should deal with nested large numbers', async () => {
+  const BIG_NUMBER_STRING = `3279739563200103600`;
+  const RESPONSE = `{ "v1": true, "v2": ${BIG_NUMBER_STRING} }`;
+  const scope = nock(HOST)
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, RESPONSE, HEADERS);
+  const response = await gcp.instance(PROPERTY);
+  assert.strictEqual(response.v2.valueOf(), BIG_NUMBER_STRING);
+  scope.done();
+});
+
 it('should accept an object with property and query fields', async () => {
   const QUERY = {key: 'value'};
   const scope = nock(HOST)
