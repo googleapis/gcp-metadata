@@ -5,8 +5,8 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import * as spawn from 'cross-spawn';
 import {SpawnOptions} from 'child_process';
+import * as spawn from 'cross-spawn';
 import {ncp} from 'ncp';
 import * as pify from 'pify';
 import * as tmp from 'tmp';
