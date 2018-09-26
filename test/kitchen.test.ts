@@ -5,23 +5,22 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import * as cp from 'child_process';
-import * as fs from 'fs';
+import {SpawnOptions} from 'child_process';
+import * as spawn from 'cross-spawn';
 import {ncp} from 'ncp';
 import * as pify from 'pify';
 import * as tmp from 'tmp';
 
-const rename = pify(fs.rename);
 const ncpp = pify(ncp);
 const keep = true;  //!!process.env.GCPM_KEEP_TEMPDIRS;
 const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
 const stagingPath = stagingDir.name;
 const pkg = require('../../package.json');
 
-const spawnp = (command: string, args: string[], options: cp.SpawnOptions = {}):
+const spawnp = (command: string, args: string[], options: SpawnOptions = {}):
     Promise<void> => {
       return new Promise((resolve, reject) => {
-        cp.spawn(command, args, Object.assign(options, {stdio: 'inherit'}))
+        spawn(command, args, Object.assign(options, {stdio: 'inherit'}))
             .on('close',
                 (code, signal) => {
                   if (code === 0) {
@@ -45,7 +44,7 @@ it('should be able to use the d.ts', async () => {
   console.log(`${__filename} staging area: ${stagingPath}`);
   await spawnp('npm', ['pack']);
   const tarball = `${pkg.name}-${pkg.version}.tgz`;
-  await rename(tarball, `${stagingPath}/${pkg.name}.tgz`);
+  await ncpp(tarball, `${stagingPath}/${pkg.name}.tgz`);
   await ncpp('test/fixtures/kitchen', `${stagingPath}/`);
   await spawnp('npm', ['install'], {cwd: `${stagingPath}/`});
 }).timeout(60000);
