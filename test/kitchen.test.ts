@@ -6,12 +6,10 @@
  */
 
 import * as cp from 'child_process';
-import * as fs from 'fs';
 import {ncp} from 'ncp';
 import * as pify from 'pify';
 import * as tmp from 'tmp';
 
-const copyFile = pify(fs.copyFile);
 const ncpp = pify(ncp);
 const keep = true;  //!!process.env.GCPM_KEEP_TEMPDIRS;
 const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
@@ -45,7 +43,7 @@ it('should be able to use the d.ts', async () => {
   console.log(`${__filename} staging area: ${stagingPath}`);
   await spawnp('npm', ['pack']);
   const tarball = `${pkg.name}-${pkg.version}.tgz`;
-  await copyFile(tarball, `${stagingPath}/${pkg.name}.tgz`);
+  await ncpp(tarball, `${stagingPath}/${pkg.name}.tgz`);
   await ncpp('test/fixtures/kitchen', `${stagingPath}/`);
   await spawnp('npm', ['install'], {cwd: `${stagingPath}/`});
 }).timeout(60000);
