@@ -5,7 +5,8 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import * as cp from 'child_process';
+import * as spawn from 'cross-spawn';
+import {SpawnOptions} from 'child_process';
 import {ncp} from 'ncp';
 import * as pify from 'pify';
 import * as tmp from 'tmp';
@@ -16,10 +17,10 @@ const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
 const stagingPath = stagingDir.name;
 const pkg = require('../../package.json');
 
-const spawnp = (command: string, args: string[], options: cp.SpawnOptions = {}):
+const spawnp = (command: string, args: string[], options: SpawnOptions = {}):
     Promise<void> => {
       return new Promise((resolve, reject) => {
-        cp.spawn(command, args, Object.assign(options, {stdio: 'inherit'}))
+        spawn(command, args, Object.assign(options, {stdio: 'inherit'}))
             .on('close',
                 (code, signal) => {
                   if (code === 0) {
