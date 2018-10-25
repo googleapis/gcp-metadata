@@ -6,6 +6,7 @@
  */
 
 import axios from 'axios';
+import {OutgoingHttpHeaders} from 'http';
 import * as rax from 'retry-axios';
 
 const jsonBigint = require('json-bigint');
@@ -20,6 +21,7 @@ export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
 export interface Options {
   params?: {[index: string]: string};
   property?: string;
+  headers?: OutgoingHttpHeaders;
 }
 
 // Accepts an options object passed from the user to the API. In previous
@@ -32,6 +34,7 @@ function validate(options: Options) {
     switch (key) {
       case 'params':
       case 'property':
+      case 'headers':
         break;
       case 'qs':
         throw new Error(
@@ -59,7 +62,7 @@ async function metadataAccessor<T>(
   rax.attach(ax);
   const reqOpts = {
     url: `${BASE_URL}/${type}${property}`,
-    headers: Object.assign({}, HEADERS),
+    headers: Object.assign({}, HEADERS, options.headers),
     raxConfig: {noResponseRetries, instance: ax},
     params: options.params
   };
