@@ -4,6 +4,32 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## v0.9.0
+
+10-26-2018 13:10 PDT
+
+- feat: allow custom headers ([#109](https://github.com/googleapis/gcp-metadata/pull/109))
+- chore: update issue templates ([#108](https://github.com/googleapis/gcp-metadata/pull/108))
+- chore: remove old issue template ([#106](https://github.com/googleapis/gcp-metadata/pull/106))
+- build: run tests on node11 ([#105](https://github.com/googleapis/gcp-metadata/pull/105))
+- chores(build): do not collect sponge.xml from windows builds ([#104](https://github.com/googleapis/gcp-metadata/pull/104))
+- chores(build): run codecov on continuous builds ([#102](https://github.com/googleapis/gcp-metadata/pull/102))
+- chore(deps): update dependency nock to v10 ([#103](https://github.com/googleapis/gcp-metadata/pull/103))
+- chore: update new issue template ([#101](https://github.com/googleapis/gcp-metadata/pull/101))
+- build: fix codecov uploading on Kokoro ([#97](https://github.com/googleapis/gcp-metadata/pull/97))
+- Update kokoro config ([#95](https://github.com/googleapis/gcp-metadata/pull/95))
+- Update CI config ([#93](https://github.com/googleapis/gcp-metadata/pull/93))
+- Update kokoro config ([#91](https://github.com/googleapis/gcp-metadata/pull/91))
+- Re-generate library using /synth.py ([#90](https://github.com/googleapis/gcp-metadata/pull/90))
+- test: remove appveyor config ([#89](https://github.com/googleapis/gcp-metadata/pull/89))
+- Update kokoro config ([#88](https://github.com/googleapis/gcp-metadata/pull/88))
+- Enable prefer-const in the eslint config ([#87](https://github.com/googleapis/gcp-metadata/pull/87))
+- Enable no-var in eslint ([#86](https://github.com/googleapis/gcp-metadata/pull/86))
+
+### New Features
+
+A new option, `headers`, has been added to allow metadata queries to be sent with custom headers.
+
 ## v0.8.0
 
 **This release has breaking changes**.  Please take care when upgrading to the latest version.
