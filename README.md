@@ -38,6 +38,13 @@ const data = await gcpMetadata.instance({
 console.log(data) // ...Tags as newline-delimited list
 ```
 
+#### Access with custom headers
+```js
+await gcpMetadata.instance({
+  headers: { 'no-trace': '1' }
+}); // ...Request is untraced
+```
+
 ### Take care with large number valued properties
 
 In some cases number valued properties returned by the Metadata Service may be

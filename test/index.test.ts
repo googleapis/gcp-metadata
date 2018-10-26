@@ -49,6 +49,15 @@ it('should access a specific metadata property', async () => {
   scope.done();
 });
 
+it('should set custom headers when supplied', async () => {
+  const headers = {human: 'phone', monkey: 'banana'};
+  const scope = nock(HOST, {reqheaders: headers})
+                    .get(`${PATH}/${TYPE}/${PROPERTY}`)
+                    .reply(200, {}, HEADERS);
+  await gcp.instance({property: PROPERTY, headers});
+  scope.done();
+});
+
 it('should return large numbers as BigNumber values', async () => {
   const BIG_NUMBER_STRING = `3279739563200103600`;
   const scope = nock(HOST)
