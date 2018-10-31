@@ -11,7 +11,7 @@ import * as rax from 'retry-axios';
 
 const jsonBigint = require('json-bigint');
 
-export const HOST_ADDRESS = 'http://metadata.google.internal';
+export const HOST_ADDRESS = 'http://metadata.google.internal.';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 export const HEADER_NAME = 'Metadata-Flavor';
