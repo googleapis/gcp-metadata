@@ -36,9 +36,8 @@
   "author": "Stephen Sawchuk",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.0",
-    "json-bigint": "^0.3.0",
-    "retry-axios": "0.3.2"
+    "gaxios": "^1.0.2",
+    "json-bigint": "^0.3.0"
   },
   "devDependencies": {
     "@types/cross-spawn": "^6.0.0",
@@ -52,7 +51,6 @@
     "codecov": "^3.0.2",
     "cross-spawn": "^6.0.5",
     "gts": "^0.8.0",
-    "hard-rejection": "^1.0.0",
     "mocha": "^5.2.0",
     "ncp": "^2.0.0",
     "nock": "^10.0.0",
