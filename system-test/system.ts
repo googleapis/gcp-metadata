@@ -13,8 +13,8 @@ import fetch from 'node-fetch';
 import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
+import * as execa from 'execa';
 
-const spawn = require('await-spawn');
 const mv = promisify(fs.rename);
 const pkg = require('../../package.json');
 const projectId = process.env.GCLOUD_PROJECT;
@@ -100,10 +100,10 @@ async function pruneFunctions(sessionOnly: boolean) {
 }
 
 /**
- * Deploy the kitchen app to GCF.
+ * Deploy the hook app to GCF.
  */
 async function deployApp() {
-  const targetDir = path.join(__dirname, '../../system-test/fixtures/kitchen');
+  const targetDir = path.join(__dirname, '../../system-test/fixtures/hook');
   await gcx.deploy({
     name: fullPrefix,
     entryPoint: 'getMetadata',
@@ -116,11 +116,11 @@ async function deployApp() {
 
 /**
  * Runs `npm pack` on the root directory, and copies the resulting
- * `gcp-metadata.tgz` over to the kitchen sink directory in fixtures.
+ * `gcp-metadata.tgz` over to the hook directory in fixtures.
  */
 async function packModule() {
-  await spawn('npm', ['pack'], {stdio: 'inherit'});
+  await execa('npm', ['pack'], {stdio: 'inherit'});
   const from = `${pkg.name}-${pkg.version}.tgz`;
-  const to = `system-test/fixtures/kitchen/${pkg.name}.tgz`;
+  const to = `system-test/fixtures/hook/${pkg.name}.tgz`;
   await mv(from, to);
 }
