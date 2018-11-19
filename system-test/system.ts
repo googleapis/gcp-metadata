@@ -6,6 +6,7 @@
  */
 
 import * as assert from 'assert';
+import * as execa from 'execa';
 import * as fs from 'fs';
 import * as gcx from 'gcx';
 import {cloudfunctions_v1, google} from 'googleapis';
@@ -13,7 +14,6 @@ import fetch from 'node-fetch';
 import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
-import * as execa from 'execa';
 
 const mv = promisify(fs.rename);
 const pkg = require('../../package.json');
