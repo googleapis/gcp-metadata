@@ -1,0 +1,9 @@
+{
+  "name": "gcf-kitchen-test",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "gcp-metadata": "file:./gcp-metadata.tgz"
+  }
+}
