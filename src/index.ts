@@ -5,10 +5,8 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import axios from 'axios';
+import {request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
-import * as rax from 'retry-axios';
-
 const jsonBigint = require('json-bigint');
 
 export const HOST_ADDRESS = 'http://169.254.169.254';
@@ -56,18 +54,13 @@ async function metadataAccessor<T>(
     property = '/' + options.property;
   }
   validate(options);
-  const ax = axios.create({
-    transformResponse: [t => t]  // Do not use default JSON.parse.
-  });
-  rax.attach(ax);
-  const reqOpts = {
-    url: `${BASE_URL}/${type}${property}`,
-    headers: Object.assign({}, HEADERS, options.headers),
-    raxConfig: {noResponseRetries, instance: ax},
-    params: options.params
-  };
   try {
-    const res = await ax.request<T>(reqOpts);
+    const res = await request<T>({
+      url: `${BASE_URL}/${type}${property}`,
+      headers: Object.assign({}, HEADERS, options.headers),
+      retryConfig: {noResponseRetries},
+      params: options.params
+    });
     // NOTE: node.js converts all incoming headers to lower case.
     if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
       throw new Error(`Invalid response from metadata service: incorrect ${
