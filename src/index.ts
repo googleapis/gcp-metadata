@@ -9,7 +9,7 @@ import {request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 const jsonBigint = require('json-bigint');
 
-export const HOST_ADDRESS = 'http://169.254.169.254';
+export const HOST_ADDRESS = 'http://metadata.google.internal.';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 export const HEADER_NAME = 'Metadata-Flavor';
