@@ -2,7 +2,7 @@
 > Get the metadata from a Google Cloud Platform environment.
 
 [![NPM Version][npm-image]][npm-url]
-[![CircleCI][circleimg]][circle]
+[![npm version](https://img.shields.io/npm/v/gcp-metadata.svg)](https://www.npmjs.org/package/gcp-metadata)
 [![codecov][codecov-image]][codecov-url]
 
 ```sh
