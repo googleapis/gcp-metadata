@@ -4,6 +4,25 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## v0.9.1
+
+12-10-2018 11:53 PST
+
+- chore(deps): update dependency googleapis to v36 ([#135](https://github.com/googleapis/gcp-metadata/pull/135))
+- chore: always nyc report before calling codecov ([#134](https://github.com/googleapis/gcp-metadata/pull/134))
+- chore: nyc ignore build/test by default ([#133](https://github.com/googleapis/gcp-metadata/pull/133))
+- chore: Re-generated  to pick up changes in the API or client library generator. ([#131](https://github.com/googleapis/gcp-metadata/pull/131))
+- fix(build): fix system key decryption ([#128](https://github.com/googleapis/gcp-metadata/pull/128))
+- chore(deps): use gaxios for http requests ([#121](https://github.com/googleapis/gcp-metadata/pull/121))
+- refactor: use execa, move post install test to system ([#127](https://github.com/googleapis/gcp-metadata/pull/127))
+- chore: add a synth.metadata
+- test: add a system test ([#126](https://github.com/googleapis/gcp-metadata/pull/126))
+- chore(deps): update dependency gts to ^0.9.0 ([#123](https://github.com/googleapis/gcp-metadata/pull/123))
+- chore: update eslintignore config ([#122](https://github.com/googleapis/gcp-metadata/pull/122))
+- chore: use latest npm on Windows ([#120](https://github.com/googleapis/gcp-metadata/pull/120))
+- chore: update CircleCI config ([#119](https://github.com/googleapis/gcp-metadata/pull/119))
+- chore: include build in eslintignore ([#115](https://github.com/googleapis/gcp-metadata/pull/115))
+
 ## v0.9.0
 
 10-26-2018 13:10 PDT
