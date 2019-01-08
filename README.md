@@ -2,7 +2,6 @@
 > Get the metadata from a Google Cloud Platform environment.
 
 [![NPM Version][npm-image]][npm-url]
-[![CircleCI][circleimg]][circle]
 [![codecov][codecov-image]][codecov-url]
 
 ```sh
@@ -60,9 +59,7 @@ console.log(id.toString()) // ... 4520031799277581759
 ```
 
 [bignumber.js]: https://github.com/MikeMcl/bignumber.js
-[circle]: https://circleci.com/gh/stephenplusplus/gcp-metadata
-[circleimg]: https://circleci.com/gh/stephenplusplus/gcp-metadata.svg?style=shield
-[codecov-image]: https://codecov.io/gh/stephenplusplus/gcp-metadata/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/stephenplusplus/gcp-metadata
+[codecov-image]: https://codecov.io/gh/googleapis/gcp-metadata/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/googleapis/gcp-metadata
 [npm-image]: https://img.shields.io/npm/v/gcp-metadata.svg
 [npm-url]: https://www.npmjs.com/package/gcp-metadata
