@@ -59,7 +59,8 @@ async function metadataAccessor<T>(
       url: `${BASE_URL}/${type}${property}`,
       headers: Object.assign({}, HEADERS, options.headers),
       retryConfig: {noResponseRetries},
-      params: options.params
+      params: options.params,
+      responseType: 'text'
     });
     // NOTE: node.js converts all incoming headers to lower case.
     if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
