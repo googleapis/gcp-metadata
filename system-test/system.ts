@@ -8,6 +8,7 @@
 import * as assert from 'assert';
 import * as execa from 'execa';
 import * as fs from 'fs';
+import * as gcbuild from 'gcbuild';
 import * as gcx from 'gcx';
 import {cloudfunctions_v1, google} from 'googleapis';
 import fetch from 'node-fetch';
@@ -15,13 +16,8 @@ import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
 
-const mv = promisify(fs.rename);
+const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json');
-const projectId = process.env.GCLOUD_PROJECT;
-
-if (!projectId) {
-  throw new Error('Please set the `GCLOUD_PROJECT` environment variable.');
-}
 
 let gcf: cloudfunctions_v1.Cloudfunctions;
 const shortPrefix = 'gcloud-tests';
@@ -29,33 +25,56 @@ const fullPrefix = `${shortPrefix}-${uuid.v4().split('-')[0]}`;
 
 describe('gcp metadata', () => {
   before(async () => {
-    // Clean up any old cloud functions just hanging out
-    gcf = await getGCFClient();
-    await pruneFunctions(false);
-
     // pack up the gcp-metadata module and copy to the target dir
     await packModule();
-
-    // deploy the function to GCF
-    await deployApp();
   });
 
-  it('should access the metadata service on GCF', async () => {
-    const url =
-        `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
-    const res = await fetch(url);
-    if (res.status === 200) {
-      const metadata = await res.json();
-      console.log(metadata);
-      assert.strictEqual(metadata.isAvailable, true);
-    } else {
-      const text = await res.text();
-      console.error(text);
-      assert.fail('Request to the deployed cloud function failed.');
-    }
+  describe('cloud functions', () => {
+    before(async () => {
+      // Clean up any old cloud functions just hanging out
+      gcf = await getGCFClient();
+      await pruneFunctions(false);
+
+      // deploy the function to GCF
+      await deployApp();
+    });
+
+    it('should access the metadata service on GCF', async () => {
+      const projectId = await google.auth.getProjectId();
+      const url =
+          `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
+      const res = await fetch(url);
+      if (res.status === 200) {
+        const metadata = await res.json();
+        console.log(metadata);
+        assert.strictEqual(metadata.isAvailable, true);
+      } else {
+        const text = await res.text();
+        console.error(text);
+        assert.fail('Request to the deployed cloud function failed.');
+      }
+    });
+
+    after(() => pruneFunctions(true));
   });
 
-  after(() => pruneFunctions(true));
+  describe('cloud build', () => {
+    it('should access the metadata service on GCB', async () => {
+      try {
+        const result = await gcbuild.build({
+          sourcePath:
+              path.join(__dirname, '../../system-test/fixtures/cloudbuild')
+        });
+        console.log(result.log);
+        assert.ok(/isAvailable: true/.test(result.log));
+        assert.ok(
+            result.log.includes('"default":{"aliases":["default"],"email"'));
+      } catch (e) {
+        console.error(e.log);
+        throw e;
+      }
+    });
+  });
 });
 
 /**
@@ -76,6 +95,7 @@ async function getGCFClient() {
  */
 async function pruneFunctions(sessionOnly: boolean) {
   console.log('Pruning leaked functions...');
+  const projectId = await google.auth.getProjectId();
   const res = await gcf.projects.locations.functions.list(
       {parent: `projects/${projectId}/locations/-`});
   const fns = res.data.functions || [];
@@ -116,11 +136,14 @@ async function deployApp() {
 
 /**
  * Runs `npm pack` on the root directory, and copies the resulting
- * `gcp-metadata.tgz` over to the hook directory in fixtures.
+ * `gcp-metadata.tgz` over to the target directories in fixtures.
  */
 async function packModule() {
   await execa('npm', ['pack'], {stdio: 'inherit'});
   const from = `${pkg.name}-${pkg.version}.tgz`;
-  const to = `system-test/fixtures/hook/${pkg.name}.tgz`;
-  await mv(from, to);
+  const targets = ['hook', 'cloudbuild'];
+  await Promise.all(targets.map(target => {
+    const to = `system-test/fixtures/${target}/${pkg.name}.tgz`;
+    return copy(from, to);
+  }));
 }

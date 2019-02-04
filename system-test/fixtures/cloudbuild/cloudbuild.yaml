@@ -1,0 +1,5 @@
+steps:
+- name: 'node:11-alpine'
+  args: ['npm', 'install']
+- name: 'node:11-alpine'
+  args: ['npm', 'start']

@@ -7,12 +7,19 @@
 
 const gcpMetadata = require('gcp-metadata');
 
-exports.getMetadata = async (req, res) => {
+async function main() {
   const isAvailable = await gcpMetadata.isAvailable();
-  const instance = await gcpMetadata.instance();
+  console.log(`isAvailable: ${isAvailable}`);
+  const token = await gcpMetadata.instance(`service-accounts/default/token`);
   const svc = await gcpMetadata.instance({
     property: 'service-accounts/',
     params: {recursive: 'true'}
   });
-  res.status(200).send({isAvailable, instance, svc});
+  console.log('serviceAccounts:');
+  console.log(JSON.stringify(svc).split('\n').join());
 };
+
+main().catch(e => {
+  console.error(e);
+  throw e;
+});
