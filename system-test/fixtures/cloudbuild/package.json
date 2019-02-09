@@ -1,0 +1,12 @@
+{
+  "name": "gcb-test-fixtures",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "gcp-metadata": "file:./gcp-metadata.tgz"
+  }
+}

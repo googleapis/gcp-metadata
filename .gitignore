@@ -3,7 +3,7 @@ build
 .vscode
 package-lock.json
 .nyc_output
-coverage
+.coverage
 package-lock.json
 gcp-metadata.tgz
 docs/
