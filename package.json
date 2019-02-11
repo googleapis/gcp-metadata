@@ -23,7 +23,9 @@
     "test-only": "nyc mocha build/test",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
     "docs": "compodoc src/",
-    "lint": "npm run check"
+    "lint": "npm run check",
+    "docs-test": "blcl docs -r --exclude www.googleapis.com",
+    "predocs-test": "npm run docs"
   },
   "keywords": [
     "google cloud platform",
@@ -64,7 +66,8 @@
     "nyc": "^13.0.0",
     "source-map-support": "^0.5.6",
     "typescript": "^3.0.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "broken-link-checker-local": "^0.2.0"
   },
   "engines": {
     "node": ">=6"
