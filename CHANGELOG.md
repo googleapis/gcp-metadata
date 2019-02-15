@@ -4,6 +4,32 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## v1.0.0
+
+02-14-2019 16:00 PST
+
+### Bug Fixes
+- fix: ask gaxios for text and not json ([#152](https://github.com/googleapis/gcp-metadata/pull/152))
+
+### Documentation
+- docs: update links in contrib guide ([#168](https://github.com/googleapis/gcp-metadata/pull/168))
+- docs: add lint/fix example to contributing guide ([#160](https://github.com/googleapis/gcp-metadata/pull/160))
+
+### Internal / Testing Changes
+- build: use linkinator for docs test ([#166](https://github.com/googleapis/gcp-metadata/pull/166))
+- chore(deps): update dependency @types/tmp to v0.0.34 ([#167](https://github.com/googleapis/gcp-metadata/pull/167))
+- build: create docs test npm scripts ([#165](https://github.com/googleapis/gcp-metadata/pull/165))
+- test: run system tests on GCB ([#157](https://github.com/googleapis/gcp-metadata/pull/157))
+- build: test using @grpc/grpc-js in CI ([#164](https://github.com/googleapis/gcp-metadata/pull/164))
+- chore: move CONTRIBUTING.md to root ([#162](https://github.com/googleapis/gcp-metadata/pull/162))
+- chore(deps): update dependency gcx to v0.1.1 ([#159](https://github.com/googleapis/gcp-metadata/pull/159))
+- chore(deps): update dependency gcx to v0.1.0 ([#158](https://github.com/googleapis/gcp-metadata/pull/158))
+- chore(deps): update dependency gcx to v0.0.4 ([#155](https://github.com/googleapis/gcp-metadata/pull/155))
+- chore(deps): update dependency googleapis to v37 ([#156](https://github.com/googleapis/gcp-metadata/pull/156))
+- build: ignore googleapis.com in doc link check ([#153](https://github.com/googleapis/gcp-metadata/pull/153))
+- build: check broken links in generated docs ([#149](https://github.com/googleapis/gcp-metadata/pull/149))
+- chore(build): inject yoshi automation key ([#148](https://github.com/googleapis/gcp-metadata/pull/148))
+
 ## v0.9.3
 
 12-10-2018 16:16 PST
