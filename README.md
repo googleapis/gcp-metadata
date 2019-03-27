@@ -1,65 +1,78 @@
-# gcp-metadata
-> Get the metadata from a Google Cloud Platform environment.
+[//]: # "This README.md file is auto-generated, all changes to this file will be lost."
+[//]: # "To regenerate it, use `python -m synthtool`."
+<img src="https://avatars2.githubusercontent.com/u/2810941?v=3&s=96" alt="Google Cloud Platform logo" title="Google Cloud Platform" align="right" height="96" width="96"/>
 
-[![NPM Version][npm-image]][npm-url]
-[![codecov][codecov-image]][codecov-url]
+# [:  Client](https://github.com/)
 
-```sh
-$ npm install --save gcp-metadata
-```
-```js
-const gcpMetadata = require('gcp-metadata');
-```
+None
+[![npm version](https://img.shields.io/npm/v/gcp-metadata.svg)](https://www.npmjs.org/package/gcp-metadata)
+[![codecov](https://img.shields.io/codecov/c/github//master.svg?style=flat)](https://codecov.io/gh/)
 
-#### Check to see if the metadata server is available
-```js
-const isAvailable = await gcpMetadata.isAvailable();
-```
 
-#### Access all metadata
-```js
-const data = await gcpMetadata.instance();
-console.log(data); // ... All metadata properties
-```
+Get the metadata from a Google Cloud Platform environment
 
-#### Access specific properties
-```js
-const data = await gcpMetadata.instance('hostname');
-console.log(data) // ...Instance hostname
-```
 
-#### Access specific properties with query parameters
-```js
-const data = await gcpMetadata.instance({
-  property: 'tags',
-  params: { alt: 'text' }
-});
-console.log(data) // ...Tags as newline-delimited list
-```
+* [Using the client library](#using-the-client-library)
+* [Versioning](#versioning)
+* [Contributing](#contributing)
+* [License](#license)
 
-#### Access with custom headers
-```js
-await gcpMetadata.instance({
-  headers: { 'no-trace': '1' }
-}); // ...Request is untraced
-```
+## Using the client library
 
-### Take care with large number valued properties
+1.  [Select or create a Cloud Platform project][projects].
+1.  [Enable the  API][enable_api].
+1.  [Set up authentication with a service account][auth] so you can access the
+    API from your local workstation.
 
-In some cases number valued properties returned by the Metadata Service may be
-too large to be representable as JavaScript numbers. In such cases we return
-those values as `BigNumber` objects (from the [bignumber.js][] library). Numbers
-that fit within the JavaScript number range will be returned as normal number
-values.
+1. Install the client library:
 
-```js
-const id = await gcpMetadata.instance('id');
-console.log(id)  // ... BigNumber { s: 1, e: 18, c: [ 45200, 31799277581759 ] }
-console.log(id.toString()) // ... 4520031799277581759
-```
+        npm install gcp-metadata
 
-[bignumber.js]: https://github.com/MikeMcl/bignumber.js
-[codecov-image]: https://codecov.io/gh/googleapis/gcp-metadata/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/googleapis/gcp-metadata
-[npm-image]: https://img.shields.io/npm/v/gcp-metadata.svg
-[npm-url]: https://www.npmjs.com/package/gcp-metadata
+
+
+
+
+The [  Client API Reference][client-docs] documentation
+also contains samples.
+
+## Versioning
+
+This library follows [Semantic Versioning](http://semver.org/).
+
+
+
+
+
+
+More Information: [Google Cloud Platform Launch Stages][launch_stages]
+
+[launch_stages]: https://cloud.google.com/terms/launch-stages
+
+## Contributing
+
+Contributions welcome! See the [Contributing Guide](https://github.com//blob/master/CONTRIBUTING.md).
+
+## License
+
+Apache Version 2.0
+
+See [LICENSE](https://github.com//blob/master/LICENSE)
+
+## What's Next
+
+* [ Documentation][product-docs]
+* [  Client API Reference][client-docs]
+* [github.com/](https://github.com/)
+
+Read more about the client libraries for Cloud APIs, including the older
+Google APIs Client Libraries, in [Client Libraries Explained][explained].
+
+[explained]: https://cloud.google.com/apis/docs/client-libraries-explained
+
+[client-docs]: 
+[product-docs]: 
+[shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
+[projects]: https://console.cloud.google.com/project
+[billing]: https://support.google.com/cloud/answer/6293499#enable-billing
+[enable_api]: https://console.cloud.google.com/flows/enableapi?apiid=
+[auth]: https://cloud.google.com/docs/authentication/getting-started
