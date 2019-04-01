@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node index.js"
   },
+  "engines": {
+    "node": ">=10"
+  },
   "dependencies": {
     "gcp-metadata": "file:./gcp-metadata.tgz"
   }

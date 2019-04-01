@@ -10,14 +10,18 @@ const gcpMetadata = require('gcp-metadata');
 async function main() {
   const isAvailable = await gcpMetadata.isAvailable();
   console.log(`isAvailable: ${isAvailable}`);
-  const token = await gcpMetadata.instance(`service-accounts/default/token`);
+  await gcpMetadata.instance(`service-accounts/default/token`);
   const svc = await gcpMetadata.instance({
     property: 'service-accounts/',
-    params: {recursive: 'true'}
+    params: {recursive: 'true'},
   });
   console.log('serviceAccounts:');
-  console.log(JSON.stringify(svc).split('\n').join());
-};
+  console.log(
+    JSON.stringify(svc)
+      .split('\n')
+      .join()
+  );
+}
 
 main().catch(e => {
   console.error(e);
