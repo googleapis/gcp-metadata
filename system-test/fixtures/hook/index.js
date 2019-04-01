@@ -12,7 +12,7 @@ exports.getMetadata = async (req, res) => {
   const instance = await gcpMetadata.instance();
   const svc = await gcpMetadata.instance({
     property: 'service-accounts/',
-    params: {recursive: 'true'}
+    params: {recursive: 'true'},
   });
   res.status(200).send({isAvailable, instance, svc});
 };
