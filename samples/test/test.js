@@ -6,7 +6,7 @@
  */
 
 const {assert} = require('chai');
-const execa = require('execa');
+const {execSync} = require('child_process');
 
 describe('gcp-metadata samples', () => {
   it('should run the quickstart', async () => {
