@@ -12,7 +12,7 @@ const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});
 
 describe('gcp-metadata samples', () => {
   it('should run the quickstart', async () => {
-    const {stdout} = await execa('node', ['quickstart']);
+    const stdout = execSync('node quickstart');
     assert.match(stdout, /Is available/);
   });
 });
