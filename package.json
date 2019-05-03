@@ -35,7 +35,7 @@
   "author": "Stephen Sawchuk",
   "license": "MIT",
   "dependencies": {
-    "gaxios": "^1.0.2",
+    "gaxios": "^2.0.0",
     "json-bigint": "^0.3.0"
   },
   "devDependencies": {
