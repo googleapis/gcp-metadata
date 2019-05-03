@@ -41,8 +41,7 @@ describe('gcp metadata', () => {
 
     it('should access the metadata service on GCF', async () => {
       const projectId = await google.auth.getProjectId();
-      const url =
-          `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
+      const url = `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
       const res = await fetch(url);
       if (res.status === 200) {
         const metadata = await res.json();
@@ -62,13 +61,16 @@ describe('gcp metadata', () => {
     it('should access the metadata service on GCB', async () => {
       try {
         const result = await gcbuild.build({
-          sourcePath:
-              path.join(__dirname, '../../system-test/fixtures/cloudbuild')
+          sourcePath: path.join(
+            __dirname,
+            '../../system-test/fixtures/cloudbuild'
+          ),
         });
         console.log(result.log);
         assert.ok(/isAvailable: true/.test(result.log));
         assert.ok(
-            result.log.includes('"default":{"aliases":["default"],"email"'));
+          result.log.includes('"default":{"aliases":["default"],"email"')
+        );
       } catch (e) {
         console.error(e.log);
         throw e;
@@ -82,8 +84,9 @@ describe('gcp metadata', () => {
  * properly authenticated.
  */
 async function getGCFClient() {
-  const auth = await google.auth.getClient(
-      {scopes: 'https://www.googleapis.com/auth/cloud-platform'});
+  const auth = await google.auth.getClient({
+    scopes: 'https://www.googleapis.com/auth/cloud-platform',
+  });
   return google.cloudfunctions({version: 'v1', auth});
 }
 
@@ -96,27 +99,30 @@ async function getGCFClient() {
 async function pruneFunctions(sessionOnly: boolean) {
   console.log('Pruning leaked functions...');
   const projectId = await google.auth.getProjectId();
-  const res = await gcf.projects.locations.functions.list(
-      {parent: `projects/${projectId}/locations/-`});
+  const res = await gcf.projects.locations.functions.list({
+    parent: `projects/${projectId}/locations/-`,
+  });
   const fns = res.data.functions || [];
   await Promise.all(
-      fns.filter(fn => {
-           if (sessionOnly) {
-             return fn.name!.includes(fullPrefix);
-           }
-           const updateDate = (new Date(fn.updateTime!)).getTime();
-           const currentDate = Date.now();
-           const minutesSinceUpdate = (currentDate - updateDate) / 1000 / 60;
-           return (minutesSinceUpdate > 60 && fn.name!.includes(shortPrefix));
-         })
-          .map(async fn => {
-            await gcf.projects.locations.functions.delete({name: fn.name})
-                .catch(e => {
-                  console.error(
-                      `There was a problem deleting function ${fn.name}.`);
-                  console.error(e);
-                });
-          }));
+    fns
+      .filter(fn => {
+        if (sessionOnly) {
+          return fn.name!.includes(fullPrefix);
+        }
+        const updateDate = new Date(fn.updateTime!).getTime();
+        const currentDate = Date.now();
+        const minutesSinceUpdate = (currentDate - updateDate) / 1000 / 60;
+        return minutesSinceUpdate > 60 && fn.name!.includes(shortPrefix);
+      })
+      .map(async fn => {
+        await gcf.projects.locations.functions
+          .delete({name: fn.name})
+          .catch(e => {
+            console.error(`There was a problem deleting function ${fn.name}.`);
+            console.error(e);
+          });
+      })
+  );
 }
 
 /**
@@ -130,7 +136,7 @@ async function deployApp() {
     triggerHTTP: true,
     runtime: 'nodejs8',
     region: 'us-central1',
-    targetDir
+    targetDir,
   });
 }
 
@@ -142,8 +148,10 @@ async function packModule() {
   await execa('npm', ['pack'], {stdio: 'inherit'});
   const from = `${pkg.name}-${pkg.version}.tgz`;
   const targets = ['hook', 'cloudbuild'];
-  await Promise.all(targets.map(target => {
-    const to = `system-test/fixtures/${target}/${pkg.name}.tgz`;
-    return copy(from, to);
-  }));
+  await Promise.all(
+    targets.map(target => {
+      const to = `system-test/fixtures/${target}/${pkg.name}.tgz`;
+      return copy(from, to);
+    })
+  );
 }
