@@ -36,7 +36,8 @@ function validate(options: Options) {
         break;
       case 'qs':
         throw new Error(
-            `'qs' is not a valid configuration option. Please use 'params' instead.`);
+          `'qs' is not a valid configuration option. Please use 'params' instead.`
+        );
       default:
         throw new Error(`'${key}' is not a valid configuration option.`);
     }
@@ -44,7 +45,10 @@ function validate(options: Options) {
 }
 
 async function metadataAccessor<T>(
-    type: string, options?: string|Options, noResponseRetries = 3): Promise<T> {
+  type: string,
+  options?: string | Options,
+  noResponseRetries = 3
+): Promise<T> {
   options = options || {};
   if (typeof options === 'string') {
     options = {property: options};
@@ -60,12 +64,13 @@ async function metadataAccessor<T>(
       headers: Object.assign({}, HEADERS, options.headers),
       retryConfig: {noResponseRetries},
       params: options.params,
-      responseType: 'text'
+      responseType: 'text',
     });
     // NOTE: node.js converts all incoming headers to lower case.
     if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
-      throw new Error(`Invalid response from metadata service: incorrect ${
-          HEADER_NAME} header.`);
+      throw new Error(
+        `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`
+      );
     } else if (!res.data) {
       throw new Error('Invalid response from the metadata service');
     }
@@ -86,12 +91,12 @@ async function metadataAccessor<T>(
 }
 
 // tslint:disable-next-line no-any
-export function instance<T = any>(options?: string|Options) {
+export function instance<T = any>(options?: string | Options) {
   return metadataAccessor<T>('instance', options);
 }
 
 // tslint:disable-next-line no-any
-export function project<T = any>(options?: string|Options) {
+export function project<T = any>(options?: string | Options) {
   return metadataAccessor<T>('project', options);
 }
 
