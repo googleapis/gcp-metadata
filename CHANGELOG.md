@@ -4,6 +4,23 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [2.0.0](https://www.github.com/googleapis/gcp-metadata/compare/v1.0.0...v2.0.0) (2019-05-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency gaxios to v2 ([#191](https://www.github.com/googleapis/gcp-metadata/issues/191)) ([ac8c1ef](https://www.github.com/googleapis/gcp-metadata/commit/ac8c1ef))
+
+
+### Build System
+
+* upgrade engines field to >=8.10.0 ([#194](https://www.github.com/googleapis/gcp-metadata/issues/194)) ([97c23c8](https://www.github.com/googleapis/gcp-metadata/commit/97c23c8))
+
+
+### BREAKING CHANGES
+
+* upgrade engines field to >=8.10.0 (#194)
+
 ## v1.0.0
 
 02-14-2019 16:00 PST
@@ -170,4 +187,3 @@ For more details see [#74](https://github.com/googleapis/gcp-metadata/pull/74).
 - chore(deps): update dependency typescript to v3 ([#67](https://github.com/googleapis/gcp-metadata/pull/67))
 - chore: make it OSPO compliant ([#66](https://github.com/googleapis/gcp-metadata/pull/66))
 - chore(deps): update dependency gts to ^0.8.0 ([#65](https://github.com/googleapis/gcp-metadata/pull/65))
-
