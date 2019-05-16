@@ -114,7 +114,7 @@ it('should return the request error', async () => {
 it('should return error when res is empty', async () => {
   const scope = nock(HOST)
     .get(`${PATH}/${TYPE}`)
-    .reply(200, null, HEADERS);
+    .reply(200, undefined, HEADERS);
   await assertRejects(gcp.instance());
   scope.done();
 });
