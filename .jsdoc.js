@@ -41,5 +41,8 @@ module.exports = {
     sourceFiles: false,
     systemName: 'gcp-metadata',
     theme: 'lumen'
+  },
+  markdown: {
+    idInHeadings: true
   }
 };
