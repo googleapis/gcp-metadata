@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [2.0.1](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.0...v2.0.1) (2019-06-26)
+
+
+### Bug Fixes
+
+* **docs:** make anchors work in jsdoc ([#212](https://www.github.com/googleapis/gcp-metadata/issues/212)) ([9174b43](https://www.github.com/googleapis/gcp-metadata/commit/9174b43))
+
 ## [2.0.0](https://www.github.com/googleapis/gcp-metadata/compare/v1.0.0...v2.0.0) (2019-05-07)
 
 
