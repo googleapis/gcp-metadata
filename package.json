@@ -33,7 +33,7 @@
     "metadata"
   ],
   "author": "Stephen Sawchuk",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "gaxios": "^2.0.0",
     "json-bigint": "^0.3.0"
