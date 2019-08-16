@@ -6,15 +6,15 @@
  */
 
 import * as assert from 'assert';
-import * as execa from 'execa';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
 import * as gcx from 'gcx';
 import {cloudfunctions_v1, google} from 'googleapis';
-import fetch from 'node-fetch';
 import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
+import {execSync} from 'child_process';
+import {request, GaxiosError, Gaxios} from 'gaxios';
 
 const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json');
@@ -42,14 +42,14 @@ describe('gcp metadata', () => {
     it('should access the metadata service on GCF', async () => {
       const projectId = await google.auth.getProjectId();
       const url = `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
-      const res = await fetch(url);
-      if (res.status === 200) {
-        const metadata = await res.json();
+      try {
+        const res = await request({url});
+        // tslint:disable-next-line no-any
+        const metadata = res.data as any;
         console.log(metadata);
         assert.strictEqual(metadata.isAvailable, true);
-      } else {
-        const text = await res.text();
-        console.error(text);
+      } catch (e) {
+        console.error((e as GaxiosError).response!.data);
         assert.fail('Request to the deployed cloud function failed.');
       }
     });
@@ -84,10 +84,14 @@ describe('gcp metadata', () => {
  * properly authenticated.
  */
 async function getGCFClient() {
-  const auth = await google.auth.getClient({
+  const auth = new google.auth.GoogleAuth({
     scopes: 'https://www.googleapis.com/auth/cloud-platform',
   });
-  return google.cloudfunctions({version: 'v1', auth});
+  const client = await auth.getClient();
+  return google.cloudfunctions({
+    version: 'v1',
+    auth: client
+  });
 }
 
 /**
@@ -145,7 +149,7 @@ async function deployApp() {
  * `gcp-metadata.tgz` over to the target directories in fixtures.
  */
 async function packModule() {
-  await execa('npm', ['pack'], {stdio: 'inherit'});
+  execSync('npm pack', {stdio: 'inherit'});
   const from = `${pkg.name}-${pkg.version}.tgz`;
   const targets = ['hook', 'cloudbuild'];
   await Promise.all(

@@ -5,10 +5,10 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import * as execa from 'execa';
 import {ncp} from 'ncp';
 import * as tmp from 'tmp';
 import {promisify} from 'util';
+import {execSync} from 'child_process';
 
 describe('installation', () => {
   const ncpp = promisify(ncp);
@@ -23,11 +23,11 @@ describe('installation', () => {
    */
   it('should be able to use the d.ts', async () => {
     console.log(`${__filename} staging area: ${stagingPath}`);
-    await execa('npm', ['pack'], {stdio: 'inherit'});
+    execSync('npm pack', {stdio: 'inherit'});
     const tarball = `${pkg.name}-${pkg.version}.tgz`;
     await ncpp(tarball, `${stagingPath}/${pkg.name}.tgz`);
     await ncpp('system-test/fixtures/kitchen', `${stagingPath}/`);
-    await execa('npm', ['install'], {cwd: `${stagingPath}/`, stdio: 'inherit'});
+    execSync('npm install', {cwd: `${stagingPath}/`, stdio: 'inherit'});
   });
 
   /**
