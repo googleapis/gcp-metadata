@@ -90,7 +90,7 @@ async function getGCFClient() {
   const client = await auth.getClient();
   return google.cloudfunctions({
     version: 'v1',
-    auth: client
+    auth: client,
   });
 }
 
