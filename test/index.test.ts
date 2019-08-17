@@ -13,8 +13,6 @@ const assertRejects = require('assert-rejects');
 
 const HOST = gcp.HOST_ADDRESS;
 const PATH = gcp.BASE_PATH;
-const BASE_URL = gcp.BASE_URL;
-const HEADER_NAME = gcp.HEADER_NAME;
 const TYPE = 'instance';
 const PROPERTY = 'property';
 
