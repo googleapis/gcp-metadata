@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [2.0.2](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.1...v2.0.2) (2019-08-26)
+
+
+### Bug Fixes
+
+* allow calls with no request, add JSON proto ([#224](https://www.github.com/googleapis/gcp-metadata/issues/224)) ([dc758b1](https://www.github.com/googleapis/gcp-metadata/commit/dc758b1))
+
 ### [2.0.1](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.0...v2.0.1) (2019-06-26)
 
 
