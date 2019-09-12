@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [2.0.3](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.2...v2.0.3) (2019-09-12)
+
+
+### Bug Fixes
+
+* use IP for metadata server ([#233](https://www.github.com/googleapis/gcp-metadata/issues/233)) ([20a15cb](https://www.github.com/googleapis/gcp-metadata/commit/20a15cb))
+
 ### [2.0.2](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.1...v2.0.2) (2019-08-26)
 
 
