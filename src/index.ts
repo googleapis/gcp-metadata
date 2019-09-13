@@ -65,7 +65,7 @@ async function metadataAccessor<T>(
       retryConfig: {noResponseRetries},
       params: options.params,
       responseType: 'text',
-      timeout: 3000
+      timeout: 3000,
     });
     // NOTE: node.js converts all incoming headers to lower case.
     if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
