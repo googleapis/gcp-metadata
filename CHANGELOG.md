@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [2.0.4](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.3...v2.0.4) (2019-09-13)
+
+
+### Bug Fixes
+
+* IP address takes 15 seconds to timeout, vs., metadata returning immediately ([#235](https://www.github.com/googleapis/gcp-metadata/issues/235)) ([d04207b](https://www.github.com/googleapis/gcp-metadata/commit/d04207b))
+* use 3s timeout rather than 15 default ([#237](https://www.github.com/googleapis/gcp-metadata/issues/237)) ([231ca5c](https://www.github.com/googleapis/gcp-metadata/commit/231ca5c))
+
 ### [2.0.3](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.2...v2.0.3) (2019-09-12)
 
 
