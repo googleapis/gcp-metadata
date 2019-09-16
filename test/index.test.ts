@@ -11,7 +11,10 @@ import * as gcp from '../src';
 
 const assertRejects = require('assert-rejects');
 
+// the metadata IP entry:
 const HOST = gcp.HOST_ADDRESS;
+// the metadata DNS entry:
+const SECONDARY_HOST = gcp.SECONDARY_HOST_ADDRESS;
 const PATH = gcp.BASE_PATH;
 const TYPE = 'instance';
 const PROPERTY = 'property';
@@ -174,34 +177,113 @@ it('should retry on DNS errors', async () => {
   assert(data);
 });
 
-it('should report isGCE if the server returns a 500 first', async () => {
-  const scope = nock(HOST)
+async function secondaryHostRequest(
+  delay: number,
+  success: boolean
+): Promise<void> {
+  let secondary: nock.Scope;
+  if (success) {
+    secondary = nock(SECONDARY_HOST)
+      .get(`${PATH}/${TYPE}`)
+      .delayConnection(delay)
+      .reply(200, {}, HEADERS);
+  } else {
+    secondary = nock(SECONDARY_HOST)
+      .get(`${PATH}/${TYPE}`)
+      .delayConnection(delay)
+      .replyWithError({code: 'ENOENT'});
+  }
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        secondary.done();
+        return resolve();
+      } catch (err) {
+        return reject(err);
+      }
+    }, delay + 50);
+  });
+}
+
+it('should report isGCE if primary server returns 500 followed by 200', async () => {
+  const secondary = secondaryHostRequest(500, true);
+  const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .twice()
     .reply(500)
     .get(`${PATH}/${TYPE}`)
     .reply(200, {}, HEADERS);
   const isGCE = await gcp.isAvailable();
-  scope.done();
+  await secondary;
+  primary.done();
   assert.strictEqual(isGCE, true);
 });
 
 it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
-  const scope = nock(HOST)
+  const secondary = secondaryHostRequest(500, true);
+  const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .replyWithError({code: 'ENOTFOUND'});
   const isGCE = await gcp.isAvailable();
-  scope.done();
+  await secondary;
+  primary.done();
   assert.strictEqual(false, isGCE);
 });
 
 it('should fail fast on isAvailable if ENOENT is returned', async () => {
-  const scope = nock(HOST)
+  const secondary = secondaryHostRequest(500, true);
+  const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .replyWithError({code: 'ENOENT'});
   const isGCE = await gcp.isAvailable();
-  scope.done();
+  await secondary;
+  primary.done();
   assert.strictEqual(false, isGCE);
+});
+
+it('should fail on isAvailable if request times out', async () => {
+  const secondary = secondaryHostRequest(5000, true);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .delayConnection(3500)
+    // this should never get called, as the 3000 timeout will trigger.
+    .reply(200, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  // secondary is allowed to simply timeout in the aether, to avoid
+  // having a test that waits 5000 ms.
+  primary.done();
+  assert.strictEqual(false, isGCE);
+});
+
+it('should report isGCE if secondary responds before primary', async () => {
+  const secondary = secondaryHostRequest(10, true);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .delayConnection(3500)
+    // this should never get called, as the 3000 timeout will trigger.
+    .reply(200, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(isGCE, true);
+});
+
+it('should fail fast on isAvailable if ENOENT is returned by secondary', done => {
+  let isGCE: boolean;
+  const secondary = secondaryHostRequest(10, false);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .delayConnection(250)
+    .replyWithError({code: 'ENOENT'});
+  gcp.isAvailable().then(_isGCE => {
+    isGCE = _isGCE;
+  });
+  setTimeout(async () => {
+    await primary;
+    await secondary;
+    assert.strictEqual(false, isGCE);
+    return done();
+  }, 500);
 });
 
 it('should throw on unexpected errors', async () => {

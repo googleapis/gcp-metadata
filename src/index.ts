@@ -5,13 +5,15 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import {request} from 'gaxios';
+import {GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 const jsonBigint = require('json-bigint');
 
 export const HOST_ADDRESS = 'http://169.254.169.254';
 export const BASE_PATH = '/computeMetadata/v1';
 export const BASE_URL = HOST_ADDRESS + BASE_PATH;
+export const SECONDARY_HOST_ADDRESS = 'http://metadata.google.internal.';
+export const SECONDARY_BASE_URL = SECONDARY_HOST_ADDRESS + BASE_PATH;
 export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
@@ -47,7 +49,8 @@ function validate(options: Options) {
 async function metadataAccessor<T>(
   type: string,
   options?: string | Options,
-  noResponseRetries = 3
+  noResponseRetries = 3,
+  fastFail = false
 ): Promise<T> {
   options = options || {};
   if (typeof options === 'string') {
@@ -59,7 +62,8 @@ async function metadataAccessor<T>(
   }
   validate(options);
   try {
-    const res = await request<T>({
+    const requestMethod = fastFail ? fastFailMetadataRequest : request;
+    const res = await requestMethod<T>({
       url: `${BASE_URL}/${type}${property}`,
       headers: Object.assign({}, HEADERS, options.headers),
       retryConfig: {noResponseRetries},
@@ -91,6 +95,16 @@ async function metadataAccessor<T>(
   }
 }
 
+async function fastFailMetadataRequest<T>(
+  options: GaxiosOptions
+): Promise<GaxiosResponse> {
+  const secondaryOptions = {
+    ...options,
+    url: options.url!.replace(BASE_URL, SECONDARY_BASE_URL),
+  };
+  return Promise.race([request<T>(options), request<T>(secondaryOptions)]);
+}
+
 // tslint:disable-next-line no-any
 export function instance<T = any>(options?: string | Options) {
   return metadataAccessor<T>('instance', options);
@@ -109,11 +123,18 @@ export async function isAvailable() {
     // Attempt to read instance metadata. As configured, this will
     // retry 3 times if there is a valid response, and fail fast
     // if there is an ETIMEDOUT or ENOTFOUND error.
-    await metadataAccessor('instance', undefined, 0);
+    await metadataAccessor('instance', undefined, 0, true);
     return true;
   } catch (err) {
-    // Failure to resolve the metadata service means that it is not available.
-    if (err.code && (err.code === 'ENOTFOUND' || err.code === 'ENOENT')) {
+    if (err.type === 'request-timeout') {
+      // If running in a GCP environment, metadata endpoint should return
+      // within ms.
+      return false;
+    } else if (
+      err.code &&
+      (err.code === 'ENOTFOUND' || err.code === 'ENOENT')
+    ) {
+      // Failure to resolve the metadata service means that it is not available.
       return false;
     }
     // Throw unexpected errors.
