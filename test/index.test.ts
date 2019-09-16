@@ -268,22 +268,16 @@ it('should report isGCE if secondary responds before primary', async () => {
   assert.strictEqual(isGCE, true);
 });
 
-it('should fail fast on isAvailable if ENOENT is returned by secondary', done => {
-  let isGCE: boolean;
+it('should fail fast on isAvailable if ENOENT is returned by secondary', async () => {
   const secondary = secondaryHostRequest(10, false);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .delayConnection(250)
     .replyWithError({code: 'ENOENT'});
-  gcp.isAvailable().then(_isGCE => {
-    isGCE = _isGCE;
-  });
-  setTimeout(async () => {
-    await primary;
-    await secondary;
-    assert.strictEqual(false, isGCE);
-    return done();
-  }, 500);
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(false, isGCE);
 });
 
 it('should throw on unexpected errors', async () => {
