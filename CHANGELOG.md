@@ -4,6 +4,17 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [3.0.0](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.4...v3.0.0) (2019-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* isAvailable now tries both DNS and IP, choosing whichever responds first (#239)
+
+### Features
+
+* isAvailable now tries both DNS and IP, choosing whichever responds first ([#239](https://www.github.com/googleapis/gcp-metadata/issues/239)) ([25bc116](https://www.github.com/googleapis/gcp-metadata/commit/25bc116))
+
 ### [2.0.4](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.3...v2.0.4) (2019-09-13)
 
 
