@@ -17,7 +17,7 @@
     "samples-test": "npm link && cd samples/ && npm link ../ && npm test && cd ../",
     "presystem-test": "npm run compile",
     "system-test": "mocha build/system-test --timeout 600000",
-    "test": "c8 mocha build/test",
+    "test": "c8 mocha --timeout=5000 build/test",
     "docs": "compodoc src/",
     "lint": "gts check && eslint '**/*.js'",
     "docs-test": "linkinator docs",
