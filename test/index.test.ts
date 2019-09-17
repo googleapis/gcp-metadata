@@ -179,10 +179,10 @@ it('should retry on DNS errors', async () => {
 
 async function secondaryHostRequest(
   delay: number,
-  success: boolean
+  responseType = 'success'
 ): Promise<void> {
   let secondary: nock.Scope;
-  if (success) {
+  if (responseType === 'success') {
     secondary = nock(SECONDARY_HOST)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(delay)
@@ -191,7 +191,7 @@ async function secondaryHostRequest(
     secondary = nock(SECONDARY_HOST)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(delay)
-      .replyWithError({code: 'ENOENT'});
+      .replyWithError({code: responseType});
   }
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -206,7 +206,7 @@ async function secondaryHostRequest(
 }
 
 it('should report isGCE if primary server returns 500 followed by 200', async () => {
-  const secondary = secondaryHostRequest(500, true);
+  const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .twice()
@@ -220,7 +220,7 @@ it('should report isGCE if primary server returns 500 followed by 200', async ()
 });
 
 it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
-  const secondary = secondaryHostRequest(500, true);
+  const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .replyWithError({code: 'ENOTFOUND'});
@@ -231,7 +231,7 @@ it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
 });
 
 it('should fail fast on isAvailable if ENOENT is returned', async () => {
-  const secondary = secondaryHostRequest(500, true);
+  const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .replyWithError({code: 'ENOENT'});
@@ -242,7 +242,7 @@ it('should fail fast on isAvailable if ENOENT is returned', async () => {
 });
 
 it('should fail on isAvailable if request times out', async () => {
-  const secondary = secondaryHostRequest(5000, true);
+  const secondary = secondaryHostRequest(5000);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .delayConnection(3500)
@@ -256,7 +256,7 @@ it('should fail on isAvailable if request times out', async () => {
 });
 
 it('should report isGCE if secondary responds before primary', async () => {
-  const secondary = secondaryHostRequest(10, true);
+  const secondary = secondaryHostRequest(10);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .delayConnection(3500)
@@ -269,7 +269,7 @@ it('should report isGCE if secondary responds before primary', async () => {
 });
 
 it('should fail fast on isAvailable if ENOENT is returned by secondary', async () => {
-  const secondary = secondaryHostRequest(10, false);
+  const secondary = secondaryHostRequest(10, 'ENOENT');
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .delayConnection(250)
