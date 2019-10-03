@@ -7,3 +7,4 @@ package-lock.json
 package-lock.json
 gcp-metadata.tgz
 docs/
+__pycache__
