@@ -132,7 +132,9 @@ export async function isAvailable() {
       return false;
     } else if (
       err.code &&
-      (err.code === 'ENOTFOUND' || err.code === 'ENOENT')
+      (err.code === 'ENOTFOUND' ||
+        err.code === 'ENOENT' ||
+        err.code === 'ENETUNREACH')
     ) {
       // Failure to resolve the metadata service means that it is not available.
       return false;
