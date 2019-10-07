@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [3.1.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.0.0...v3.1.0) (2019-10-07)
+
+
+### Features
+
+* don't throw on ENETUNREACH ([#250](https://www.github.com/googleapis/gcp-metadata/issues/250)) ([88f2101](https://www.github.com/googleapis/gcp-metadata/commit/88f2101))
+
 ## [3.0.0](https://www.github.com/googleapis/gcp-metadata/compare/v2.0.4...v3.0.0) (2019-09-17)
 
 
