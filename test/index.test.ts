@@ -230,6 +230,17 @@ it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
   assert.strictEqual(false, isGCE);
 });
 
+it('should fail fast on isAvailable if ENETUNREACH is returned', async () => {
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .replyWithError({code: 'ENETUNREACH'});
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(false, isGCE);
+});
+
 it('should fail fast on isAvailable if ENOENT is returned', async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
@@ -281,9 +292,13 @@ it('should fail fast on isAvailable if ENOENT is returned by secondary', async (
 });
 
 it('should throw on unexpected errors', async () => {
-  const scope = nock(HOST)
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .replyWithError({code: '🤡'});
+  const secondary = nock(SECONDARY_HOST)
     .get(`${PATH}/${TYPE}`)
     .replyWithError({code: '🤡'});
   await assertRejects(gcp.isAvailable());
-  scope.done();
+  primary.done();
+  secondary.done();
 });
