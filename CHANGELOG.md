@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [3.2.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.1.0...v3.2.0) (2019-10-10)
+
+
+### Features
+
+* add DEBUG_AUTH for digging into authentication issues ([#254](https://www.github.com/googleapis/gcp-metadata/issues/254)) ([804156d](https://www.github.com/googleapis/gcp-metadata/commit/804156d))
+
 ## [3.1.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.0.0...v3.1.0) (2019-10-07)
 
 
