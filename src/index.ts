@@ -126,6 +126,10 @@ export async function isAvailable() {
     await metadataAccessor('instance', undefined, 0, true);
     return true;
   } catch (err) {
+    if (process.env.DEBUG_AUTH) {
+      console.info(err);
+    }
+
     if (err.type === 'request-timeout') {
       // If running in a GCP environment, metadata endpoint should return
       // within ms.

@@ -230,6 +230,27 @@ it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
   assert.strictEqual(false, isGCE);
 });
 
+it('should log error if DEBUG_AUTH is set', async () => {
+  process.env.DEBUG_AUTH = 'true';
+
+  const info = console.info;
+  let err: Error | null = null;
+  console.info = (_err: Error) => {
+    err = _err;
+  };
+
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .replyWithError({code: 'ENOTFOUND'});
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  console.info = info;
+  delete process.env.DEBUG_AUTH;
+  assert.strictEqual(/failed, reason/.test(err!.message), true);
+});
+
 it('should fail fast on isAvailable if ENETUNREACH is returned', async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
