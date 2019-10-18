@@ -35,7 +35,7 @@
   "author": "Stephen Sawchuk",
   "license": "Apache-2.0",
   "dependencies": {
-    "gaxios": "^2.0.1",
+    "gaxios": "^2.1.0",
     "json-bigint": "^0.3.0"
   },
   "devDependencies": {
