@@ -120,7 +120,7 @@ async function pruneFunctions(sessionOnly: boolean) {
       })
       .map(async fn => {
         await gcf.projects.locations.functions
-          .delete({name: fn.name})
+          .delete({name: fn.name as string})
           .catch(e => {
             console.error(`There was a problem deleting function ${fn.name}.`);
             console.error(e);
