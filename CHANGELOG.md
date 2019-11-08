@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [3.2.1](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.0...v3.2.1) (2019-11-08)
+
+
+### Bug Fixes
+
+* **deps:** update gaxios ([#257](https://www.github.com/googleapis/gcp-metadata/issues/257)) ([ba6e0b6](https://www.github.com/googleapis/gcp-metadata/commit/ba6e0b668635b4aa4ed10535ff021c02b2edf5ea))
+
 ## [3.2.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.1.0...v3.2.0) (2019-10-10)
 
 
