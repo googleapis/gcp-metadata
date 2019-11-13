@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [3.2.2](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.1...v3.2.2) (2019-11-13)
+
+
+### Bug Fixes
+
+* **docs:** add jsdoc-region-tag plugin ([#264](https://www.github.com/googleapis/gcp-metadata/issues/264)) ([af8362b](https://www.github.com/googleapis/gcp-metadata/commit/af8362b5a35d270af00cb3696bbf7344810e9b0c))
+
 ### [3.2.1](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.0...v3.2.1) (2019-11-08)
 
 
