@@ -37,7 +37,7 @@ it('should create the correct accessors', async () => {
 
 it('should access all the metadata properly', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`, undefined, HEADERS)
+    .get(`${PATH}/${TYPE}/`, undefined, HEADERS)
     .reply(200, {}, HEADERS);
   await gcp.instance();
   scope.done();
@@ -105,7 +105,7 @@ it('should accept an object with property and query fields', async () => {
 
 it('should return the request error', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .times(4)
     .reply(500, undefined, HEADERS);
   await assertRejects(gcp.instance(), /Unsuccessful response status code/);
@@ -114,7 +114,7 @@ it('should return the request error', async () => {
 
 it('should return error when res is empty', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .reply(200, undefined, HEADERS);
   await assertRejects(gcp.instance());
   scope.done();
@@ -122,7 +122,7 @@ it('should return error when res is empty', async () => {
 
 it('should return error when flavor header is incorrect', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
   await assertRejects(
     gcp.instance(),
@@ -133,7 +133,7 @@ it('should return error when flavor header is incorrect', async () => {
 
 it('should return error if statusCode is not 200', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .reply(418, {}, HEADERS);
   await assertRejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
@@ -141,10 +141,10 @@ it('should return error if statusCode is not 200', async () => {
 
 it('should retry if the initial request fails', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .times(2)
     .reply(500)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .reply(200, {}, HEADERS);
   await gcp.instance();
   scope.done();
@@ -168,9 +168,9 @@ it('should throw if invalid options are passed', async () => {
 
 it('should retry on DNS errors', async () => {
   const scope = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: 'ETIMEDOUT'})
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .reply(200, {}, HEADERS);
   const data = await gcp.instance();
   scope.done();
@@ -184,12 +184,12 @@ async function secondaryHostRequest(
   let secondary: nock.Scope;
   if (responseType === 'success') {
     secondary = nock(SECONDARY_HOST)
-      .get(`${PATH}/${TYPE}`)
+      .get(`${PATH}/${TYPE}/`)
       .delayConnection(delay)
       .reply(200, {}, HEADERS);
   } else {
     secondary = nock(SECONDARY_HOST)
-      .get(`${PATH}/${TYPE}`)
+      .get(`${PATH}/${TYPE}/`)
       .delayConnection(delay)
       .replyWithError({code: responseType});
   }
@@ -208,10 +208,10 @@ async function secondaryHostRequest(
 it('should report isGCE if primary server returns 500 followed by 200', async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .twice()
     .reply(500)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .reply(200, {}, HEADERS);
   const isGCE = await gcp.isAvailable();
   await secondary;
@@ -222,7 +222,7 @@ it('should report isGCE if primary server returns 500 followed by 200', async ()
 it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: 'ENOTFOUND'});
   const isGCE = await gcp.isAvailable();
   await secondary;
@@ -241,7 +241,7 @@ it('should log error if DEBUG_AUTH is set', async () => {
 
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: 'ENOTFOUND'});
   const isGCE = await gcp.isAvailable();
   await secondary;
@@ -254,7 +254,7 @@ it('should log error if DEBUG_AUTH is set', async () => {
 it('should fail fast on isAvailable if ENETUNREACH is returned', async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: 'ENETUNREACH'});
   const isGCE = await gcp.isAvailable();
   await secondary;
@@ -265,7 +265,7 @@ it('should fail fast on isAvailable if ENETUNREACH is returned', async () => {
 it('should fail fast on isAvailable if ENOENT is returned', async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: 'ENOENT'});
   const isGCE = await gcp.isAvailable();
   await secondary;
@@ -276,7 +276,7 @@ it('should fail fast on isAvailable if ENOENT is returned', async () => {
 it('should fail on isAvailable if request times out', async () => {
   const secondary = secondaryHostRequest(5000);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .delayConnection(3500)
     // this should never get called, as the 3000 timeout will trigger.
     .reply(200, {}, HEADERS);
@@ -290,7 +290,7 @@ it('should fail on isAvailable if request times out', async () => {
 it('should report isGCE if secondary responds before primary', async () => {
   const secondary = secondaryHostRequest(10);
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .delayConnection(3500)
     // this should never get called, as the 3000 timeout will trigger.
     .reply(200, {}, HEADERS);
@@ -303,7 +303,7 @@ it('should report isGCE if secondary responds before primary', async () => {
 it('should fail fast on isAvailable if ENOENT is returned by secondary', async () => {
   const secondary = secondaryHostRequest(10, 'ENOENT');
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .delayConnection(250)
     .replyWithError({code: 'ENOENT'});
   const isGCE = await gcp.isAvailable();
@@ -314,10 +314,10 @@ it('should fail fast on isAvailable if ENOENT is returned by secondary', async (
 
 it('should throw on unexpected errors', async () => {
   const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: '🤡'});
   const secondary = nock(SECONDARY_HOST)
-    .get(`${PATH}/${TYPE}`)
+    .get(`${PATH}/${TYPE}/`)
     .replyWithError({code: '🤡'});
   await assertRejects(gcp.isAvailable());
   primary.done();

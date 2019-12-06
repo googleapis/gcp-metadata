@@ -58,13 +58,13 @@ async function metadataAccessor<T>(
   }
   let property = '';
   if (typeof options === 'object' && options.property) {
-    property = '/' + options.property;
+    property = options.property;
   }
   validate(options);
   try {
     const requestMethod = fastFail ? fastFailMetadataRequest : request;
     const res = await requestMethod<T>({
-      url: `${BASE_URL}/${type}${property}`,
+      url: `${BASE_URL}/${type}/${property}`,
       headers: Object.assign({}, HEADERS, options.headers),
       retryConfig: {noResponseRetries},
       params: options.params,
