@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [3.2.3](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.2...v3.2.3) (2019-12-12)
+
+
+### Bug Fixes
+
+* **deps:** pin TypeScript below 3.7.0 ([e4bf622](https://www.github.com/googleapis/gcp-metadata/commit/e4bf622e6654a51ddffc0921a15250130591db2f))
+
 ### [3.2.2](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.1...v3.2.2) (2019-11-13)
 
 
