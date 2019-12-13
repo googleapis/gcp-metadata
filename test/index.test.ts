@@ -323,3 +323,20 @@ it('should throw on unexpected errors', async () => {
   primary.done();
   secondary.done();
 });
+
+it('should report isGCE secondary succeeds before primary fails', async () => {
+  const secondary = secondaryHostRequest(10);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .delayConnection(200)
+    // this should never get called, as the 3000 timeout will trigger.
+    .reply(500, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  await new Promise((resolve, reject) => {
+    setTimeout(() => {
+      primary.done();
+      return resolve();
+    }, 500);
+  });
+});

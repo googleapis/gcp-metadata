@@ -102,7 +102,49 @@ async function fastFailMetadataRequest<T>(
     ...options,
     url: options.url!.replace(BASE_URL, SECONDARY_BASE_URL),
   };
-  return Promise.race([request<T>(options), request<T>(secondaryOptions)]);
+  // We race a connection between DNS/IP to metadata server. There are a couple
+  // reasons for this:
+  //
+  // 1. the DNS is slow in some GCP environments; by checking both, we might
+  //    detect the runtime environment signficantly faster.
+  // 2. we can't just check the IP, which is tarpitted and slow to respond
+  //    on a user's local machine.
+  //
+  // Additional logic has been added to make sure that we don't create an
+  // unhandled rejection in scenarios where a failure happens sometime
+  // after a success.
+  //
+  // Note, however, if a failure happens prior to a success, a rejection should
+  // occur, this is for folks running locally.
+  //
+  let responded = false;
+  const r1: Promise<GaxiosResponse> = request<T>(options)
+    .then((res: GaxiosResponse) => {
+      responded = true;
+      return res;
+    })
+    .catch(err => {
+      if (responded) {
+        // If we already succeeded don't reject.
+        return r2;
+      } else {
+        throw err;
+      }
+    });
+  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions)
+    .then((res: GaxiosResponse) => {
+      responded = true;
+      return res;
+    })
+    .catch(err => {
+      if (responded) {
+        // If we already succeeded don't reject.
+        return r1;
+      } else {
+        throw err;
+      }
+    });
+  return Promise.race([r1, r2]);
 }
 
 // tslint:disable-next-line no-any
