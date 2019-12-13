@@ -133,7 +133,12 @@ export async function isAvailable() {
     return cachedIsAvailableResponse;
   }
   try {
+    // Attempt to read instance metadata. As configured, this will
+    // retry 3 times if there is a valid response, and fail fast
+    // if there is an ETIMEDOUT or ENOTFOUND error.
     await metadataAccessor('instance', undefined, detectGCPAvailableRetries(), true);
+    cachedIsAvailableResponse = true;
+    return cachedIsAvailableResponse;
   } catch (err) {
     if (process.env.DEBUG_AUTH) {
       console.info(err);
