@@ -127,7 +127,11 @@ function detectGCPAvailableRetries(): number {
 /**
  * Determine if the metadata server is currently available.
  */
+let cachedIsAvailableResponse: boolean | undefined;
 export async function isAvailable() {
+  if (cachedIsAvailableResponse !== undefined) {
+    return cachedIsAvailableResponse;
+  }
   try {
     await metadataAccessor(
       'instance',
@@ -157,4 +161,11 @@ export async function isAvailable() {
     // Throw unexpected errors.
     throw err;
   }
+}
+
+/**
+ * reset the memoized isAvailable() lookup.
+ */
+export function resetIsAvailableCache() {
+  cachedIsAvailableResponse = undefined;
 }
