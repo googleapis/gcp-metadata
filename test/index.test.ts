@@ -324,7 +324,7 @@ it('should throw on unexpected errors', async () => {
   secondary.done();
 });
 
-it('should report isGCE secondary succeeds before primary fails', async () => {
+it('should report isGCE if secondary succeeds before primary fails', async () => {
   const secondary = secondaryHostRequest(10);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
