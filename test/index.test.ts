@@ -26,6 +26,10 @@ const HEADERS = {
 
 nock.disableNetConnect();
 
+beforeEach(() => {
+  gcp.resetIsAvailableCache();
+});
+
 afterEach(() => {
   nock.cleanAll();
 });
@@ -335,4 +339,19 @@ it('should retry environment detection if DETECT_GCP_RETRIES >= 2', async () => 
   primary.done();
   assert.strictEqual(true, isGCE);
   delete process.env.DETECT_GCP_RETRIES;
+});
+
+it('should cache response from first isAvailable() call', async () => {
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .twice()
+    .reply(500)
+    .get(`${PATH}/${TYPE}`)
+    .reply(200, {}, HEADERS);
+  await gcp.isAvailable();
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(isGCE, true);
 });

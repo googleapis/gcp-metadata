@@ -133,13 +133,7 @@ export async function isAvailable() {
     return cachedIsAvailableResponse;
   }
   try {
-    await metadataAccessor(
-      'instance',
-      undefined,
-      detectGCPAvailableRetries(),
-      true
-    );
-    return true;
+    await metadataAccessor('instance', undefined, detectGCPAvailableRetries(), true);
   } catch (err) {
     if (process.env.DEBUG_AUTH) {
       console.info(err);
