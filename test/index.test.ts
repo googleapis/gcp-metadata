@@ -323,3 +323,16 @@ it('should throw on unexpected errors', async () => {
   primary.done();
   secondary.done();
 });
+
+it('should retry environment detection if DETECT_GCP_RETRIES >= 2', async () => {
+  process.env.DETECT_GCP_RETRIES = '2';
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .replyWithError({code: 'ENETUNREACH'})
+    .get(`${PATH}/${TYPE}`)
+    .reply(200, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  primary.done();
+  assert.strictEqual(true, isGCE);
+  delete process.env.DETECT_GCP_RETRIES;
+});
