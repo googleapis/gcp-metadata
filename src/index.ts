@@ -119,26 +119,30 @@ async function fastFailMetadataRequest<T>(
   //
   let responded = false;
   const r1: Promise<GaxiosResponse> = request<T>(options)
+    .then(res => {
+      responded = true;
+      return res;
+    })
     .catch(err => {
       if (responded) {
         return r2;
       } else {
+        responded = true;
         throw err;
       }
-    })
-    .finally(() => {
-      responded = true;
     });
   const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions)
+    .then(res => {
+      responded = true;
+      return res;
+    })
     .catch(err => {
       if (responded) {
         return r1;
       } else {
+        responded = true;
         throw err;
       }
-    })
-    .finally(() => {
-      responded = true;
     });
   return Promise.race([r1, r2]);
 }
