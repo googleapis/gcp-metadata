@@ -119,7 +119,9 @@ export function project<T = any>(options?: string | Options) {
  * How many times should we retry detecting GCP environment.
  */
 function detectGCPAvailableRetries(): number {
-  return process.env.DETECT_GCP_RETRIES ? Number(process.env.DETECT_GCP_RETRIES) : 0;
+  return process.env.DETECT_GCP_RETRIES
+    ? Number(process.env.DETECT_GCP_RETRIES)
+    : 0;
 }
 
 /**
@@ -127,9 +129,6 @@ function detectGCPAvailableRetries(): number {
  */
 export async function isAvailable() {
   try {
-    // Attempt to read instance metadata. As configured, this will
-    // retry 3 times if there is a valid response, and fail fast
-    // if there is an ETIMEDOUT or ENOTFOUND error.
     await metadataAccessor(
       'instance',
       undefined,
