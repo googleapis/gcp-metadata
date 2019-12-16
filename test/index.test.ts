@@ -340,7 +340,7 @@ it('should report isGCE if secondary succeeds before primary fails', async () =>
     }, 500);
   });
 });
-  
+
 it('should retry environment detection if DETECT_GCP_RETRIES >= 2', async () => {
   process.env.DETECT_GCP_RETRIES = '2';
   const primary = nock(HOST)
