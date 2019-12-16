@@ -324,6 +324,23 @@ it('should throw on unexpected errors', async () => {
   secondary.done();
 });
 
+it('should report isGCE if secondary succeeds before primary fails', async () => {
+  const secondary = secondaryHostRequest(10);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .delayConnection(200)
+    // this should never get called, as the 3000 timeout will trigger.
+    .reply(500, {}, HEADERS);
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  await new Promise((resolve, reject) => {
+    setTimeout(() => {
+      primary.done();
+      return resolve();
+    }, 500);
+  });
+});
+
 it('should retry environment detection if DETECT_GCP_RETRIES >= 2', async () => {
   process.env.DETECT_GCP_RETRIES = '2';
   const primary = nock(HOST)
