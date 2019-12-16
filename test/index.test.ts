@@ -354,6 +354,20 @@ it('should cache response from first isAvailable() call', async () => {
   assert.strictEqual(isGCE, true);
 });
 
+it('should only make one outbound request, if isAvailable() called in rapid succession', async () => {
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .reply(200, {}, HEADERS);
+  gcp.isAvailable();
+  // because we haven't created additional mocks, we expect this to fail
+  // if we were not caching the first isAvailable() call:
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(isGCE, true);
+});
+
 it('resets cache when resetIsAvailableCache() is called', async () => {
   // we will attempt to hit the secondary and primary server twice,
   // mock accordingly.

@@ -127,18 +127,22 @@ function detectGCPAvailableRetries(): number {
 /**
  * Determine if the metadata server is currently available.
  */
-let cachedIsAvailableResponse: boolean | undefined;
+let cachedIsAvailableResponse: Promise<boolean> | undefined;
 export async function isAvailable() {
-  if (cachedIsAvailableResponse !== undefined) {
-    return cachedIsAvailableResponse;
-  }
   try {
     // Attempt to read instance metadata. As configured, this will
     // retry 3 times if there is a valid response, and fail fast
     // if there is an ETIMEDOUT or ENOTFOUND error.
-    await metadataAccessor('instance', undefined, detectGCPAvailableRetries(), true);
-    cachedIsAvailableResponse = true;
-    return cachedIsAvailableResponse;
+    if (cachedIsAvailableResponse === undefined) {
+      cachedIsAvailableResponse = metadataAccessor(
+        'instance',
+        undefined,
+        detectGCPAvailableRetries(),
+        true
+      );
+    }
+    await cachedIsAvailableResponse;
+    return true;
   } catch (err) {
     if (process.env.DEBUG_AUTH) {
       console.info(err);
