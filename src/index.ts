@@ -130,9 +130,10 @@ function detectGCPAvailableRetries(): number {
 let cachedIsAvailableResponse: Promise<boolean> | undefined;
 export async function isAvailable() {
   try {
-    // Attempt to read instance metadata. As configured, this will
-    // retry 3 times if there is a valid response, and fail fast
-    // if there is an ETIMEDOUT or ENOTFOUND error.
+    // If a user is instantiating several GCP libraries at the same time,
+    // this may result in multiple calls to isAvailable(), to detect the
+    // runtime environment. We use the same promise for each of these calls
+    // to reduce the network load.
     if (cachedIsAvailableResponse === undefined) {
       cachedIsAvailableResponse = metadataAccessor(
         'instance',
