@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [3.3.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.3...v3.3.0) (2019-12-16)
+
+
+### Features
+
+* add environment variable for configuring environment detection ([#275](https://www.github.com/googleapis/gcp-metadata/issues/275)) ([580cfa4](https://www.github.com/googleapis/gcp-metadata/commit/580cfa4a5f5d0041aa09ae85cfc5a4575dd3957f))
+* cache response from isAvailable() method ([#274](https://www.github.com/googleapis/gcp-metadata/issues/274)) ([a05e13f](https://www.github.com/googleapis/gcp-metadata/commit/a05e13f1d1d61b1f9b9b1703bc37cdbdc022c93b))
+
+
+### Bug Fixes
+
+* fastFailMetadataRequest should not reject, if response already happened ([#273](https://www.github.com/googleapis/gcp-metadata/issues/273)) ([a6590c4](https://www.github.com/googleapis/gcp-metadata/commit/a6590c4fd8bc2dff3995c83d4c9175d5bd9f5e4a))
+
 ### [3.2.3](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.2...v3.2.3) (2019-12-12)
 
 
