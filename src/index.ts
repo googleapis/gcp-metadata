@@ -169,14 +169,22 @@ function detectGCPAvailableRetries(): number {
 /**
  * Determine if the metadata server is currently available.
  */
+let cachedIsAvailableResponse: Promise<boolean> | undefined;
 export async function isAvailable() {
   try {
-    await metadataAccessor(
-      'instance',
-      undefined,
-      detectGCPAvailableRetries(),
-      true
-    );
+    // If a user is instantiating several GCP libraries at the same time,
+    // this may result in multiple calls to isAvailable(), to detect the
+    // runtime environment. We use the same promise for each of these calls
+    // to reduce the network load.
+    if (cachedIsAvailableResponse === undefined) {
+      cachedIsAvailableResponse = metadataAccessor(
+        'instance',
+        undefined,
+        detectGCPAvailableRetries(),
+        true
+      );
+    }
+    await cachedIsAvailableResponse;
     return true;
   } catch (err) {
     if (process.env.DEBUG_AUTH) {
@@ -199,4 +207,11 @@ export async function isAvailable() {
     // Throw unexpected errors.
     throw err;
   }
+}
+
+/**
+ * reset the memoized isAvailable() lookup.
+ */
+export function resetIsAvailableCache() {
+  cachedIsAvailableResponse = undefined;
 }

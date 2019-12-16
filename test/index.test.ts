@@ -26,6 +26,10 @@ const HEADERS = {
 
 nock.disableNetConnect();
 
+beforeEach(() => {
+  gcp.resetIsAvailableCache();
+});
+
 afterEach(() => {
   nock.cleanAll();
 });
@@ -209,7 +213,6 @@ it('should report isGCE if primary server returns 500 followed by 200', async ()
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
-    .twice()
     .reply(500)
     .get(`${PATH}/${TYPE}`)
     .reply(200, {}, HEADERS);
@@ -352,4 +355,55 @@ it('should retry environment detection if DETECT_GCP_RETRIES >= 2', async () => 
   primary.done();
   assert.strictEqual(true, isGCE);
   delete process.env.DETECT_GCP_RETRIES;
+});
+
+it('should cache response from first isAvailable() call', async () => {
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .reply(200, {}, HEADERS);
+  await gcp.isAvailable();
+  // because we haven't created additional mocks, we expect this to fail
+  // if we were not caching the first isAvailable() call:
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(isGCE, true);
+});
+
+it('should only make one outbound request, if isAvailable() called in rapid succession', async () => {
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .reply(200, {}, HEADERS);
+  gcp.isAvailable();
+  // because we haven't created additional mocks, we expect this to fail
+  // if we were not caching the first isAvailable() call:
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(isGCE, true);
+});
+
+it('resets cache when resetIsAvailableCache() is called', async () => {
+  // we will attempt to hit the secondary and primary server twice,
+  // mock accordingly.
+  const secondary = secondaryHostRequest(250);
+  const secondary2 = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .reply(200, {}, HEADERS)
+    .get(`${PATH}/${TYPE}`)
+    .replyWithError({code: 'ENOENT'});
+
+  // Check whether we're in a GCP environment twice, resetting the cache
+  // inbetween:
+  await gcp.isAvailable();
+  gcp.resetIsAvailableCache();
+  const isGCE = await gcp.isAvailable();
+
+  await secondary;
+  await secondary2;
+  primary.done();
+  assert.strictEqual(isGCE, false);
 });
