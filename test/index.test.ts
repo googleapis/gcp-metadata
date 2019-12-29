@@ -6,6 +6,7 @@
  */
 
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import * as nock from 'nock';
 import * as gcp from '../src';
 

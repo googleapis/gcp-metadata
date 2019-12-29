@@ -6,6 +6,7 @@
  */
 
 import * as assert from 'assert';
+import {describe, it} from 'mocha';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
 import * as gcx from 'gcx';
