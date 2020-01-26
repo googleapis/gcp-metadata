@@ -259,6 +259,17 @@ it('should log error if DEBUG_AUTH is set', async () => {
   }
 );
 
+it(`should fail fast on isAvailable if 404 status code is returned`, async () => {
+  const secondary = secondaryHostRequest(500);
+  const primary = nock(HOST)
+    .get(`${PATH}/${TYPE}`)
+    .reply(404);
+  const isGCE = await gcp.isAvailable();
+  await secondary;
+  primary.done();
+  assert.strictEqual(false, isGCE);
+});
+
 it('should fail on isAvailable if request times out', async () => {
   const secondary = secondaryHostRequest(5000);
   const primary = nock(HOST)

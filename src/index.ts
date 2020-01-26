@@ -207,6 +207,8 @@ export async function isAvailable() {
     ) {
       // Failure to resolve the metadata service means that it is not available.
       return false;
+    } else if (err.response && err.response.status === 404) {
+      return false;
     }
     // Throw unexpected errors.
     throw err;
