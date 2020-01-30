@@ -223,17 +223,6 @@ it('should report isGCE if primary server returns 500 followed by 200', async ()
   assert.strictEqual(isGCE, true);
 });
 
-it('should fail fast on isAvailable if ENOTFOUND is returned', async () => {
-  const secondary = secondaryHostRequest(500);
-  const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
-    .replyWithError({code: 'ENOTFOUND'});
-  const isGCE = await gcp.isAvailable();
-  await secondary;
-  primary.done();
-  assert.strictEqual(false, isGCE);
-});
-
 it('should log error if DEBUG_AUTH is set', async () => {
   process.env.DEBUG_AUTH = 'true';
 
@@ -255,22 +244,26 @@ it('should log error if DEBUG_AUTH is set', async () => {
   assert.strictEqual(/failed, reason/.test(err!.message), true);
 });
 
-it('should fail fast on isAvailable if ENETUNREACH is returned', async () => {
-  const secondary = secondaryHostRequest(500);
-  const primary = nock(HOST)
-    .get(`${PATH}/${TYPE}`)
-    .replyWithError({code: 'ENETUNREACH'});
-  const isGCE = await gcp.isAvailable();
-  await secondary;
-  primary.done();
-  assert.strictEqual(false, isGCE);
-});
+['EHOSTDOWN', 'EHOSTUNREACH', 'ENETUNREACH', 'ENOENT', 'ENOTFOUND'].forEach(
+  errorCode => {
+    it(`should fail fast on isAvailable if ${errorCode} is returned`, async () => {
+      const secondary = secondaryHostRequest(500);
+      const primary = nock(HOST)
+        .get(`${PATH}/${TYPE}`)
+        .replyWithError({code: errorCode});
+      const isGCE = await gcp.isAvailable();
+      await secondary;
+      primary.done();
+      assert.strictEqual(false, isGCE);
+    });
+  }
+);
 
-it('should fail fast on isAvailable if ENOENT is returned', async () => {
+it(`should fail fast on isAvailable if 404 status code is returned`, async () => {
   const secondary = secondaryHostRequest(500);
   const primary = nock(HOST)
     .get(`${PATH}/${TYPE}`)
-    .replyWithError({code: 'ENOENT'});
+    .reply(404);
   const isGCE = await gcp.isAvailable();
   await secondary;
   primary.done();
