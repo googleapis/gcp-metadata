@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [3.3.1](https://www.github.com/googleapis/gcp-metadata/compare/v3.3.0...v3.3.1) (2020-01-30)
+
+
+### Bug Fixes
+
+* **isAvailable:** handle EHOSTDOWN and EHOSTUNREACH error codes ([#291](https://www.github.com/googleapis/gcp-metadata/issues/291)) ([ba8d9f5](https://www.github.com/googleapis/gcp-metadata/commit/ba8d9f50eac6cf8b439c1b66c48ace146c75f6e2))
+
 ## [3.3.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.2.3...v3.3.0) (2019-12-16)
 
 
