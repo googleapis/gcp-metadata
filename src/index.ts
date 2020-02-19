@@ -223,6 +223,16 @@ export function resetIsAvailableCache() {
 }
 
 export function requestTimeout(): number {
-  // Increase timeout if we think we're in a Cloud Run or GCF environment:
+  // In testing, we were able to reproduce behavior similar to
+  // https://github.com/googleapis/google-auth-library-nodejs/issues/798
+  // by making many concurrent network requests. Requests do not actually fail,
+  // rather they take significantly longer to complete (and we hit our
+  // default 3000ms timeout).
+  //
+  // This logic detects a GCF environment, using the documented environment
+  // variables K_SERVICE and FUNCTION_NAME:
+  // https://cloud.google.com/functions/docs/env-var and, in a GCF environment
+  // extends timeouts signficantly (the 500,000ms value is based on testing
+  // 150 concurrent network connections.
   return process.env.K_SERVICE || process.env.FUNCTION_NAME ? 500000 : 3000;
 }
