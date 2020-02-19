@@ -69,7 +69,7 @@ async function metadataAccessor<T>(
       retryConfig: {noResponseRetries},
       params: options.params,
       responseType: 'text',
-      timeout: 3000,
+      timeout: requestTimeout(),
     });
     // NOTE: node.js converts all incoming headers to lower case.
     if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
@@ -220,4 +220,9 @@ export async function isAvailable() {
  */
 export function resetIsAvailableCache() {
   cachedIsAvailableResponse = undefined;
+}
+
+export function requestTimeout(): number {
+  // Increase timeout if we think we're in a Cloud Run or GCF environment:
+  return process.env.K_SERVICE || process.env.FUNCTION_NAME ? 500000 : 3000;
 }

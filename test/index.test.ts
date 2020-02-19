@@ -401,3 +401,13 @@ it('resets cache when resetIsAvailableCache() is called', async () => {
   primary.done();
   assert.strictEqual(isGCE, false);
 });
+
+it('returns request timeout of 3000ms, when not GCF', () => {
+  assert.strictEqual(gcp.requestTimeout(), 3000);
+});
+
+it('returns request timeout of 500000ms, when in GCF environment', () => {
+  process.env.FUNCTION_NAME = 'my-function';
+  assert.strictEqual(gcp.requestTimeout(), 500000);
+  delete process.env.FUNCTION_NAME;
+});
