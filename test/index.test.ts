@@ -406,8 +406,14 @@ it('returns request timeout of 3000ms, when not GCF', () => {
   assert.strictEqual(gcp.requestTimeout(), 3000);
 });
 
-it('returns request timeout of 500000ms, when in GCF environment', () => {
+it('returns request timeout of 0, when FUNCTION_NAME set', () => {
   process.env.FUNCTION_NAME = 'my-function';
-  assert.strictEqual(gcp.requestTimeout(), 500000);
+  assert.strictEqual(gcp.requestTimeout(), 0);
   delete process.env.FUNCTION_NAME;
+});
+
+it('returns request timeout of 0, when K_SERVICE set', () => {
+  process.env.K_SERVICE = 'my-function';
+  assert.strictEqual(gcp.requestTimeout(), 0);
+  delete process.env.K_SERVICE;
 });

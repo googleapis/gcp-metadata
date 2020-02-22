@@ -232,7 +232,6 @@ export function requestTimeout(): number {
   // This logic detects a GCF environment, using the documented environment
   // variables K_SERVICE and FUNCTION_NAME:
   // https://cloud.google.com/functions/docs/env-var and, in a GCF environment
-  // extends timeouts signficantly (the 500,000ms value is based on testing
-  // 150 concurrent network connections.
-  return process.env.K_SERVICE || process.env.FUNCTION_NAME ? 500000 : 3000;
+  // eliminates timeouts (by setting the value to 0 to disable).
+  return process.env.K_SERVICE || process.env.FUNCTION_NAME ? 0 : 3000;
 }
