@@ -69,7 +69,7 @@ async function metadataAccessor<T>(
       retryConfig: {noResponseRetries},
       params: options.params,
       responseType: 'text',
-      timeout: 3000,
+      timeout: requestTimeout(),
     });
     // NOTE: node.js converts all incoming headers to lower case.
     if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
@@ -220,4 +220,18 @@ export async function isAvailable() {
  */
 export function resetIsAvailableCache() {
   cachedIsAvailableResponse = undefined;
+}
+
+export function requestTimeout(): number {
+  // In testing, we were able to reproduce behavior similar to
+  // https://github.com/googleapis/google-auth-library-nodejs/issues/798
+  // by making many concurrent network requests. Requests do not actually fail,
+  // rather they take significantly longer to complete (and we hit our
+  // default 3000ms timeout).
+  //
+  // This logic detects a GCF environment, using the documented environment
+  // variables K_SERVICE and FUNCTION_NAME:
+  // https://cloud.google.com/functions/docs/env-var and, in a GCF environment
+  // eliminates timeouts (by setting the value to 0 to disable).
+  return process.env.K_SERVICE || process.env.FUNCTION_NAME ? 0 : 3000;
 }
