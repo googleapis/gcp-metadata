@@ -14,7 +14,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "gcp-metadata": "^3.3.1"
+    "gcp-metadata": "^3.4.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
