@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [3.4.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.3.1...v3.4.0) (2020-02-24)
+
+
+### Features
+
+* significantly increase timeout if GCF environment detected ([#300](https://www.github.com/googleapis/gcp-metadata/issues/300)) ([8e507c6](https://www.github.com/googleapis/gcp-metadata/commit/8e507c645f69a11f508884b3181dc4414e579fcc))
+
 ### [3.3.1](https://www.github.com/googleapis/gcp-metadata/compare/v3.3.0...v3.3.1) (2020-01-30)
 
 
