@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [3.5.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.4.0...v3.5.0) (2020-03-03)
+
+
+### Features
+
+* add ECONNREFUSED to list of known errors for isAvailable() ([#309](https://www.github.com/googleapis/gcp-metadata/issues/309)) ([17ff6ea](https://www.github.com/googleapis/gcp-metadata/commit/17ff6ea361d02de31463532d4ab4040bf6276e0b))
+
 ## [3.4.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.3.1...v3.4.0) (2020-02-24)
 
 
