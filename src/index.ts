@@ -203,6 +203,7 @@ export async function isAvailable() {
         'ENETUNREACH',
         'ENOENT',
         'ENOTFOUND',
+        'ECONNREFUSED',
       ].includes(err.code)
     ) {
       // Failure to resolve the metadata service means that it is not available.
