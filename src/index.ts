@@ -7,7 +7,7 @@
 
 import {GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
-const jsonBigint = require('json-bigint');
+const jsonBigint = require('json-bigint'); // eslint-disable-line
 
 export const HOST_ADDRESS = 'http://169.254.169.254';
 export const BASE_PATH = '/computeMetadata/v1';

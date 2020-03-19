@@ -6,11 +6,9 @@
  */
 
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {beforeEach, afterEach, describe, it} from 'mocha';
 import * as nock from 'nock';
 import * as gcp from '../src';
-
-const assertRejects = require('assert-rejects');
 
 // the metadata IP entry:
 const HOST = gcp.HOST_ADDRESS;
@@ -113,7 +111,7 @@ it('should return the request error', async () => {
     .get(`${PATH}/${TYPE}`)
     .times(4)
     .reply(500, undefined, HEADERS);
-  await assertRejects(gcp.instance(), /Unsuccessful response status code/);
+  await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
 });
 
@@ -121,7 +119,7 @@ it('should return error when res is empty', async () => {
   const scope = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .reply(200, undefined, HEADERS);
-  await assertRejects(gcp.instance());
+  await assert.rejects(gcp.instance());
   scope.done();
 });
 
@@ -129,7 +127,7 @@ it('should return error when flavor header is incorrect', async () => {
   const scope = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
-  await assertRejects(
+  await assert.rejects(
     gcp.instance(),
     /Invalid response from metadata service: incorrect Metadata-Flavor header./
   );
@@ -140,7 +138,7 @@ it('should return error if statusCode is not 200', async () => {
   const scope = nock(HOST)
     .get(`${PATH}/${TYPE}`)
     .reply(418, {}, HEADERS);
-  await assertRejects(gcp.instance(), /Unsuccessful response status code/);
+  await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
   scope.done();
 });
 
@@ -156,18 +154,18 @@ it('should retry if the initial request fails', async () => {
 });
 
 it('should throw if request options are passed', async () => {
-  await assertRejects(
+  await assert.rejects(
     // tslint:disable-next-line no-any
     gcp.instance({qs: {one: 'two'}} as any),
-    /\'qs\' is not a valid configuration option. Please use \'params\' instead\./
+    /'qs' is not a valid configuration option. Please use 'params' instead\./
   );
 });
 
 it('should throw if invalid options are passed', async () => {
-  await assertRejects(
+  await assert.rejects(
     // tslint:disable-next-line no-any
     gcp.instance({fake: 'news'} as any),
-    /\'fake\' is not a valid/
+    /'fake' is not a valid/
   );
 });
 
@@ -321,7 +319,7 @@ it('should throw on unexpected errors', async () => {
   const secondary = nock(SECONDARY_HOST)
     .get(`${PATH}/${TYPE}`)
     .replyWithError({code: '🤡'});
-  await assertRejects(gcp.isAvailable());
+  assert.rejects(gcp.isAvailable());
   primary.done();
   secondary.done();
 });
