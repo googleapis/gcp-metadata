@@ -6,7 +6,7 @@
  */
 
 import * as assert from 'assert';
-import {describe, it} from 'mocha';
+import {before, after, describe, it} from 'mocha';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
 import * as gcx from 'gcx';
@@ -18,7 +18,7 @@ import {execSync} from 'child_process';
 import {request, GaxiosError, Gaxios} from 'gaxios';
 
 const copy = promisify(fs.copyFile);
-const pkg = require('../../package.json');
+const pkg = require('../../package.json'); // eslint-disable-line
 
 let gcf: cloudfunctions_v1.Cloudfunctions;
 const shortPrefix = 'gcloud-tests';

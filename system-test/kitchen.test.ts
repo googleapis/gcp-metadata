@@ -10,12 +10,14 @@ import * as tmp from 'tmp';
 import {promisify} from 'util';
 import {execSync} from 'child_process';
 
+import {describe, it, after} from 'mocha';
+
 describe('installation', () => {
   const ncpp = promisify(ncp);
   const keep = !!process.env.GCPM_KEEP_TEMPDIRS;
   const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
   const stagingPath = stagingDir.name;
-  const pkg = require('../../package.json');
+  const pkg = require('../../package.json'); // eslint-disable-line
 
   /**
    * Create a staging directory with temp fixtures used to test on a fresh
