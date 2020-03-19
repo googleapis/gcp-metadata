@@ -4,6 +4,23 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [4.0.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.5.0...v4.0.0) (2020-03-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* typescript@3.7.x has breaking changes; compiler now targets es2015
+* drops Node 8 from engines field (#315)
+
+### Features
+
+* drops Node 8 from engines field ([#315](https://www.github.com/googleapis/gcp-metadata/issues/315)) ([acb6233](https://www.github.com/googleapis/gcp-metadata/commit/acb62337e8ba7f0b259ae4e553f19c5786207d84))
+
+
+### Build System
+
+* switch to latest typescirpt/gts ([#317](https://www.github.com/googleapis/gcp-metadata/issues/317)) ([fbb7158](https://www.github.com/googleapis/gcp-metadata/commit/fbb7158be62c9f1949b69079e35113be1e10495c))
+
 ## [3.5.0](https://www.github.com/googleapis/gcp-metadata/compare/v3.4.0...v3.5.0) (2020-03-03)
 
 
