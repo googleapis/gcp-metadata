@@ -38,6 +38,18 @@ describe('gcp metadata', () => {
 
       // deploy the function to GCF
       await deployApp();
+      // allow the outside world to curl our function:
+      const projectId = await google.auth.getProjectId();
+      await gcf.projects.locations.functions.setIamPolicy({
+        resource: `projects/${projectId}/locations/us-central1/functions/${fullPrefix}`,
+        requestBody: {
+          policy: {
+            bindings: [
+              {members: ['allUsers'], role: 'roles/cloudfunctions.invoker'},
+            ],
+          },
+        },
+      });
     });
 
     it('should access the metadata service on GCF', async () => {
