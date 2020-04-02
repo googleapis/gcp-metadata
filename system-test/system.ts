@@ -38,7 +38,8 @@ describe('gcp metadata', () => {
 
       // deploy the function to GCF
       await deployApp();
-      // allow the outside world to curl our function:
+      // cloud functions now require authentication by default, see:
+      // https://cloud.google.com/functions/docs/release-notes
       const projectId = await google.auth.getProjectId();
       await gcf.projects.locations.functions.setIamPolicy({
         resource: `projects/${projectId}/locations/us-central1/functions/${fullPrefix}`,
