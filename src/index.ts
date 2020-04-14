@@ -38,7 +38,7 @@ function validate(options: Options) {
         break;
       case 'qs':
         throw new Error(
-          `'qs' is not a valid configuration option. Please use 'params' instead.`
+          "'qs' is not a valid configuration option. Please use 'params' instead."
         );
       default:
         throw new Error(`'${key}' is not a valid configuration option.`);
@@ -147,12 +147,12 @@ async function fastFailMetadataRequest<T>(
   return Promise.race([r1, r2]);
 }
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instance<T = any>(options?: string | Options) {
   return metadataAccessor<T>('instance', options);
 }
 
-// tslint:disable-next-line no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function project<T = any>(options?: string | Options) {
   return metadataAccessor<T>('project', options);
 }
