@@ -15,7 +15,7 @@ import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
 import {execSync} from 'child_process';
-import {request, GaxiosError, Gaxios} from 'gaxios';
+import {request, GaxiosError} from 'gaxios';
 
 const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json'); // eslint-disable-line
@@ -58,7 +58,7 @@ describe('gcp metadata', () => {
       const url = `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
       try {
         const res = await request({url});
-        // tslint:disable-next-line no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const metadata = res.data as any;
         console.log(metadata);
         assert.strictEqual(metadata.isAvailable, true);
