@@ -24,6 +24,20 @@ export interface Options {
   headers?: OutgoingHttpHeaders;
 }
 
+/**
+ * Returns the base URL while taking into account the GCE_METADATA_IP
+ * environment variable if it exists.
+ * By using a function instead of a const, testing this functionality is made
+ * easier.
+ *
+ * @returns The base URL, eg. http://169.254.169.254/computeMetadata/v1.
+ */
+function getBaseUrl(): string {
+  return process.env.GCE_METADATA_IP
+    ? `http://${process.env.GCE_METADATA_IP}${BASE_PATH}`
+    : BASE_URL;
+}
+
 // Accepts an options object passed from the user to the API. In previous
 // versions of the API, it referred to a `Request` or an `Axios` request
 // options object.  Now it refers to an object with very limited property
@@ -64,7 +78,7 @@ async function metadataAccessor<T>(
   try {
     const requestMethod = fastFail ? fastFailMetadataRequest : request;
     const res = await requestMethod<T>({
-      url: `${BASE_URL}/${type}${property}`,
+      url: `${getBaseUrl()}/${type}${property}`,
       headers: Object.assign({}, HEADERS, options.headers),
       retryConfig: {noResponseRetries},
       params: options.params,
@@ -100,7 +114,7 @@ async function fastFailMetadataRequest<T>(
 ): Promise<GaxiosResponse> {
   const secondaryOptions = {
     ...options,
-    url: options.url!.replace(BASE_URL, SECONDARY_BASE_URL),
+    url: options.url!.replace(getBaseUrl(), SECONDARY_BASE_URL),
   };
   // We race a connection between DNS/IP to metadata server. There are a couple
   // reasons for this:
