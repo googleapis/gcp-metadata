@@ -26,11 +26,18 @@ const HEADERS = {
 nock.disableNetConnect();
 
 describe('system test', () => {
+  const originalGceMetadataIp = process.env.GCE_METADATA_IP;
+
   beforeEach(() => {
+    // Clear this environment variable to ensure it does not affect
+    // expected test outcome.
+    delete process.env.GCE_METADATA_IP;
     gcp.resetIsAvailableCache();
   });
 
   afterEach(() => {
+    // Restore environment variable if it previously existed.
+    process.env.GCE_METADATA_IP = originalGceMetadataIp;
     nock.cleanAll();
   });
 
@@ -50,6 +57,15 @@ describe('system test', () => {
   it('should access a specific metadata property', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}/${PROPERTY}`)
+      .reply(200, {}, HEADERS);
+    await gcp.instance(PROPERTY);
+    scope.done();
+  });
+
+  it('should use GCE_METADATA_IP if available', async () => {
+    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
+      .get(`${PATH}/${TYPE}/${PROPERTY}`, undefined, HEADERS)
       .reply(200, {}, HEADERS);
     await gcp.instance(PROPERTY);
     scope.done();
@@ -143,6 +159,18 @@ describe('system test', () => {
 
   it('should retry if the initial request fails', async () => {
     const scope = nock(HOST)
+      .get(`${PATH}/${TYPE}`)
+      .times(2)
+      .reply(500)
+      .get(`${PATH}/${TYPE}`)
+      .reply(200, {}, HEADERS);
+    await gcp.instance();
+    scope.done();
+  });
+
+  it('should retry with GCE_METADATA_IP if first request fails', async () => {
+    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
       .get(`${PATH}/${TYPE}`)
       .times(2)
       .reply(500)
@@ -270,9 +298,36 @@ describe('system test', () => {
     assert.strictEqual(false, isGCE);
   });
 
+  it('should fail fast with GCE_METADATA_IP 404 on isAvailable', async () => {
+    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+    const secondary = secondaryHostRequest(500);
+    const primary = nock(`http://${process.env.GCE_METADATA_IP}`)
+      .get(`${PATH}/${TYPE}`)
+      .reply(404);
+    const isGCE = await gcp.isAvailable();
+    await secondary;
+    primary.done();
+    assert.strictEqual(false, isGCE);
+  });
+
   it('should fail on isAvailable if request times out', async () => {
     secondaryHostRequest(5000);
     const primary = nock(HOST)
+      .get(`${PATH}/${TYPE}`)
+      .delayConnection(3500)
+      // this should never get called, as the 3000 timeout will trigger.
+      .reply(200, {}, HEADERS);
+    const isGCE = await gcp.isAvailable();
+    // secondary is allowed to simply timeout in the aether, to avoid
+    // having a test that waits 5000 ms.
+    primary.done();
+    assert.strictEqual(false, isGCE);
+  });
+
+  it('should fail on isAvailable if GCE_METADATA_IP times out', async () => {
+    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+    secondaryHostRequest(5000);
+    const primary = nock(`http://${process.env.GCE_METADATA_IP}`)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
       // this should never get called, as the 3000 timeout will trigger.
