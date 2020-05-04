@@ -24,6 +24,7 @@ const HEADERS = {
 };
 
 nock.disableNetConnect();
+process.removeAllListeners('warning');
 
 describe('system test', () => {
   const originalGceMetadataIp = process.env.GCE_METADATA_IP;
@@ -229,6 +230,7 @@ describe('system test', () => {
           secondary.done();
           return resolve();
         } catch (err) {
+          console.info(err);
           return reject(err);
         }
       }, delay + 50);
@@ -364,16 +366,26 @@ describe('system test', () => {
     assert.strictEqual(false, isGCE);
   });
 
-  it('should throw on unexpected errors', async () => {
+  it('should return false on unexpected errors and warn', async () => {
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .replyWithError({code: '🤡'});
     const secondary = nock(SECONDARY_HOST)
       .get(`${PATH}/${TYPE}`)
       .replyWithError({code: '🤡'});
-    assert.rejects(gcp.isAvailable());
+    const done = new Promise(resolve => {
+      process.on('warning', warning => {
+        assert.strictEqual(
+          warning.toString().includes('unexpected error'),
+          true
+        );
+        return resolve();
+      });
+    });
+    assert.strictEqual(await gcp.isAvailable(), false);
     primary.done();
     secondary.done();
+    return done;
   });
 
   it('should report isGCE if secondary succeeds before primary fails', async () => {
