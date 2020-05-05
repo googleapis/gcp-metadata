@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [4.1.0](https://www.github.com/googleapis/gcp-metadata/compare/v4.0.1...v4.1.0) (2020-05-05)
+
+
+### Features
+
+* Introduces the GCE_METADATA_IP to allow using a different IP address for the GCE metadata server. ([#346](https://www.github.com/googleapis/gcp-metadata/issues/346)) ([ec0f82d](https://www.github.com/googleapis/gcp-metadata/commit/ec0f82d022b4b3aac95e94ee1d8e53cfac3b14a4))
+
+
+### Bug Fixes
+
+* do not check secondary host if GCE_METADATA_IP set ([#352](https://www.github.com/googleapis/gcp-metadata/issues/352)) ([64fa7d6](https://www.github.com/googleapis/gcp-metadata/commit/64fa7d68cbb76f455a3bfdcb27d58e7775eb789a))
+* warn rather than throwing when we fail to connect to metadata server ([#351](https://www.github.com/googleapis/gcp-metadata/issues/351)) ([754a6c0](https://www.github.com/googleapis/gcp-metadata/commit/754a6c07d1a72615cbb5ebf9ee04475a9a12f1c0))
+
 ### [4.0.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.0.0...v4.0.1) (2020-04-14)
 
 
