@@ -216,24 +216,35 @@ export async function isAvailable() {
       // If running in a GCP environment, metadata endpoint should return
       // within ms.
       return false;
-    } else if (
-      err.code &&
-      [
-        'EHOSTDOWN',
-        'EHOSTUNREACH',
-        'ENETUNREACH',
-        'ENOENT',
-        'ENOTFOUND',
-        'ECONNREFUSED',
-      ].includes(err.code)
-    ) {
+    }
+    if (err.response && err.response.status === 404) {
+      return false;
+    } else {
+      if (
+        !(err.response && err.response.status === 404) &&
+        // A warning is emitted if we see an unexpected err.code, or err.code
+        // is not populated:
+        (!err.code ||
+          ![
+            'EHOSTDOWN',
+            'EHOSTUNREACH',
+            'ENETUNREACH',
+            'ENOENT',
+            'ENOTFOUND',
+            'ECONNREFUSED',
+          ].includes(err.code))
+      ) {
+        let code = 'UNKNOWN';
+        if (err.code) code = err.code;
+        process.emitWarning(
+          `received unexpected error = ${err.message} code = ${code}`,
+          'MetadataLookupWarning'
+        );
+      }
+
       // Failure to resolve the metadata service means that it is not available.
       return false;
-    } else if (err.response && err.response.status === 404) {
-      return false;
     }
-    // Throw unexpected errors.
-    throw err;
   }
 }
 
