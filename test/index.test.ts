@@ -302,12 +302,10 @@ describe('system test', () => {
 
   it('should fail fast with GCE_METADATA_IP 404 on isAvailable', async () => {
     process.env.GCE_METADATA_IP = '127.0.0.1:8080';
-    const secondary = secondaryHostRequest(500);
     const primary = nock(`http://${process.env.GCE_METADATA_IP}`)
       .get(`${PATH}/${TYPE}`)
       .reply(404);
     const isGCE = await gcp.isAvailable();
-    await secondary;
     primary.done();
     assert.strictEqual(false, isGCE);
   });
@@ -339,6 +337,15 @@ describe('system test', () => {
     // having a test that waits 5000 ms.
     primary.done();
     assert.strictEqual(false, isGCE);
+  });
+
+  it('should report isGCE if GCE_METADATA_IP responds with 200', async () => {
+    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
+      .get(`${PATH}/${TYPE}`)
+      .reply(200, {}, HEADERS);
+    assert.strictEqual(await gcp.isAvailable(), true);
+    scope.done();
   });
 
   it('should report isGCE if secondary responds before primary', async () => {
