@@ -10,10 +10,8 @@ import {OutgoingHttpHeaders} from 'http';
 const jsonBigint = require('json-bigint'); // eslint-disable-line
 
 export const HOST_ADDRESS = 'http://169.254.169.254';
-export const BASE_PATH = '/computeMetadata/v1';
-export const BASE_URL = HOST_ADDRESS + BASE_PATH;
 export const SECONDARY_HOST_ADDRESS = 'http://metadata.google.internal.';
-export const SECONDARY_BASE_URL = SECONDARY_HOST_ADDRESS + BASE_PATH;
+
 export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
@@ -27,15 +25,21 @@ export interface Options {
 /**
  * Returns the base URL while taking into account the GCE_METADATA_IP
  * environment variable if it exists.
- * By using a function instead of a const, testing this functionality is made
- * easier.
  *
- * @returns The base URL, eg. http://169.254.169.254/computeMetadata/v1.
+ * @returns The base URL, e.g., http://169.254.169.254/computeMetadata/v1.
  */
-function getBaseUrl(): string {
-  return process.env.GCE_METADATA_IP
-    ? `http://${process.env.GCE_METADATA_IP}${BASE_PATH}`
-    : BASE_URL;
+function getBaseUrl(baseUrl?: string) {
+  const metadataBasePath = '/computeMetadata/v1';
+  if (!baseUrl) {
+    baseUrl = process.env.GCE_METADATA_IP
+      ? process.env.GCE_METADATA_IP
+      : HOST_ADDRESS;
+  }
+  // If no scheme is provided default to HTTP:
+  if (!/^https?:\/\//.test(baseUrl)) {
+    baseUrl = `http://${baseUrl}`;
+  }
+  return new URL(metadataBasePath, baseUrl).href;
 }
 
 // Accepts an options object passed from the user to the API. In previous
@@ -114,7 +118,7 @@ async function fastFailMetadataRequest<T>(
 ): Promise<GaxiosResponse> {
   const secondaryOptions = {
     ...options,
-    url: options.url!.replace(getBaseUrl(), SECONDARY_BASE_URL),
+    url: options.url!.replace(getBaseUrl(), getBaseUrl(SECONDARY_HOST_ADDRESS)),
   };
   // We race a connection between DNS/IP to metadata server. There are a couple
   // reasons for this:
@@ -195,7 +199,10 @@ export async function isAvailable() {
         'instance',
         undefined,
         detectGCPAvailableRetries(),
-        true
+        // If the default HOST_ADDRESS has been overridden, we should not
+        // make an effort to try SECONDARY_HOST_ADDRESS (as we are likely in
+        // a non-GCP environment):
+        process.env.GCE_METADATA_IP ? false : true
       );
     }
     await cachedIsAvailableResponse;
