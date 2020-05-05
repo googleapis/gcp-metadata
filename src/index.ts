@@ -9,6 +9,7 @@ import {GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 const jsonBigint = require('json-bigint'); // eslint-disable-line
 
+export const BASE_PATH = '/computeMetadata/v1';
 export const HOST_ADDRESS = 'http://169.254.169.254';
 export const SECONDARY_HOST_ADDRESS = 'http://metadata.google.internal.';
 
@@ -29,7 +30,6 @@ export interface Options {
  * @returns The base URL, e.g., http://169.254.169.254/computeMetadata/v1.
  */
 function getBaseUrl(baseUrl?: string) {
-  const metadataBasePath = '/computeMetadata/v1';
   if (!baseUrl) {
     baseUrl = process.env.GCE_METADATA_IP
       ? process.env.GCE_METADATA_IP
@@ -39,7 +39,7 @@ function getBaseUrl(baseUrl?: string) {
   if (!/^https?:\/\//.test(baseUrl)) {
     baseUrl = `http://${baseUrl}`;
   }
-  return new URL(metadataBasePath, baseUrl).href;
+  return new URL(BASE_PATH, baseUrl).href;
 }
 
 // Accepts an options object passed from the user to the API. In previous

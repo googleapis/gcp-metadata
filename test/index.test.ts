@@ -14,7 +14,7 @@ import * as gcp from '../src';
 const HOST = gcp.HOST_ADDRESS;
 // the metadata DNS entry:
 const SECONDARY_HOST = gcp.SECONDARY_HOST_ADDRESS;
-const PATH = '/computeMetadata/v1';
+const PATH = gcp.BASE_PATH;
 const TYPE = 'instance';
 const PROPERTY = 'property';
 
