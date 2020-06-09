@@ -4,14 +4,14 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/gcp-metadata.git",
-        "sha": "a00d6cd842bcff2f4b3059739826ceb93fb42d4a"
+        "sha": "3f1eadacaa36f04aa1f105050031f6c158330576"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "be74d3e532faa47eb59f1a0eaebde0860d1d8ab4"
+        "sha": "1c92077459db3dc50741e878f98b08c6261181e0"
       }
     }
   ]
