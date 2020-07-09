@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [4.1.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.0...v4.1.1) (2020-07-09)
+
+
+### Bug Fixes
+
+* typeo in nodejs .gitattribute ([#371](https://www.github.com/googleapis/gcp-metadata/issues/371)) ([5b4bb1c](https://www.github.com/googleapis/gcp-metadata/commit/5b4bb1c85e67e3ef0a6d1ec2ea316d560e03092f))
+
 ## [4.1.0](https://www.github.com/googleapis/gcp-metadata/compare/v4.0.1...v4.1.0) (2020-05-05)
 
 
