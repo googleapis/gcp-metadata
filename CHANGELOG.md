@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [4.1.2](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.1...v4.1.2) (2020-07-10)
+
+
+### Bug Fixes
+
+* **deps:** roll back dependency gcp-metadata to ^4.1.0 ([#373](https://www.github.com/googleapis/gcp-metadata/issues/373)) ([a45adef](https://www.github.com/googleapis/gcp-metadata/commit/a45adefd92418faa08c8a5014cedb844d1eb3ae6))
+
 ### [4.1.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.0...v4.1.1) (2020-07-09)
 
 
