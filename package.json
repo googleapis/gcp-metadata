@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.10",
-    "@types/mocha": "^7.0.0",
+    "@types/mocha": "^8.0.0",
     "@types/ncp": "^2.0.1",
     "@types/nock": "^10.0.3",
     "@types/node": "^12.7.2",
