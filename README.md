@@ -25,7 +25,15 @@ console.log(data); // ... All metadata properties
 #### Access specific properties
 ```js
 const data = await gcpMetadata.instance('hostname');
-console.log(data) // ...Instance hostname
+console.log(data); // ...Instance hostname
+const projectId = await gcpMetadata.project('project-id');
+console.log(projectId); // ...Project ID of the running instance
+```
+
+#### Access nested properties with the relative path
+```js
+const data = await gcpMetadata.instance('service-accounts/default/email');
+console.log(data); // ...Email address of the Compute identity service account
 ```
 
 #### Access specific properties with query parameters
