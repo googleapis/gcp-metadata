@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [4.1.3](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.2...v4.1.3) (2020-07-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency json-bigint to ^0.4.0 ([#378](https://www.github.com/googleapis/gcp-metadata/issues/378)) ([b214280](https://www.github.com/googleapis/gcp-metadata/commit/b2142807928c8c032509277900d35fccd1023f0f))
+
 ### [4.1.2](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.1...v4.1.2) (2020-07-10)
 
 
