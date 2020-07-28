@@ -54,7 +54,7 @@
     "codecov": "^3.5.0",
     "gcbuild": "^1.3.4",
     "gcx": "^1.0.0",
-    "googleapis": "^56.0.0",
+    "googleapis": "^57.0.0",
     "gts": "^2.0.0",
     "linkinator": "^2.0.0",
     "mocha": "^8.0.0",
