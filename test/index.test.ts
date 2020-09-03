@@ -33,6 +33,7 @@ describe('system test', () => {
     // Clear this environment variable to ensure it does not affect
     // expected test outcome.
     delete process.env.GCE_METADATA_HOST;
+    delete process.env.GCE_METADATA_IP;
     gcp.resetIsAvailableCache();
   });
 
@@ -58,6 +59,16 @@ describe('system test', () => {
   it('should access a specific metadata property', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}/${PROPERTY}`)
+      .reply(200, {}, HEADERS);
+    await gcp.instance(PROPERTY);
+    scope.done();
+  });
+
+
+  it('should use GCE_METADATA_IP if available', async () => {
+    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
+      .get(`${PATH}/${TYPE}/${PROPERTY}`, undefined, HEADERS)
       .reply(200, {}, HEADERS);
     await gcp.instance(PROPERTY);
     scope.done();

@@ -203,9 +203,7 @@ export async function isAvailable() {
         // If the default HOST_ADDRESS has been overridden, we should not
         // make an effort to try SECONDARY_HOST_ADDRESS (as we are likely in
         // a non-GCP environment):
-        process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST
-          ? false
-          : true
+        !(process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST)
       );
     }
     await cachedIsAvailableResponse;

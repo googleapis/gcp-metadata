@@ -71,3 +71,10 @@ console.log(id.toString()) // ... 4520031799277581759
 [codecov-url]: https://codecov.io/gh/googleapis/gcp-metadata
 [npm-image]: https://img.shields.io/npm/v/gcp-metadata.svg
 [npm-url]: https://www.npmjs.com/package/gcp-metadata
+
+### Set your own metadata host with an environment variable
+
+```
+export GCE_METADATA_HOST = '169.254.169.254'
+
+```
