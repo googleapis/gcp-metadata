@@ -64,7 +64,6 @@ describe('system test', () => {
     scope.done();
   });
 
-
   it('should use GCE_METADATA_IP if available', async () => {
     process.env.GCE_METADATA_IP = '127.0.0.1:8080';
     const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
