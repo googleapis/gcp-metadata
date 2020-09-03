@@ -31,7 +31,10 @@ export interface Options {
  */
 function getBaseUrl(baseUrl?: string) {
   if (!baseUrl) {
-    baseUrl = process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST || HOST_ADDRESS;
+    baseUrl =
+      process.env.GCE_METADATA_IP ||
+      process.env.GCE_METADATA_HOST ||
+      HOST_ADDRESS;
   }
   // If no scheme is provided default to HTTP:
   if (!/^https?:\/\//.test(baseUrl)) {
@@ -200,7 +203,9 @@ export async function isAvailable() {
         // If the default HOST_ADDRESS has been overridden, we should not
         // make an effort to try SECONDARY_HOST_ADDRESS (as we are likely in
         // a non-GCP environment):
-        (process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST) ? false : true
+        process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST
+          ? false
+          : true
       );
     }
     await cachedIsAvailableResponse;
