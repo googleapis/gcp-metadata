@@ -72,7 +72,7 @@ console.log(id.toString()) // ... 4520031799277581759
 [npm-image]: https://img.shields.io/npm/v/gcp-metadata.svg
 [npm-url]: https://www.npmjs.com/package/gcp-metadata
 
-### Set your own metadata host with an environment variable
+### Set your own host with an environment variable
 
 ```
 export GCE_METADATA_HOST = '169.254.169.254'
