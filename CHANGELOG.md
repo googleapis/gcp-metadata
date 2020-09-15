@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [4.2.0](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.4...v4.2.0) (2020-09-15)
+
+
+### Features
+
+* add support for GCE_METADATA_HOST environment variable ([#406](https://www.github.com/googleapis/gcp-metadata/issues/406)) ([eaf128a](https://www.github.com/googleapis/gcp-metadata/commit/eaf128ad5afc4357cde72d19b017b9474c070fea))
+
 ### [4.1.4](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.3...v4.1.4) (2020-07-15)
 
 
