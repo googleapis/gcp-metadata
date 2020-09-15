@@ -27,18 +27,19 @@ nock.disableNetConnect();
 process.removeAllListeners('warning');
 
 describe('system test', () => {
-  const originalGceMetadataIp = process.env.GCE_METADATA_IP;
+  const originalGceMetadataIp = process.env.GCE_METADATA_HOST;
 
   beforeEach(() => {
     // Clear this environment variable to ensure it does not affect
     // expected test outcome.
+    delete process.env.GCE_METADATA_HOST;
     delete process.env.GCE_METADATA_IP;
     gcp.resetIsAvailableCache();
   });
 
   afterEach(() => {
     // Restore environment variable if it previously existed.
-    process.env.GCE_METADATA_IP = originalGceMetadataIp;
+    process.env.GCE_METADATA_HOST = originalGceMetadataIp;
     nock.cleanAll();
   });
 
@@ -66,6 +67,15 @@ describe('system test', () => {
   it('should use GCE_METADATA_IP if available', async () => {
     process.env.GCE_METADATA_IP = '127.0.0.1:8080';
     const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
+      .get(`${PATH}/${TYPE}/${PROPERTY}`, undefined, HEADERS)
+      .reply(200, {}, HEADERS);
+    await gcp.instance(PROPERTY);
+    scope.done();
+  });
+
+  it('should use GCE_METADATA_HOST if available', async () => {
+    process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}/${PROPERTY}`, undefined, HEADERS)
       .reply(200, {}, HEADERS);
     await gcp.instance(PROPERTY);
@@ -169,9 +179,9 @@ describe('system test', () => {
     scope.done();
   });
 
-  it('should retry with GCE_METADATA_IP if first request fails', async () => {
-    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
-    const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
+  it('should retry with GCE_METADATA_HOST if first request fails', async () => {
+    process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .times(2)
       .reply(500)
@@ -300,9 +310,9 @@ describe('system test', () => {
     assert.strictEqual(false, isGCE);
   });
 
-  it('should fail fast with GCE_METADATA_IP 404 on isAvailable', async () => {
-    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
-    const primary = nock(`http://${process.env.GCE_METADATA_IP}`)
+  it('should fail fast with GCE_METADATA_HOST 404 on isAvailable', async () => {
+    process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
+    const primary = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .reply(404);
     const isGCE = await gcp.isAvailable();
@@ -324,10 +334,10 @@ describe('system test', () => {
     assert.strictEqual(false, isGCE);
   });
 
-  it('should fail on isAvailable if GCE_METADATA_IP times out', async () => {
-    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
+  it('should fail on isAvailable if GCE_METADATA_HOST times out', async () => {
+    process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
     secondaryHostRequest(5000);
-    const primary = nock(`http://${process.env.GCE_METADATA_IP}`)
+    const primary = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
       // this should never get called, as the 3000 timeout will trigger.
@@ -339,9 +349,9 @@ describe('system test', () => {
     assert.strictEqual(false, isGCE);
   });
 
-  it('should report isGCE if GCE_METADATA_IP responds with 200', async () => {
-    process.env.GCE_METADATA_IP = '127.0.0.1:8080';
-    const scope = nock(`http://${process.env.GCE_METADATA_IP}`)
+  it('should report isGCE if GCE_METADATA_HOST responds with 200', async () => {
+    process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
+    const scope = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .reply(200, {}, HEADERS);
     assert.strictEqual(await gcp.isAvailable(), true);
