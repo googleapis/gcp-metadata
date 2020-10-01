@@ -4,14 +4,14 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/gcp-metadata.git",
-        "sha": "eaf128ad5afc4357cde72d19b017b9474c070fea"
+        "sha": "6f7f94119826abc4235e2ed40d8f01b101097be2"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "fdd03c161003ab97657cc0218f25c82c89ddf4b6"
+        "sha": "079dcce498117f9570cebe6e6cff254b38ba3860"
       }
     }
   ],
@@ -62,9 +62,7 @@
     "CONTRIBUTING.md",
     "LICENSE",
     "api-extractor.json",
-    "package-lock.json.2092602543",
     "renovate.json",
-    "samples/README.md",
-    "samples/package-lock.json.1344538203"
+    "samples/README.md"
   ]
 }
