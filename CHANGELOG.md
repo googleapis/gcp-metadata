@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [4.2.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.2.0...v4.2.1) (2020-10-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency gaxios to v4 ([#420](https://www.github.com/googleapis/gcp-metadata/issues/420)) ([b99fb07](https://www.github.com/googleapis/gcp-metadata/commit/b99fb0764b8dbb8b083f73b8007816914db4f09a))
+
 ## [4.2.0](https://www.github.com/googleapis/gcp-metadata/compare/v4.1.4...v4.2.0) (2020-09-15)
 
 
