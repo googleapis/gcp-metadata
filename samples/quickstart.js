@@ -19,6 +19,9 @@ function main() {
     // Instance and Project level metadata will only be available if
     // running inside of a Google Cloud compute environment such as
     // Cloud Functions, App Engine, Kubernetes Engine, or Compute Engine.
+    // To learn more about the differences between instance and project
+    // level metadata, see:
+    // https://cloud.google.com/compute/docs/storing-retrieving-metadata#project-instance-metadata
     if (isAvailable) {
       // grab all top level metadata from the service
       const instanceMetadata = await gcpMetadata.instance();
