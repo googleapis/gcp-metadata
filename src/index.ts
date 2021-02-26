@@ -7,7 +7,7 @@
 
 import {GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
-const jsonBigint = require('json-bigint'); // eslint-disable-line
+import jsonBigint = require('json-bigint');
 
 export const BASE_PATH = '/computeMetadata/v1';
 export const HOST_ADDRESS = 'http://169.254.169.254';
@@ -166,11 +166,17 @@ async function fastFailMetadataRequest<T>(
   return Promise.race([r1, r2]);
 }
 
+/**
+ * Obtain metadata for the current GCE instance
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instance<T = any>(options?: string | Options) {
   return metadataAccessor<T>('instance', options);
 }
 
+/**
+ * Obtain metadata for the current GCP Project.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function project<T = any>(options?: string | Options) {
   return metadataAccessor<T>('project', options);
@@ -185,10 +191,11 @@ function detectGCPAvailableRetries(): number {
     : 0;
 }
 
+let cachedIsAvailableResponse: Promise<boolean> | undefined;
+
 /**
  * Determine if the metadata server is currently available.
  */
-let cachedIsAvailableResponse: Promise<boolean> | undefined;
 export async function isAvailable() {
   try {
     // If a user is instantiating several GCP libraries at the same time,
@@ -256,6 +263,9 @@ export function resetIsAvailableCache() {
   cachedIsAvailableResponse = undefined;
 }
 
+/**
+ * Obtain the timeout for requests to the metadata server.
+ */
 export function requestTimeout(): number {
   // In testing, we were able to reproduce behavior similar to
   // https://github.com/googleapis/google-auth-library-nodejs/issues/798
