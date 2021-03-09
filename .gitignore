@@ -6,5 +6,5 @@ package-lock.json
 .coverage
 package-lock.json
 gcp-metadata.tgz
-docs/
 __pycache__
+.DS_Store

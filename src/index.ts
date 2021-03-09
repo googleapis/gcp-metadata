@@ -9,17 +9,58 @@ import {GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
 
+/**
+ * Base path for the metadata server. Defaults to '/computeMetadata/v1'.
+ * @public
+ */
 export const BASE_PATH = '/computeMetadata/v1';
+
+/**
+ * IP Address used to access the metadata server. Defaults to 'http://169.254.169.254'.
+ * @public
+ */
 export const HOST_ADDRESS = 'http://169.254.169.254';
+
+/**
+ * Host name used to access the metadata server. Defaults to 'http://metadata.google.internal.'.
+ * @public
+ */
 export const SECONDARY_HOST_ADDRESS = 'http://metadata.google.internal.';
 
+/**
+ * Name of the HTTP Header sent with all requests. Defaults to 'Metadata-Flavor'.
+ * @public
+ */
 export const HEADER_NAME = 'Metadata-Flavor';
+
+/**
+ * Value of the HTTP Header sent in the 'Metadata-Flavor' header. Defaults to 'Google'.
+ * @public
+ */
 export const HEADER_VALUE = 'Google';
+
+/**
+ * Collection of headers sent with all requests.
+ * @public
+ */
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
 
+/**
+ * Request options sent to the metadata server.
+ * @public
+ */
 export interface Options {
+  /**
+   * Querystring parameters that will be passed to the metadata server with the request. Useful for performing recursive queries.
+   */
   params?: {[index: string]: string};
+  /**
+   * The specific property path to query from the metadata server.
+   */
   property?: string;
+  /**
+   * Specific HTTP headers to include in the request to the metadata server.
+   */
   headers?: OutgoingHttpHeaders;
 }
 
@@ -168,6 +209,20 @@ async function fastFailMetadataRequest<T>(
 
 /**
  * Obtain metadata for the current GCE instance
+ * @example
+ * ```js
+ * const gcpMetadata = require('gcp-metadata');
+ *
+ * // fetch all instance metadata
+ * const instanceMetadata = await gcpMetadata.instance();
+ *
+ * // fetch properties with custom querystring parameters:
+ * const data = await gcpMetadata.instance({
+ *   property: 'tags',
+ *   params: { alt: 'text' }
+ * });
+ * ```
+ * @public
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instance<T = any>(options?: string | Options) {
@@ -176,6 +231,17 @@ export function instance<T = any>(options?: string | Options) {
 
 /**
  * Obtain metadata for the current GCP Project.
+ * @public
+ * @example
+ * ```js
+ * const gcpMetadata = require('gcp-metadata');
+ *
+ * // fetch all metadata for the project
+ * const projectMetadata = await gcpMetadata.project();
+ *
+ * // fetch the current projectId from the metadata server
+ * const projectId = await gcpMetadata.project('project-id');
+ * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function project<T = any>(options?: string | Options) {
@@ -195,6 +261,12 @@ let cachedIsAvailableResponse: Promise<boolean> | undefined;
 
 /**
  * Determine if the metadata server is currently available.
+ * @example
+ * ```js
+ * const gcpMetadata = require('gcp-metadata');
+ * const isAvailable = await gcpMetadata.isAvailable();
+ * ```
+ * @public
  */
 export async function isAvailable() {
   try {
@@ -258,6 +330,7 @@ export async function isAvailable() {
 
 /**
  * reset the memoized isAvailable() lookup.
+ * @public
  */
 export function resetIsAvailableCache() {
   cachedIsAvailableResponse = undefined;
@@ -265,6 +338,7 @@ export function resetIsAvailableCache() {
 
 /**
  * Obtain the timeout for requests to the metadata server.
+ * @public
  */
 export function requestTimeout(): number {
   // In testing, we were able to reproduce behavior similar to
