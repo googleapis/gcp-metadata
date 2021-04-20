@@ -3,15 +3,15 @@
     {
       "git": {
         "name": ".",
-        "remote": "git@github.com:googleapis/gcp-metadata.git",
-        "sha": "da58ca87c92932ebb59a50b12e8a1afdd96c9a47"
+        "remote": "https://github.com/googleapis/gcp-metadata.git",
+        "sha": "d4a8f405d6f26f16e888e5fb888fa3f353ba6668"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "0199c79b8324fba66476300824aa931788c47e2d"
+        "sha": "c6706ee5d693e9ae5967614170732646590d8374"
       }
     }
   ]
