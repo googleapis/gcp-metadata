@@ -10,7 +10,7 @@ import {before, after, describe, it} from 'mocha';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
 import * as gcx from 'gcx';
-import {cloudfunctions_v1, google} from 'googleapis';
+import {CloudFunctionsServiceClient} from '@google-cloud/functions';
 import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
@@ -20,7 +20,8 @@ import {request, GaxiosError} from 'gaxios';
 const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json'); // eslint-disable-line
 
-let gcf: cloudfunctions_v1.Cloudfunctions;
+let gcf: CloudFunctionsServiceClient;
+let projectId: string;
 const shortPrefix = 'gcloud-tests';
 const fullPrefix = `${shortPrefix}-${uuid.v4().split('-')[0]}`;
 
@@ -28,33 +29,30 @@ describe('gcp metadata', () => {
   before(async () => {
     // pack up the gcp-metadata module and copy to the target dir
     await packModule();
+    gcf = new CloudFunctionsServiceClient();
+    projectId = await gcf.auth.getProjectId();
   });
 
   describe('cloud functions', () => {
     before(async () => {
       // Clean up any old cloud functions just hanging out
-      gcf = await getGCFClient();
       await pruneFunctions(false);
 
       // deploy the function to GCF
       await deployApp();
       // cloud functions now require authentication by default, see:
       // https://cloud.google.com/functions/docs/release-notes
-      const projectId = await google.auth.getProjectId();
-      await gcf.projects.locations.functions.setIamPolicy({
+      await gcf.setIamPolicy({
         resource: `projects/${projectId}/locations/us-central1/functions/${fullPrefix}`,
-        requestBody: {
-          policy: {
-            bindings: [
-              {members: ['allUsers'], role: 'roles/cloudfunctions.invoker'},
-            ],
-          },
+        policy: {
+          bindings: [
+            {members: ['allUsers'], role: 'roles/cloudfunctions.invoker'},
+          ],
         },
       });
     });
 
     it('should access the metadata service on GCF', async () => {
-      const projectId = await google.auth.getProjectId();
       const url = `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
       try {
         const res = await request({url});
@@ -94,21 +92,6 @@ describe('gcp metadata', () => {
 });
 
 /**
- * Create a new GCF client using googleapis, and ensure it's
- * properly authenticated.
- */
-async function getGCFClient() {
-  const auth = new google.auth.GoogleAuth({
-    scopes: 'https://www.googleapis.com/auth/cloud-platform',
-  });
-  const client = await auth.getClient();
-  return google.cloudfunctions({
-    version: 'v1',
-    auth: client,
-  });
-}
-
-/**
  * Delete all cloud functions created in the project by this
  * test suite. It can delete ones created in this session, and
  * also delete any of them created > 7 days ago by tests.
@@ -116,29 +99,25 @@ async function getGCFClient() {
  */
 async function pruneFunctions(sessionOnly: boolean) {
   console.log('Pruning leaked functions...');
-  const projectId = await google.auth.getProjectId();
-  const res = await gcf.projects.locations.functions.list({
+  const [fns] = await gcf.listFunctions({
     parent: `projects/${projectId}/locations/-`,
   });
-  const fns = res.data.functions || [];
   await Promise.all(
     fns
       .filter(fn => {
         if (sessionOnly) {
           return fn.name!.includes(fullPrefix);
         }
-        const updateDate = new Date(fn.updateTime!).getTime();
+        const updateDate = ((fn.updateTime?.seconds as number) || 0) * 1000;
         const currentDate = Date.now();
         const minutesSinceUpdate = (currentDate - updateDate) / 1000 / 60;
         return minutesSinceUpdate > 60 && fn.name!.includes(shortPrefix);
       })
       .map(async fn => {
-        await gcf.projects.locations.functions
-          .delete({name: fn.name as string})
-          .catch(e => {
-            console.error(`There was a problem deleting function ${fn.name}.`);
-            console.error(e);
-          });
+        await gcf.deleteFunction({name: fn.name}).catch(e => {
+          console.error(`There was a problem deleting function ${fn.name}.`);
+          console.error(e);
+        });
       })
   );
 }
