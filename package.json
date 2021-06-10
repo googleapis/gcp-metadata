@@ -23,9 +23,7 @@
     "predocs-test": "npm run docs",
     "prelint": "cd samples; npm link ../; npm install",
     "clean": "gts clean",
-    "precompile": "gts clean",
-    "api-extractor": "api-extractor run --local",
-    "api-documenter": "api-documenter yaml --input-folder=temp"
+    "precompile": "gts clean"
   },
   "keywords": [
     "google cloud platform",
@@ -45,8 +43,6 @@
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.10",
     "@google-cloud/functions": "^1.1.4",
-    "@microsoft/api-documenter": "^7.8.10",
-    "@microsoft/api-extractor": "^7.8.10",
     "@types/json-bigint": "^1.0.0",
     "@types/mocha": "^8.0.0",
     "@types/ncp": "^2.0.1",
