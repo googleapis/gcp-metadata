@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [4.3.0](https://www.github.com/googleapis/gcp-metadata/compare/v4.2.1...v4.3.0) (2021-06-10)
+
+
+### Features
+
+* add `gcf-owl-bot[bot]` to `ignoreAuthors` ([#450](https://www.github.com/googleapis/gcp-metadata/issues/450)) ([6a0f9ad](https://www.github.com/googleapis/gcp-metadata/commit/6a0f9ad09b6d16370d08c5d60541ce3ef64a9f97))
+
 ### [4.2.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.2.0...v4.2.1) (2020-10-29)
 
 
