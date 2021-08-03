@@ -217,7 +217,7 @@ Apache Version 2.0
 
 See [LICENSE](https://github.com/googleapis/gcp-metadata/blob/master/LICENSE)
 
-[client-docs]: https://googleapis.dev/nodejs/gcp-metadata/latest
+[client-docs]: https://cloud.google.com/nodejs/docs/reference/gcp-metadata/latest
 [product-docs]: https://cloud.google.com/compute/docs/storing-retrieving-metadata
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
 [projects]: https://console.cloud.google.com/project
