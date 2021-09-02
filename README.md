@@ -6,7 +6,7 @@
 
 [![release level](https://img.shields.io/badge/release%20level-general%20availability%20%28GA%29-brightgreen.svg?style=flat)](https://cloud.google.com/terms/launch-stages)
 [![npm version](https://img.shields.io/npm/v/gcp-metadata.svg)](https://www.npmjs.org/package/gcp-metadata)
-[![codecov](https://img.shields.io/codecov/c/github/googleapis/gcp-metadata/master.svg?style=flat)](https://codecov.io/gh/googleapis/gcp-metadata)
+[![codecov](https://img.shields.io/codecov/c/github/googleapis/gcp-metadata/main.svg?style=flat)](https://codecov.io/gh/googleapis/gcp-metadata)
 
 
 
@@ -15,7 +15,7 @@ Get the metadata from a Google Cloud Platform environment
 
 
 A comprehensive list of changes in each version may be found in
-[the CHANGELOG](https://github.com/googleapis/gcp-metadata/blob/master/CHANGELOG.md).
+[the CHANGELOG](https://github.com/googleapis/gcp-metadata/blob/main/CHANGELOG.md).
 
 * [GCP Metadata Node.js Client API Reference][client-docs]
 * [GCP Metadata Documentation][product-docs]
@@ -150,11 +150,11 @@ export GCE_METADATA_HOST = '169.254.169.254'
 
 ## Samples
 
-Samples are in the [`samples/`](https://github.com/googleapis/gcp-metadata/tree/master/samples) directory. Each sample's `README.md` has instructions for running its sample.
+Samples are in the [`samples/`](https://github.com/googleapis/gcp-metadata/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
 
 | Sample                      | Source Code                       | Try it |
 | --------------------------- | --------------------------------- | ------ |
-| Quickstart | [source code](https://github.com/googleapis/gcp-metadata/blob/master/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/gcp-metadata&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
+| Quickstart | [source code](https://github.com/googleapis/gcp-metadata/blob/main/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/gcp-metadata&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
 
 
 
@@ -203,7 +203,7 @@ More Information: [Google Cloud Platform Launch Stages][launch_stages]
 
 ## Contributing
 
-Contributions welcome! See the [Contributing Guide](https://github.com/googleapis/gcp-metadata/blob/master/CONTRIBUTING.md).
+Contributions welcome! See the [Contributing Guide](https://github.com/googleapis/gcp-metadata/blob/main/CONTRIBUTING.md).
 
 Please note that this `README.md`, the `samples/README.md`,
 and a variety of configuration files in this repository (including `.nycrc` and `tsconfig.json`)
@@ -215,7 +215,7 @@ to its templates in
 
 Apache Version 2.0
 
-See [LICENSE](https://github.com/googleapis/gcp-metadata/blob/master/LICENSE)
+See [LICENSE](https://github.com/googleapis/gcp-metadata/blob/main/LICENSE)
 
 [client-docs]: https://googleapis.dev/nodejs/gcp-metadata/latest
 [product-docs]: https://cloud.google.com/compute/docs/storing-retrieving-metadata
