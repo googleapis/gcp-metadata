@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+### [4.3.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.3.0...v4.3.1) (2021-09-02)
+
+
+### Bug Fixes
+
+* **build:** switch primary branch to main ([#481](https://www.github.com/googleapis/gcp-metadata/issues/481)) ([8a7965c](https://www.github.com/googleapis/gcp-metadata/commit/8a7965c47c077ef766e4b416358630c0b24b0af2))
+
 ## [4.3.0](https://www.github.com/googleapis/gcp-metadata/compare/v4.2.1...v4.3.0) (2021-06-10)
 
 
