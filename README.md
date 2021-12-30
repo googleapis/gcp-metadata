@@ -6,7 +6,6 @@
 
 [![release level](https://img.shields.io/badge/release%20level-general%20availability%20%28GA%29-brightgreen.svg?style=flat)](https://cloud.google.com/terms/launch-stages)
 [![npm version](https://img.shields.io/npm/v/gcp-metadata.svg)](https://www.npmjs.org/package/gcp-metadata)
-[![codecov](https://img.shields.io/codecov/c/github/googleapis/gcp-metadata/main.svg?style=flat)](https://codecov.io/gh/googleapis/gcp-metadata)
 
 
 
