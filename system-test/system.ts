@@ -84,7 +84,7 @@ describe('gcp metadata', () => {
           result.log.includes('"default":{"aliases":["default"],"email"')
         );
       } catch (e) {
-        console.error(e.log);
+        console.error((e as gcbuild.BuildError).log);
         throw e;
       }
     });
