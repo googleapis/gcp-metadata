@@ -390,7 +390,7 @@ describe('system test', () => {
     const secondary = nock(SECONDARY_HOST)
       .get(`${PATH}/${TYPE}`)
       .replyWithError({code: '🤡'});
-    const done = new Promise(resolve => {
+    const done = new Promise<void>(resolve => {
       process.on('warning', warning => {
         assert.strictEqual(
           warning.toString().includes('unexpected error'),
@@ -414,7 +414,7 @@ describe('system test', () => {
       .reply(500, {}, HEADERS);
     await gcp.isAvailable();
     await secondary;
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       setTimeout(() => {
         primary.done();
         return resolve();

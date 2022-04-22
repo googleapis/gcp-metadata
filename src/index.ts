@@ -5,7 +5,7 @@
  * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
  */
 
-import {GaxiosOptions, GaxiosResponse, request} from 'gaxios';
+import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
 
@@ -107,8 +107,9 @@ async function metadataAccessor<T>(
     }
     return res.data;
   } catch (e) {
-    if (e.response && e.response.status !== 200) {
-      e.message = `Unsuccessful response status code. ${e.message}`;
+    const err = e as GaxiosError;
+    if (err.response && err.response.status !== 200) {
+      err.message = `Unsuccessful response status code. ${err.message}`;
     }
     throw e;
   }
@@ -215,7 +216,8 @@ export async function isAvailable() {
     }
     await cachedIsAvailableResponse;
     return true;
-  } catch (err) {
+  } catch (e) {
+    const err = e as GaxiosError & {type: string};
     if (process.env.DEBUG_AUTH) {
       console.info(err);
     }
