@@ -4,6 +4,17 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [5.0.0](https://github.com/googleapis/gcp-metadata/compare/v4.3.1...v5.0.0) (2022-04-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop node 10, update typescript to 4.6.3 (#519)
+
+### Build System
+
+* drop node 10, update typescript to 4.6.3 ([#519](https://github.com/googleapis/gcp-metadata/issues/519)) ([688749b](https://github.com/googleapis/gcp-metadata/commit/688749bc50407f3cd127a0b10ae09487d6fe5aea))
+
 ### [4.3.1](https://www.github.com/googleapis/gcp-metadata/compare/v4.3.0...v4.3.1) (2021-09-02)
 
 
