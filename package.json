@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@compodoc/compodoc": "^1.1.10",
-    "@google-cloud/functions": "^1.1.4",
+    "@google-cloud/functions": "^2.0.0",
     "@types/json-bigint": "^1.0.0",
     "@types/mocha": "^9.0.0",
     "@types/ncp": "^2.0.1",
