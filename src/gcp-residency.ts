@@ -78,8 +78,14 @@ export function isGoogleComputeEngineWindows(): boolean {
       'Get-WMIObject -Query "SELECT ReleaseDate, Manufacturer FROM Win32_BIOS"';
     const results = execSync(q, {shell: 'powershell.exe'}).toString();
 
+    // TEMP: debug for Windows
+    console.dir({results});
+
     return /Manufacturer\s*:\s*Google/.test(results);
   } catch (e) {
+    // TEMP: debug for Windows
+    console.dir({e});
+
     return false;
   }
 }
