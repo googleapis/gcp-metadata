@@ -74,18 +74,13 @@ export function isGoogleComputeEngineWindows(): boolean {
 
   try {
     // Retrieve BIOS DMI information using WMI under Microsoft PowerShell
-    const q =
+    const query =
       'Get-WMIObject -Query "SELECT ReleaseDate, Manufacturer FROM Win32_BIOS"';
-    const results = execSync(q, {shell: 'powershell.exe'}).toString();
+    const results = execSync(query, {shell: 'powershell.exe'}).toString();
 
-    // TEMP: debug for Windows
-    console.dir({results});
-
+    // Matches 'Manufacturer' + optional, varying spacing + ':' + optional, varying spacing + 'Google'
     return /Manufacturer\s*:\s*Google/.test(results);
-  } catch (e) {
-    // TEMP: debug for Windows
-    console.dir({e});
-
+  } catch {
     return false;
   }
 }
