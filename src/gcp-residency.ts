@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-import {execSync} from 'child_process';
-import {readFileSync} from 'fs';
+import {networkInterfaces} from 'os';
 
-/**
- * Known paths unique to Google Compute Engine Linux instances
- */
-export const GCE_LINUX_BIOS_PATHS = {
-  BIOS_DATE: '/sys/class/dmi/id/bios_date',
-  BIOS_VENDOR: '/sys/class/dmi/id/bios_vendor',
-};
+const GCE_MAC_ADDRESS_REGEX = /^42:01/;
 
 /**
  * Determines if the process is running on a Cloud Functions instance.
@@ -44,54 +37,24 @@ export function isGoogleCloudFunction(): boolean {
 }
 
 /**
- * Determines if the process is running on a Linux Google Compute Engine instance.
- *
- * @returns {boolean} `true` if the process is running on Linux Google Compute Engine, `false` otherwise.
- */
-export function isGoogleComputeEngineLinux(): boolean {
-  if (process.platform !== 'linux') return false;
-
-  try {
-    // ensure this file exist
-    readFileSync(GCE_LINUX_BIOS_PATHS.BIOS_DATE, 'utf8');
-
-    // ensure this file exist and matches
-    const biosVendor = readFileSync(GCE_LINUX_BIOS_PATHS.BIOS_VENDOR, 'utf8');
-
-    return /Google/.test(biosVendor);
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Determines if the process is running on a Windows Google Compute Engine instance.
- *
- * @returns {boolean} `true` if the process is running on Windows GCE, `false` otherwise.
- */
-export function isGoogleComputeEngineWindows(): boolean {
-  if (process.platform !== 'win32') return false;
-
-  try {
-    // Retrieve BIOS DMI information using WMI under Microsoft PowerShell
-    const query =
-      'Get-WMIObject -Query "SELECT ReleaseDate, Manufacturer FROM Win32_BIOS"';
-    const results = execSync(query, {shell: 'powershell.exe'}).toString();
-
-    // Matches 'Manufacturer' + optional, varying spacing + ':' + optional, varying spacing + 'Google'
-    return /Manufacturer\s*:\s*Google/.test(results);
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Determines if the process is running on a Google Compute Engine instance.
  *
  * @returns {boolean} `true` if the process is running on GCE, `false` otherwise.
  */
 export function isGoogleComputeEngine(): boolean {
-  return isGoogleComputeEngineLinux() || isGoogleComputeEngineWindows();
+  const interfaces = networkInterfaces();
+
+  for (const item of Object.values(interfaces)) {
+    if (!item) continue;
+
+    for (const {mac} of item) {
+      if (GCE_MAC_ADDRESS_REGEX.test(mac)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 /**

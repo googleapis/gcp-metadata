@@ -15,49 +15,39 @@
  */
 
 import {strict as assert} from 'assert';
-import {execSync} from 'child_process';
-import * as fs from 'fs';
+import * as os from 'os';
 
 import {beforeEach, describe, it} from 'mocha';
+import {SinonSandbox, createSandbox} from 'sinon';
 
 import * as gcpResidency from '../src/gcp-residency';
 
-function getLinuxBiosVendor() {
-  if (process.platform !== 'linux') return '';
-
-  try {
-    return fs.readFileSync(
-      gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_VENDOR,
-      'utf8'
-    );
-  } catch {
-    return '';
-  }
-}
-
-function getWindowsBIOSManufacturer() {
-  if (process.platform !== 'win32') return '';
-
-  const query = 'Get-WMIObject -Query "SELECT Manufacturer FROM Win32_BIOS"';
-  return execSync(query, {shell: 'powershell.exe'}).toString();
-}
-
 const ENVIRONMENT_BACKUP = {...process.env};
-const EXPECT_CLOUD_FUNCTION = !!process.env.K_SERVICE;
-const EXPECT_LINUX_GCE = /Google/.test(getLinuxBiosVendor());
-const EXPECT_WINDOWS_GCE = /Google/.test(getWindowsBIOSManufacturer());
-
-/** A simple block to help with debugging failed tests. */
-const DEBUG_HELP = JSON.stringify({
-  processEnv: process.env,
-  getLinuxBiosVendor: getLinuxBiosVendor(),
-  getWindowsBIOSManufacturer: getWindowsBIOSManufacturer(),
-});
 
 describe('gcp-residency', () => {
+  let sandbox: SinonSandbox;
+
   beforeEach(() => {
     process.env = {...ENVIRONMENT_BACKUP};
+    sandbox = createSandbox();
   });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
+  /**
+   * A simple utility for stubbing the networkInterface for GCE emulation.
+   *
+   * @param isGCE determines if the address should begin with `42:01` or not
+   */
+  function setGCENetworkInterface(isGCE = true) {
+    const mac = isGCE ? '42:01:00:00:00:00' : '00:00:00:00:00:00';
+
+    sandbox.stub(os, 'networkInterfaces').returns({
+      'test-interface': [{mac} as os.NetworkInterfaceInfo],
+    });
+  }
 
   describe('isGoogleCloudFunction', () => {
     it('should return `true` if `K_SERVICE` env is set', () => {
@@ -80,58 +70,53 @@ describe('gcp-residency', () => {
 
       assert.equal(gcpResidency.isGoogleCloudFunction(), false);
     });
-
-    it('should return the expected result', () => {
-      assert.equal(
-        gcpResidency.isGoogleCloudFunction(),
-        EXPECT_CLOUD_FUNCTION,
-        `Expecting \`isGoogleCloudFunction()\` to be \`${EXPECT_CLOUD_FUNCTION}\`. Details: ${DEBUG_HELP}`
-      );
-    });
-  });
-
-  describe('isGoogleComputeEngineLinux', () => {
-    it('should return the expected result', () => {
-      assert.equal(
-        gcpResidency.isGoogleComputeEngineLinux(),
-        EXPECT_LINUX_GCE,
-        `Expecting \`isGoogleComputeEngineLinux()\` to be \`${EXPECT_LINUX_GCE}\`. Details: ${DEBUG_HELP}`
-      );
-    });
-  });
-
-  describe('isGoogleComputeEngineWindows', () => {
-    it('should return the expected result', () => {
-      assert.equal(
-        gcpResidency.isGoogleComputeEngineWindows(),
-        EXPECT_WINDOWS_GCE,
-        `Expecting \`isGoogleComputeEngineWindows()\` to be \`${EXPECT_WINDOWS_GCE}\`. Details: ${DEBUG_HELP}`
-      );
-    });
   });
 
   describe('isGoogleComputeEngine', () => {
-    it('should return the expected result', () => {
-      const onGCE = EXPECT_WINDOWS_GCE || EXPECT_LINUX_GCE;
+    it('should return `true` if the host MAC address begins with `42:01`', () => {
+      setGCENetworkInterface(true);
 
-      assert.equal(
-        gcpResidency.isGoogleComputeEngine(),
-        onGCE,
-        `Expecting \`isGoogleComputeEngineWindows()\` to be \`${onGCE}\`. Details: ${DEBUG_HELP}`
-      );
+      assert.equal(gcpResidency.isGoogleComputeEngine(), true);
+    });
+
+    it('should return `false` if the host MAC address does not begin with `42:01`', () => {
+      setGCENetworkInterface(false);
+
+      assert.equal(gcpResidency.isGoogleComputeEngine(), false);
     });
   });
 
   describe('detectGCPResidency', () => {
-    it('should return the expected result', () => {
-      const onGCP =
-        EXPECT_CLOUD_FUNCTION || EXPECT_LINUX_GCE || EXPECT_WINDOWS_GCE;
+    it('should return `true` if `isGoogleCloudFunction`', () => {
+      // `isGoogleCloudFunction` = true
+      process.env.K_SERVICE = '1';
 
-      assert.equal(
-        gcpResidency.detectGCPResidency(),
-        onGCP,
-        `Expecting \`isGoogleComputeEngineWindows()\` to be \`${onGCP}\`. Details: ${DEBUG_HELP}`
-      );
+      // `isGoogleComputeEngine` = false
+      setGCENetworkInterface(false);
+
+      assert(gcpResidency.detectGCPResidency());
+    });
+
+    it('should return `true` if `isGoogleComputeEngine`', () => {
+      // `isGoogleCloudFunction` = false
+      delete process.env.FUNCTION_NAME;
+      delete process.env.K_SERVICE;
+
+      // `isGoogleComputeEngine` = true
+      setGCENetworkInterface(true);
+
+      assert(gcpResidency.detectGCPResidency());
+    });
+
+    it('should return `false` !`isGoogleCloudFunction` && !`isGoogleComputeEngine`', () => {
+      // `isGoogleCloudFunction` = false
+      delete process.env.FUNCTION_NAME;
+      delete process.env.K_SERVICE;
+
+      // `isGoogleComputeEngine` = false
+      setGCENetworkInterface(false);
+
+      assert.equal(gcpResidency.detectGCPResidency(), false);
     });
   });
 });
