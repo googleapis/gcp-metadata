@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [5.0.1](https://github.com/googleapis/gcp-metadata/compare/v5.0.0...v5.0.1) (2022-09-09)
+
+
+### Bug Fixes
+
+* Remove pip install statements ([#1546](https://github.com/googleapis/gcp-metadata/issues/1546)) ([#529](https://github.com/googleapis/gcp-metadata/issues/529)) ([064c64c](https://github.com/googleapis/gcp-metadata/commit/064c64cec160ffe645e6946a5125960e3e269d7f))
+
 ## [5.0.0](https://github.com/googleapis/gcp-metadata/compare/v4.3.1...v5.0.0) (2022-04-22)
 
 
