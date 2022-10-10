@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-import {networkInterfaces} from 'os';
+import {readFileSync, statSync} from 'fs';
+import {networkInterfaces, platform} from 'os';
+
+/**
+ * Known paths unique to Google Compute Engine Linux instances
+ */
+export const GCE_LINUX_BIOS_PATHS = {
+  BIOS_DATE: '/sys/class/dmi/id/bios_date',
+  BIOS_VENDOR: '/sys/class/dmi/id/bios_vendor',
+};
 
 const GCE_MAC_ADDRESS_REGEX = /^42:01/;
 
@@ -37,11 +46,33 @@ export function isGoogleCloudFunction(): boolean {
 }
 
 /**
- * Determines if the process is running on a Google Compute Engine instance.
+ * Determines if the process is running on a Linux Google Compute Engine instance.
  *
- * @returns {boolean} `true` if the process is running on GCE, `false` otherwise.
+ * @returns {boolean} `true` if the process is running on Linux GCE, `false` otherwise.
  */
-export function isGoogleComputeEngine(): boolean {
+export function isGoogleComputeEngineLinux(): boolean {
+  if (platform() !== 'linux') return false;
+
+  try {
+    // ensure this file exist
+    statSync(GCE_LINUX_BIOS_PATHS.BIOS_DATE);
+
+    // ensure this file exist and matches
+    const biosVendor = readFileSync(GCE_LINUX_BIOS_PATHS.BIOS_VENDOR, 'utf8');
+
+    return /Google/.test(biosVendor);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Determines if the process is running on a Google Compute Engine instance with a known
+ * MAC address.
+ *
+ * @returns {boolean} `true` if the process is running on GCE (as determined by MAC address), `false` otherwise.
+ */
+export function isGoogleComputeEngineMACAddress(): boolean {
   const interfaces = networkInterfaces();
 
   for (const item of Object.values(interfaces)) {
@@ -55,6 +86,15 @@ export function isGoogleComputeEngine(): boolean {
   }
 
   return false;
+}
+
+/**
+ * Determines if the process is running on a Google Compute Engine instance.
+ *
+ * @returns {boolean} `true` if the process is running on GCE, `false` otherwise.
+ */
+export function isGoogleComputeEngine(): boolean {
+  return isGoogleComputeEngineLinux() || isGoogleComputeEngineMACAddress();
 }
 
 /**
