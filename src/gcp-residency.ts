@@ -28,19 +28,30 @@ export const GCE_LINUX_BIOS_PATHS = {
 const GCE_MAC_ADDRESS_REGEX = /^42:01/;
 
 /**
- * Determines if the process is running on a Cloud Functions instance.
+ * Determines if the process is running on a Google Cloud Serverless environment (Cloud Run or Cloud Functions instance).
  *
- * Uses the {@link https://cloud.google.com/functions/docs/env-var Cloud Functions environment variables}.
+ * Uses the:
+ * - {@link https://cloud.google.com/run/docs/container-contract#env-vars Cloud Run environment variables}.
+ * - {@link https://cloud.google.com/functions/docs/env-var Cloud Functions environment variables}.
  *
- * @returns {boolean} `true` if the process is running on Cloud Functions, `false` otherwise.
+ * @returns {boolean} `true` if the process is running on GCP serverless, `false` otherwise.
  */
-export function isGoogleCloudFunction(): boolean {
+export function isGoogleCloudServerless(): boolean {
   /**
-   * `K_SERVICE` and `FUNCTION_NAME` are variables unique to Cloud Functions environments:
-   * - `FUNCTION_NAME` in {@link https://cloud.google.com/functions/docs/env-var Python 3.7 and Go 1.11}.
-   * - `K_SERVICE` in {@link https://cloud.google.com/functions/docs/env-var Newer runtimes}.
+   * `CLOUD_RUN_JOB` is used for Cloud Run Jobs
+   * - See {@link https://cloud.google.com/run/docs/container-contract#env-vars Cloud Run environment variables}.
+   *
+   * `FUNCTION_NAME` is used in older Cloud Functions environments:
+   * - See {@link https://cloud.google.com/functions/docs/env-var Python 3.7 and Go 1.11}.
+   *
+   * `K_SERVICE` is used in Cloud Run and newer Cloud Functions environments:
+   * - See {@link https://cloud.google.com/run/docs/container-contract#env-vars Cloud Run environment variables}.
+   * - See {@link https://cloud.google.com/functions/docs/env-var Cloud Functions newer runtimes}.
    */
-  const isGFEnvironment = process.env.K_SERVICE || process.env.FUNCTION_NAME;
+  const isGFEnvironment =
+    process.env.CLOUD_RUN_JOB ||
+    process.env.FUNCTION_NAME ||
+    process.env.K_SERVICE;
 
   return !!isGFEnvironment;
 }
@@ -103,5 +114,5 @@ export function isGoogleComputeEngine(): boolean {
  * @returns {boolean} `true` if the process is running on GCP, `false` otherwise.
  */
 export function detectGCPResidency(): boolean {
-  return isGoogleCloudFunction() || isGoogleComputeEngine();
+  return isGoogleCloudServerless() || isGoogleComputeEngine();
 }

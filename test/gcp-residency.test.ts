@@ -31,6 +31,7 @@ describe('gcp-residency', () => {
   beforeEach(() => {
     process.env = {...ENVIRONMENT_BACKUP};
     sandbox = createSandbox();
+    removeServerlessEnvironmentVariables();
   });
 
   afterEach(() => {
@@ -88,26 +89,33 @@ describe('gcp-residency', () => {
     });
   }
 
-  describe('isGoogleCloudFunction', () => {
-    it('should return `true` if `K_SERVICE` env is set', () => {
-      process.env.K_SERVICE = '1';
-      delete process.env.FUNCTION_NAME;
+  function removeServerlessEnvironmentVariables() {
+    delete process.env.CLOUD_RUN_JOB;
+    delete process.env.FUNCTION_NAME;
+    delete process.env.K_SERVICE;
+  }
 
-      assert(gcpResidency.isGoogleCloudFunction());
+  describe('isGoogleCloudServerless', () => {
+    it('should return `true` if `CLOUD_RUN_JOB` env is set', () => {
+      process.env.CLOUD_RUN_JOB = '1';
+
+      assert(gcpResidency.isGoogleCloudServerless());
     });
 
     it('should return `true` if `FUNCTION_NAME` env is set', () => {
       process.env.FUNCTION_NAME = '1';
-      delete process.env.K_SERVICE;
 
-      assert(gcpResidency.isGoogleCloudFunction());
+      assert(gcpResidency.isGoogleCloudServerless());
     });
 
-    it('should return `false` if neither `K_SERVICE` nor `FUNCTION_NAME` are set', () => {
-      delete process.env.FUNCTION_NAME;
-      delete process.env.K_SERVICE;
+    it('should return `true` if `K_SERVICE` env is set', () => {
+      process.env.K_SERVICE = '1';
 
-      assert.equal(gcpResidency.isGoogleCloudFunction(), false);
+      assert(gcpResidency.isGoogleCloudServerless());
+    });
+
+    it('should return `false` if none of the envs are set', () => {
+      assert.equal(gcpResidency.isGoogleCloudServerless(), false);
     });
   });
 
@@ -154,8 +162,8 @@ describe('gcp-residency', () => {
   });
 
   describe('detectGCPResidency', () => {
-    it('should return `true` if `isGoogleCloudFunction`', () => {
-      // `isGoogleCloudFunction` = true
+    it('should return `true` if `isGoogleCloudServerless`', () => {
+      // `isGoogleCloudServerless` = true
       process.env.K_SERVICE = '1';
 
       // `isGoogleComputeEngine` = false
@@ -165,9 +173,8 @@ describe('gcp-residency', () => {
     });
 
     it('should return `true` if `isGoogleComputeEngine`', () => {
-      // `isGoogleCloudFunction` = false
-      delete process.env.FUNCTION_NAME;
-      delete process.env.K_SERVICE;
+      // `isGoogleCloudServerless` = false
+      removeServerlessEnvironmentVariables();
 
       // `isGoogleComputeEngine` = true
       setGCENetworkInterface(true);
@@ -175,10 +182,9 @@ describe('gcp-residency', () => {
       assert(gcpResidency.detectGCPResidency());
     });
 
-    it('should return `false` !`isGoogleCloudFunction` && !`isGoogleComputeEngine`', () => {
-      // `isGoogleCloudFunction` = false
-      delete process.env.FUNCTION_NAME;
-      delete process.env.K_SERVICE;
+    it('should return `false` !`isGoogleCloudServerless` && !`isGoogleComputeEngine`', () => {
+      // `isGoogleCloudServerless` = false
+      removeServerlessEnvironmentVariables();
 
       // `isGoogleComputeEngine` = false
       setGCENetworkInterface(false);
