@@ -8,6 +8,7 @@
 import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
+import {detectGCPResidency} from './gcp-residency';
 
 export const BASE_PATH = '/computeMetadata/v1';
 export const HOST_ADDRESS = 'http://169.254.169.254';
@@ -266,18 +267,34 @@ export function resetIsAvailableCache() {
 }
 
 /**
+ * A cache for the detected GCP Residency.
+ */
+export let gcpResidencyCache: boolean | null = null;
+
+/**
+ * Sets the detected GCP Residency.
+ * Useful for forcing metadata server detection behavior.
+ *
+ * Set `null` to autodetect the environment (default behavior).
+ */
+export function setGCPResidency(value: boolean | null = null) {
+  gcpResidencyCache = value !== null ? value : detectGCPResidency();
+}
+
+/**
  * Obtain the timeout for requests to the metadata server.
+ *
+ * In certain environments and conditions requests can take longer than
+ * the default timeout to complete. This function will determine the
+ * appropriate timeout based on the environment.
+ *
+ * @returns {number} a request timeout duration in milliseconds.
  */
 export function requestTimeout(): number {
-  // In testing, we were able to reproduce behavior similar to
-  // https://github.com/googleapis/google-auth-library-nodejs/issues/798
-  // by making many concurrent network requests. Requests do not actually fail,
-  // rather they take significantly longer to complete (and we hit our
-  // default 3000ms timeout).
-  //
-  // This logic detects a GCF environment, using the documented environment
-  // variables K_SERVICE and FUNCTION_NAME:
-  // https://cloud.google.com/functions/docs/env-var and, in a GCF environment
-  // eliminates timeouts (by setting the value to 0 to disable).
-  return process.env.K_SERVICE || process.env.FUNCTION_NAME ? 0 : 3000;
+  // Detecting the residency can be resource-intensive. Let's cache the result.
+  if (gcpResidencyCache === null) {
+    gcpResidencyCache = detectGCPResidency();
+  }
+
+  return gcpResidencyCache ? 0 : 3000;
 }

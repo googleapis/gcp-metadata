@@ -26,7 +26,7 @@ const HEADERS = {
 nock.disableNetConnect();
 process.removeAllListeners('warning');
 
-describe('system test', () => {
+describe('unit test', () => {
   const originalGceMetadataIp = process.env.GCE_METADATA_HOST;
 
   beforeEach(() => {
@@ -35,6 +35,7 @@ describe('system test', () => {
     delete process.env.GCE_METADATA_HOST;
     delete process.env.GCE_METADATA_IP;
     gcp.resetIsAvailableCache();
+    gcp.setGCPResidency();
   });
 
   afterEach(() => {
@@ -482,19 +483,15 @@ describe('system test', () => {
     assert.strictEqual(isGCE, false);
   });
 
-  it('returns request timeout of 3000ms, when not GCF', () => {
-    assert.strictEqual(gcp.requestTimeout(), 3000);
-  });
+  describe('requestTimeout', () => {
+    it('should return a request timeout of `0` when running on GCP', () => {
+      gcp.setGCPResidency(true);
+      assert.strictEqual(gcp.requestTimeout(), 0);
+    });
 
-  it('returns request timeout of 0, when FUNCTION_NAME set', () => {
-    process.env.FUNCTION_NAME = 'my-function';
-    assert.strictEqual(gcp.requestTimeout(), 0);
-    delete process.env.FUNCTION_NAME;
-  });
-
-  it('returns request timeout of 0, when K_SERVICE set', () => {
-    process.env.K_SERVICE = 'my-function';
-    assert.strictEqual(gcp.requestTimeout(), 0);
-    delete process.env.K_SERVICE;
+    it('should return a request timeout of `3000` when not running on GCP', () => {
+      gcp.setGCPResidency(false);
+      assert.strictEqual(gcp.requestTimeout(), 3000);
+    });
   });
 });
