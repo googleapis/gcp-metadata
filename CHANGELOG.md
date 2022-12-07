@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [5.1.0](https://github.com/googleapis/gcp-metadata/compare/v5.0.1...v5.1.0) (2022-12-07)
+
+
+### Features
+
+* Extend GCP Residency Detection Support ([#528](https://github.com/googleapis/gcp-metadata/issues/528)) ([2b35bb0](https://github.com/googleapis/gcp-metadata/commit/2b35bb0e6fb1a18294aeeebba91a6bf7b400385a))
+
 ## [5.0.1](https://github.com/googleapis/gcp-metadata/compare/v5.0.0...v5.0.1) (2022-09-09)
 
 
