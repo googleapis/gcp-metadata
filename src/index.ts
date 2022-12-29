@@ -8,6 +8,7 @@
 import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
+import {fileURLToPath} from 'url';
 import {detectGCPResidency} from './gcp-residency';
 
 export const BASE_PATH = '/computeMetadata/v1';
@@ -298,3 +299,5 @@ export function requestTimeout(): number {
 
   return gcpResidencyCache ? 0 : 3000;
 }
+
+export * from './gcp-residency';
