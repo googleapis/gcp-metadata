@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [5.2.0](https://github.com/googleapis/gcp-metadata/compare/v5.1.0...v5.2.0) (2023-01-03)
+
+
+### Features
+
+* Export `gcp-residency` tools ([#552](https://github.com/googleapis/gcp-metadata/issues/552)) ([ba9ae24](https://github.com/googleapis/gcp-metadata/commit/ba9ae24331b53199f81e97b6a88414050cfcf546))
+
 ## [5.1.0](https://github.com/googleapis/gcp-metadata/compare/v5.0.1...v5.1.0) (2022-12-07)
 
 
