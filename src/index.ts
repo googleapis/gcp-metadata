@@ -298,3 +298,5 @@ export function requestTimeout(): number {
 
   return gcpResidencyCache ? 0 : 3000;
 }
+
+export * from './gcp-residency';
