@@ -31,7 +31,8 @@ export class GCPResidencyUtil {
       | 'fsReadFileSync'
       | 'fsStatSync'
       | 'processEnv'
-      | 'osNetworkInterfaces']?: SinonStub | void;
+      | 'osNetworkInterfaces'
+      | 'osPlatform']?: SinonStub | void;
   } = {};
 
   constructor(public sandbox: SinonSandbox) {}
@@ -59,7 +60,9 @@ export class GCPResidencyUtil {
    * @param platform a Node.js platform
    */
   setGCEPlatform(platform: NodeJS.Platform = 'linux') {
-    this.sandbox.stub(os, 'platform').returns(platform);
+    this.stubs.osPlatform ??= this.sandbox.stub(os, 'platform');
+
+    this.stubs.osPlatform.returns(platform);
   }
 
   /**
@@ -94,6 +97,10 @@ export class GCPResidencyUtil {
     });
   }
 
+  /**
+   * Removes serverless-related environment variables from the
+   * environment (such as Cloud Run and Cloud Functions).
+   */
   removeServerlessEnvironmentVariables() {
     const customEnv = {...process.env};
 
@@ -105,6 +112,10 @@ export class GCPResidencyUtil {
     this.stubs.processEnv.value(customEnv);
   }
 
+  /**
+   * Sets the environment as non-GCP by stubbing and setting/removing the
+   * environment variables.
+   */
   setNonGCP() {
     // `isGoogleCloudServerless` = false
     this.removeServerlessEnvironmentVariables();
