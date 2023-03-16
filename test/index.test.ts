@@ -6,9 +6,13 @@
  */
 
 import * as assert from 'assert';
+
 import {beforeEach, afterEach, describe, it} from 'mocha';
 import * as nock from 'nock';
+import {SinonSandbox, createSandbox} from 'sinon';
+
 import * as gcp from '../src';
+import {GCPResidencyUtil} from './utils/gcp-residency';
 
 // the metadata IP entry:
 const HOST = gcp.HOST_ADDRESS;
@@ -23,11 +27,15 @@ const HEADERS = {
   [gcp.HEADER_NAME.toLowerCase()]: gcp.HEADER_VALUE,
 };
 
-nock.disableNetConnect();
-process.removeAllListeners('warning');
-
 describe('unit test', () => {
   const originalGceMetadataIp = process.env.GCE_METADATA_HOST;
+  let sandbox: SinonSandbox;
+  let residency: GCPResidencyUtil;
+
+  before(() => {
+    nock.disableNetConnect();
+    process.removeAllListeners('warning');
+  });
 
   beforeEach(() => {
     // Clear this environment variable to ensure it does not affect
@@ -35,13 +43,18 @@ describe('unit test', () => {
     delete process.env.GCE_METADATA_HOST;
     delete process.env.GCE_METADATA_IP;
     gcp.resetIsAvailableCache();
-    gcp.setGCPResidency();
+
+    sandbox = createSandbox();
+    residency = new GCPResidencyUtil(sandbox);
+
+    residency.setNonGCP();
   });
 
   afterEach(() => {
     // Restore environment variable if it previously existed.
     process.env.GCE_METADATA_HOST = originalGceMetadataIp;
     nock.cleanAll();
+    sandbox.restore();
   });
 
   it('should create the correct accessors', async () => {
@@ -481,6 +494,28 @@ describe('unit test', () => {
     await secondary2;
     primary.done();
     assert.strictEqual(isGCE, false);
+  });
+
+  describe('setGCPResidency', () => {
+    it('should set `gcpResidencyCache`', () => {
+      gcp.setGCPResidency(true);
+      assert.equal(gcp.gcpResidencyCache, true);
+
+      gcp.setGCPResidency(false);
+      assert.equal(gcp.gcpResidencyCache, false);
+    });
+
+    it('should match gcp residency results by default', () => {
+      // Set as GCP
+      residency.setGCENetworkInterface(true);
+      gcp.setGCPResidency();
+      assert.equal(gcp.gcpResidencyCache, true);
+
+      // Set as non-GCP
+      residency.setNonGCP();
+      gcp.setGCPResidency();
+      assert.equal(gcp.gcpResidencyCache, false);
+    });
   });
 
   describe('requestTimeout', () => {
