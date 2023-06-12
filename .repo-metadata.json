@@ -8,5 +8,6 @@
   "language": "nodejs",
   "repo": "googleapis/gcp-metadata",
   "distribution_name": "gcp-metadata",
-  "requires_billing": false
+  "requires_billing": false,
+  "library_type": "GAPIC_AUTO"
 }
