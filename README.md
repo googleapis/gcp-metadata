@@ -148,7 +148,7 @@ console.log(id.toString()) // ... 4520031799277581759
 
 * `DEBUG_AUTH`: emit debugging logs
 
-* `METADATA_SERVER_DETECTION`: configure desired metadata server availability.
+* `METADATA_SERVER_DETECTION`: configure desired metadata server availability check behavior.
 
   * `assume-present`: don't try to ping the metadata server, but assume it's present
   * `none`: don't try to ping the metadata server, but don't try to use it either
