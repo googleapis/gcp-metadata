@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [5.3.0](https://github.com/googleapis/gcp-metadata/compare/v5.2.0...v5.3.0) (2023-06-28)
+
+
+### Features
+
+* Metadata Server Detection Configuration ([#562](https://github.com/googleapis/gcp-metadata/issues/562)) ([8c7c715](https://github.com/googleapis/gcp-metadata/commit/8c7c715f1fc22ad65554a745a93915713ca6698f))
+
 ## [5.2.0](https://github.com/googleapis/gcp-metadata/compare/v5.1.0...v5.2.0) (2023-01-03)
 
 
