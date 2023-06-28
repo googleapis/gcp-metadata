@@ -42,6 +42,8 @@ describe('unit test', () => {
     // expected test outcome.
     delete process.env.GCE_METADATA_HOST;
     delete process.env.GCE_METADATA_IP;
+    delete process.env.METADATA_SERVER_DETECTION;
+
     gcp.resetIsAvailableCache();
 
     sandbox = createSandbox();
@@ -260,6 +262,95 @@ describe('unit test', () => {
       }, delay + 50);
     });
   }
+
+  describe('METADATA_SERVER_DETECTION', () => {
+    it('should respect `assume-present`', async () => {
+      process.env.METADATA_SERVER_DETECTION = 'assume-present';
+
+      // if this is called, this the test would fail.
+      const scope = nock(HOST);
+
+      const isGCE = await gcp.isAvailable();
+      assert.strictEqual(isGCE, true);
+
+      scope.done();
+    });
+
+    it('should respect `bios-only` (residency = true)', async () => {
+      process.env.METADATA_SERVER_DETECTION = 'bios-only';
+
+      // if this is called, this the test would fail.
+      const scope = nock(HOST);
+
+      gcp.setGCPResidency(true);
+      const isGCE = await gcp.isAvailable();
+      assert.strictEqual(isGCE, true);
+
+      scope.done();
+    });
+
+    it('should respect `bios-only` (residency = false)', async () => {
+      process.env.METADATA_SERVER_DETECTION = 'bios-only';
+
+      // if either are called, this the test would fail.
+      nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+      nock(SECONDARY_HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+
+      gcp.setGCPResidency(false);
+      const isGCE = await gcp.isAvailable();
+      assert.strictEqual(isGCE, false);
+
+      nock.cleanAll();
+    });
+
+    it('should respect `none`', async () => {
+      process.env.METADATA_SERVER_DETECTION = 'none';
+
+      // if either are called, this the test would fail.
+      nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+      nock(SECONDARY_HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+
+      // if this is referenced, this test would fail.
+      gcp.setGCPResidency(true);
+
+      const isGCE = await gcp.isAvailable();
+      assert.strictEqual(isGCE, false);
+    });
+
+    it('should respect `ping-only`', async () => {
+      process.env.METADATA_SERVER_DETECTION = 'ping-only';
+
+      gcp.resetIsAvailableCache();
+      nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+      nock(SECONDARY_HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
+
+      // if this is referenced, this test would fail.
+      gcp.setGCPResidency(false);
+
+      const isGCE = await gcp.isAvailable();
+      assert.strictEqual(isGCE, true);
+
+      nock.cleanAll();
+    });
+
+    it('should ignore spaces and capitalization', async () => {
+      process.env.METADATA_SERVER_DETECTION = '   ASSUME-present\t';
+
+      // if this is called, this the test would fail.
+      const scope = nock(HOST);
+
+      const isGCE = await gcp.isAvailable();
+      assert.strictEqual(isGCE, true);
+
+      scope.done();
+    });
+
+    it('should throw on unknown values', async () => {
+      process.env.METADATA_SERVER_DETECTION = 'abc';
+
+      await assert.rejects(gcp.isAvailable, RangeError);
+    });
+  });
 
   it('should report isGCE if primary server returns 500 followed by 200', async () => {
     const secondary = secondaryHostRequest(500);
@@ -494,6 +585,21 @@ describe('unit test', () => {
     await secondary2;
     primary.done();
     assert.strictEqual(isGCE, false);
+  });
+
+  describe('getGCPResidency', () => {
+    it('should set and use `gcpResidencyCache`', () => {
+      gcp.setGCPResidency(false);
+      assert.equal(gcp.getGCPResidency(), false);
+      assert.equal(gcp.gcpResidencyCache, false);
+
+      gcp.setGCPResidency(true);
+      assert.equal(gcp.getGCPResidency(), true);
+      assert.equal(gcp.gcpResidencyCache, true);
+
+      gcp.setGCPResidency(null);
+      assert.equal(gcp.getGCPResidency(), gcp.gcpResidencyCache);
+    });
   });
 
   describe('setGCPResidency', () => {
