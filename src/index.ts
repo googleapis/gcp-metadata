@@ -18,6 +18,20 @@ export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
 
+/**
+ * Metadata server detection override options.
+ *
+ * Available via `process.env.METADATA_SERVER_DETECTION`.
+ */
+export const METADATA_SERVER_DETECTION = Object.freeze({
+  'assume-present':
+    "don't try to ping the metadata server, but assume it's present",
+  none: "don't try to ping the metadata server, but don't try to use it either",
+  'bios-only':
+    "treat the result of a BIOS probe as canonical (don't fall back to pinging)",
+  'ping-only': 'skip the BIOS probe, and go straight to pinging',
+});
+
 export interface Options {
   params?: {[index: string]: string};
   property?: string;
@@ -199,6 +213,30 @@ let cachedIsAvailableResponse: Promise<boolean> | undefined;
  * Determine if the metadata server is currently available.
  */
 export async function isAvailable() {
+  if (process.env.METADATA_SERVER_DETECTION) {
+    const value =
+      process.env.METADATA_SERVER_DETECTION.trim().toLocaleLowerCase();
+
+    if (!(value in METADATA_SERVER_DETECTION)) {
+      throw new RangeError(
+        `Unknown \`METADATA_SERVER_DETECTION\` env variable. Got \`${value}\`, but it should be \`${Object.keys(
+          METADATA_SERVER_DETECTION
+        ).join('`, `')}\`, or unset`
+      );
+    }
+
+    switch (value as keyof typeof METADATA_SERVER_DETECTION) {
+      case 'assume-present':
+        return true;
+      case 'none':
+        return false;
+      case 'bios-only':
+        return getGCPResidency();
+      case 'ping-only':
+      // continue, we want to ping the server
+    }
+  }
+
   try {
     // If a user is instantiating several GCP libraries at the same time,
     // this may result in multiple calls to isAvailable(), to detect the
@@ -272,10 +310,25 @@ export function resetIsAvailableCache() {
 export let gcpResidencyCache: boolean | null = null;
 
 /**
+ * Detects GCP Residency.
+ * Caches results to reduce costs for subsequent calls.
+ *
+ * @see setGCPResidency for setting
+ */
+export function getGCPResidency(): boolean {
+  if (gcpResidencyCache === null) {
+    setGCPResidency();
+  }
+
+  return gcpResidencyCache!;
+}
+
+/**
  * Sets the detected GCP Residency.
  * Useful for forcing metadata server detection behavior.
  *
  * Set `null` to autodetect the environment (default behavior).
+ * @see getGCPResidency for getting
  */
 export function setGCPResidency(value: boolean | null = null) {
   gcpResidencyCache = value !== null ? value : detectGCPResidency();
@@ -291,12 +344,7 @@ export function setGCPResidency(value: boolean | null = null) {
  * @returns {number} a request timeout duration in milliseconds.
  */
 export function requestTimeout(): number {
-  // Detecting the residency can be resource-intensive. Let's cache the result.
-  if (gcpResidencyCache === null) {
-    gcpResidencyCache = detectGCPResidency();
-  }
-
-  return gcpResidencyCache ? 0 : 3000;
+  return getGCPResidency() ? 0 : 3000;
 }
 
 export * from './gcp-residency';
