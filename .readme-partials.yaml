@@ -62,7 +62,7 @@ body: |-
 
     For example:
     ```
-    export GCE_METADATA_HOST = '169.254.169.254'
+    export GCE_METADATA_HOST='169.254.169.254'
     ```
 
   * `DETECT_GCP_RETRIES`: number representing number of retries that should be attempted on metadata lookup.
