@@ -141,7 +141,7 @@ console.log(id.toString()) // ... 4520031799277581759
 
   For example:
   ```
-  export GCE_METADATA_HOST = '169.254.169.254'
+  export GCE_METADATA_HOST='169.254.169.254'
   ```
 
 * `DETECT_GCP_RETRIES`: number representing number of retries that should be attempted on metadata lookup.
