@@ -131,7 +131,7 @@ async function deployApp() {
     name: fullPrefix,
     entryPoint: 'getMetadata',
     triggerHTTP: true,
-    runtime: 'nodejs10',
+    runtime: 'nodejs14',
     region: 'us-central1',
     targetDir,
   });
