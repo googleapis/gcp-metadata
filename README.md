@@ -141,7 +141,7 @@ console.log(id.toString()) // ... 4520031799277581759
 
   For example:
   ```
-  export GCE_METADATA_HOST = '169.254.169.254'
+  export GCE_METADATA_HOST='169.254.169.254'
   ```
 
 * `DETECT_GCP_RETRIES`: number representing number of retries that should be attempted on metadata lookup.
@@ -171,7 +171,7 @@ also contains samples.
 
 ## Supported Node.js Versions
 
-Our client libraries follow the [Node.js release schedule](https://nodejs.org/en/about/releases/).
+Our client libraries follow the [Node.js release schedule](https://github.com/nodejs/release#release-schedule).
 Libraries are compatible with all current _active_ and _maintenance_ versions of
 Node.js.
 If you are using an end-of-life version of Node.js, we recommend that you update
