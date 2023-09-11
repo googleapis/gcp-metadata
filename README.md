@@ -158,7 +158,7 @@ console.log(id.toString()) // ... 4520031799277581759
 
 ## Samples
 
-Samples are in the [`samples/`](https://github.com/googleapis/gcp-metadata/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
+Samples are in the [`samples/`](https://github.com/googleapis/gcp-metadata/tree/main/packages/google-cloud-functions/samples) directory. Each sample's `README.md` has instructions for running its sample.
 
 | Sample                      | Source Code                       | Try it |
 | --------------------------- | --------------------------------- | ------ |
