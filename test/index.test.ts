@@ -158,7 +158,7 @@ describe('unit test', () => {
       .get(`${PATH}/universe/${PROPERTY}`)
       .reply(200, VALUE, HEADERS);
 
-    assert(await gcp.project(PROPERTY), VALUE);
+    assert(await gcp.universe(PROPERTY), VALUE);
 
     scope.done();
   });
