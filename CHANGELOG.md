@@ -4,6 +4,17 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [6.0.0](https://github.com/googleapis/gcp-metadata/compare/v5.3.0...v6.0.0) (2023-07-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to Node 14, and update gaxios, ts, and gts ([#571](https://github.com/googleapis/gcp-metadata/issues/571))
+
+### Miscellaneous Chores
+
+* Upgrade to Node 14, and update gaxios, ts, and gts ([#571](https://github.com/googleapis/gcp-metadata/issues/571)) ([88ff3ff](https://github.com/googleapis/gcp-metadata/commit/88ff3ff3d9bd8be32126e7fe76cbf33e401f8db7))
+
 ## [5.3.0](https://github.com/googleapis/gcp-metadata/compare/v5.2.0...v5.3.0) (2023-06-28)
 
 
