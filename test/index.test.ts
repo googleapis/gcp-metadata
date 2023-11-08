@@ -150,6 +150,19 @@ describe('unit test', () => {
     scope.done();
   });
 
+  it('should query the `universe` type', async () => {
+    const PROPERTY = 'universe_domain';
+    const VALUE = 'my-domain.com';
+
+    const scope = nock(HOST)
+      .get(`${PATH}/universe/${PROPERTY}`)
+      .reply(200, VALUE, HEADERS);
+
+    assert(await gcp.project(PROPERTY), VALUE);
+
+    scope.done();
+  });
+
   it('should return the request error', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}`)
