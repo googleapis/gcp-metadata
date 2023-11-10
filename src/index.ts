@@ -184,6 +184,14 @@ async function fastFailMetadataRequest<T>(
 
 /**
  * Obtain metadata for the current GCE instance
+ *
+ * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
+ *
+ * @example
+ * ```
+ * const serviceAccount: {} = await instance('service-accounts/');
+ * const serviceAccountEmail: string = await instance('service-accounts/default/email');
+ * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instance<T = any>(options?: string | Options) {
@@ -191,11 +199,33 @@ export function instance<T = any>(options?: string | Options) {
 }
 
 /**
- * Obtain metadata for the current GCP Project.
+ * Obtain metadata for the current GCP project
+ *
+ * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
+ *
+ * @example
+ * ```
+ * const projectId: string = await project('project-id');
+ * const numericProjectId: number = await project('numeric-project-id');
+ * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function project<T = any>(options?: string | Options) {
   return metadataAccessor<T>('project', options);
+}
+
+/**
+ * Obtain metadata for the current universe
+ *
+ * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
+ *
+ * @example
+ * ```
+ * const universeDomain: string = await universe('universe_domain');
+ * ```
+ */
+export function universe<T>(options?: string | Options) {
+  return metadataAccessor<T>('universe', options);
 }
 
 /*
