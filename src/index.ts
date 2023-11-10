@@ -38,6 +38,25 @@ export interface Options {
   headers?: OutgoingHttpHeaders;
 }
 
+export interface MetadataAccessor {
+  /**
+   *
+   * @example
+   *
+   * // equivalent to `project('project-id')`;
+   * const metadataKey = 'project/project-id';
+   */
+  metadataKey: string;
+  params?: Options['params'];
+  headers?: Options['headers'];
+  noResponseRetries?: number;
+  fastFail?: boolean;
+}
+
+export type BulkResults<T extends readonly MetadataAccessor[]> = {
+  [key in T[number]['metadataKey']]: ReturnType<JSON['parse']>;
+};
+
 /**
  * Returns the base URL while taking into account the GCE_METADATA_HOST
  * environment variable if it exists.
@@ -83,25 +102,52 @@ function validate(options: Options) {
 async function metadataAccessor<T>(
   type: string,
   options?: string | Options,
+  noResponseRetries?: number,
+  fastFail?: boolean
+): Promise<T>;
+async function metadataAccessor<T>(metadata: MetadataAccessor): Promise<T>;
+async function metadataAccessor<T>(
+  type: MetadataAccessor | string,
+  options: string | Options = {},
   noResponseRetries = 3,
   fastFail = false
 ): Promise<T> {
-  options = options || {};
+  let metadataKey = '';
+  let params: {} = {};
+  let headers: OutgoingHttpHeaders = {};
+
+  if (typeof type === 'object') {
+    const metadataAccessor: MetadataAccessor = type;
+
+    metadataKey = metadataAccessor.metadataKey;
+    params = metadataAccessor.params || params;
+    headers = metadataAccessor.headers || headers;
+    noResponseRetries = metadataAccessor.noResponseRetries || noResponseRetries;
+    fastFail = metadataAccessor.fastFail || fastFail;
+  } else {
+    metadataKey = type;
+  }
+
   if (typeof options === 'string') {
-    options = {property: options};
+    metadataKey += `/${options}`;
+  } else {
+    validate(options);
+
+    if (options.property) {
+      metadataKey += `/${options.property}`;
+    }
+
+    headers = options.headers || headers;
+    params = options.params || params;
   }
-  let property = '';
-  if (typeof options === 'object' && options.property) {
-    property = '/' + options.property;
-  }
-  validate(options);
+
   try {
     const requestMethod = fastFail ? fastFailMetadataRequest : request;
     const res = await requestMethod<T>({
-      url: `${getBaseUrl()}/${type}${property}`,
-      headers: Object.assign({}, HEADERS, options.headers),
+      url: `${getBaseUrl()}/${metadataKey}`,
+      headers: {...HEADERS, ...headers},
       retryConfig: {noResponseRetries},
-      params: options.params,
+      params,
       responseType: 'text',
       timeout: requestTimeout(),
     });
@@ -183,7 +229,7 @@ async function fastFailMetadataRequest<T>(
 }
 
 /**
- * Obtain metadata for the current GCE instance
+ * Obtain metadata for the current GCE instance.
  *
  * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
  *
@@ -199,7 +245,7 @@ export function instance<T = any>(options?: string | Options) {
 }
 
 /**
- * Obtain metadata for the current GCP project
+ * Obtain metadata for the current GCP project.
  *
  * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
  *
@@ -215,7 +261,7 @@ export function project<T = any>(options?: string | Options) {
 }
 
 /**
- * Obtain metadata for the current universe
+ * Obtain metadata for the current universe.
  *
  * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
  *
@@ -226,6 +272,49 @@ export function project<T = any>(options?: string | Options) {
  */
 export function universe<T>(options?: string | Options) {
   return metadataAccessor<T>('universe', options);
+}
+
+/**
+ * Retrieve metadata items in parallel.
+ *
+ * @see {@link https://cloud.google.com/compute/docs/metadata/predefined-metadata-keys}
+ *
+ * @example
+ * ```
+ * const data = await bulk([
+ *   {
+ *     metadataKey: 'instance',
+ *   },
+ *   {
+ *     metadataKey: 'project/project-id',
+ *   },
+ * ] as const);
+ *
+ * // data.instance;
+ * // data['project/project-id'];
+ * ```
+ *
+ * @param properties The metadata properties to retrieve
+ * @returns The metadata in `metadatakey:value` format
+ */
+export async function bulk<
+  T extends readonly Readonly<MetadataAccessor>[],
+  R extends BulkResults<T> = BulkResults<T>,
+>(properties: T): Promise<R> {
+  const r = {} as BulkResults<T>;
+
+  await Promise.all(
+    properties.map(item => {
+      return (async () => {
+        const res = await metadataAccessor(item);
+        const key = item.metadataKey as keyof typeof r;
+
+        r[key] = res;
+      })();
+    })
+  );
+
+  return r as R;
 }
 
 /*

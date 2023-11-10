@@ -276,6 +276,32 @@ describe('unit test', () => {
     });
   }
 
+  it('should make requests in bulk', async () => {
+    const INSTANCE_VALUE = {instance: 'data'};
+    const UNIVERSE_DOMAIN = 'my-domain.com';
+
+    const scopes = [
+      nock(HOST)
+        .get(`${PATH}/universe/universe_domain`)
+        .reply(200, UNIVERSE_DOMAIN, HEADERS),
+      nock(HOST).get(`${PATH}/instance`).reply(200, INSTANCE_VALUE, HEADERS),
+    ];
+
+    const data = await gcp.bulk([
+      {
+        metadataKey: 'instance',
+      },
+      {
+        metadataKey: 'universe/universe_domain',
+      },
+    ] as const);
+
+    assert.deepEqual(data.instance, INSTANCE_VALUE);
+    assert.deepEqual(data['universe/universe_domain'], UNIVERSE_DOMAIN);
+
+    scopes.map(scope => scope.done());
+  });
+
   describe('METADATA_SERVER_DETECTION', () => {
     it('should respect `assume-present`', async () => {
       process.env.METADATA_SERVER_DETECTION = 'assume-present';
