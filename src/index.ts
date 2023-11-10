@@ -299,7 +299,7 @@ export function universe<T>(options?: string | Options) {
  */
 export async function bulk<
   T extends readonly Readonly<MetadataAccessor>[],
-  R extends BulkResults<T> = BulkResults<T>
+  R extends BulkResults<T> = BulkResults<T>,
 >(properties: T): Promise<R> {
   const r = {} as BulkResults<T>;
 
