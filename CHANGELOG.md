@@ -4,6 +4,19 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [6.1.0](https://github.com/googleapis/gcp-metadata/compare/v6.0.0...v6.1.0) (2023-11-10)
+
+
+### Features
+
+* Add `universe` metadata handler ([#596](https://github.com/googleapis/gcp-metadata/issues/596)) ([0c02016](https://github.com/googleapis/gcp-metadata/commit/0c02016756754cddde6c4402fac1ceb6a318e82d))
+* Bulk Metadata Requests ([#598](https://github.com/googleapis/gcp-metadata/issues/598)) ([0a51378](https://github.com/googleapis/gcp-metadata/commit/0a513788537173570f9910d368dd36717de7233b))
+
+
+### Bug Fixes
+
+* Repo Metadata ([#595](https://github.com/googleapis/gcp-metadata/issues/595)) ([470a872](https://github.com/googleapis/gcp-metadata/commit/470a8722df2b2fb2da1b076b73414d2e28a3ff4e))
+
 ## [6.0.0](https://github.com/googleapis/gcp-metadata/compare/v5.3.0...v6.0.0) (2023-07-17)
 
 
