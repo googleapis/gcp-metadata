@@ -13,6 +13,7 @@ import {SinonSandbox, createSandbox} from 'sinon';
 
 import * as gcp from '../src';
 import {GCPResidencyUtil} from './utils/gcp-residency';
+import {GaxiosError} from 'gaxios';
 
 // the metadata IP entry:
 const HOST = gcp.HOST_ADDRESS;
@@ -191,9 +192,19 @@ describe('unit test', () => {
     scope.done();
   });
 
-  it('should return error if statusCode is not 200', async () => {
-    const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
-    await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
+  it('should return the request error', async () => {
+    const scope = nock(HOST)
+      .get(`${PATH}/${TYPE}`)
+      .times(4)
+      .reply(404, undefined, HEADERS);
+
+    try {
+      await gcp.instance();
+    } catch (err) {
+      assert(err instanceof GaxiosError);
+      assert.strictEqual(err.status, 404);
+    }
+
     scope.done();
   });
 
