@@ -196,16 +196,8 @@ async function fastFailMetadataRequest<T>(
   // Note, however, if a failure happens prior to a success, a rejection should
   // occur, this is for folks running locally.
   //
-  const r1: Promise<GaxiosResponse> = request<T>(options)
-    .then(res => res)
-    .catch(err => {
-      throw err;
-    });
-  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions)
-    .then(res => res)
-    .catch(err => {
-      throw err;
-    });
+  const r1: Promise<GaxiosResponse> = request<T>(options);
+  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions);
   return Promise.any([r1, r2]);
 }
 
