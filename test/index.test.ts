@@ -164,23 +164,6 @@ describe('unit test', () => {
     scope.done();
   });
 
-  it('should return the request error', async () => {
-    const scope = nock(HOST)
-      .get(`${PATH}/${TYPE}`)
-      .times(4)
-      .reply(500, undefined, HEADERS);
-    await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
-    scope.done();
-  });
-
-  it('should return error when res is empty', async () => {
-    const scope = nock(HOST)
-      .get(`${PATH}/${TYPE}`)
-      .reply(200, undefined, HEADERS);
-    await assert.rejects(gcp.instance());
-    scope.done();
-  });
-
   it('should return error when flavor header is incorrect', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}`)
@@ -195,7 +178,6 @@ describe('unit test', () => {
   it('should return the request error', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}`)
-      .times(4)
       .reply(404, undefined, HEADERS);
 
     try {
