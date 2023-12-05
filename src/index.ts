@@ -141,39 +141,31 @@ async function metadataAccessor<T>(
     params = options.params || params;
   }
 
-  try {
-    const requestMethod = fastFail ? fastFailMetadataRequest : request;
-    const res = await requestMethod<T>({
-      url: `${getBaseUrl()}/${metadataKey}`,
-      headers: {...HEADERS, ...headers},
-      retryConfig: {noResponseRetries},
-      params,
-      responseType: 'text',
-      timeout: requestTimeout(),
-    });
-    // NOTE: node.js converts all incoming headers to lower case.
-    if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
-      throw new Error(
-        `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`
-      );
-    } else if (!res.data) {
-      throw new Error('Invalid response from the metadata service');
-    }
-    if (typeof res.data === 'string') {
-      try {
-        return jsonBigint.parse(res.data);
-      } catch {
-        /* ignore */
-      }
-    }
-    return res.data;
-  } catch (e) {
-    const err = e as GaxiosError;
-    if (err.response && err.response.status !== 200) {
-      err.message = `Unsuccessful response status code. ${err.message}`;
-    }
-    throw e;
+  const requestMethod = fastFail ? fastFailMetadataRequest : request;
+  const res = await requestMethod<T>({
+    url: `${getBaseUrl()}/${metadataKey}`,
+    headers: {...HEADERS, ...headers},
+    retryConfig: {noResponseRetries},
+    params,
+    responseType: 'text',
+    timeout: requestTimeout(),
+  });
+  // NOTE: node.js converts all incoming headers to lower case.
+  if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
+    throw new Error(
+      `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`
+    );
   }
+
+  if (typeof res.data === 'string') {
+    try {
+      return jsonBigint.parse(res.data);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return res.data;
 }
 
 async function fastFailMetadataRequest<T>(
