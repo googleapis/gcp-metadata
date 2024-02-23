@@ -1,6 +1,6 @@
 {
   "description": "Samples for the gcp-metadata npm module.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Google LLC",
   "engines": {
     "node": ">=14"
