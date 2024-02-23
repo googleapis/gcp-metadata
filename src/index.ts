@@ -182,7 +182,9 @@ async function fastFailMetadataRequest<T>(
 ): Promise<GaxiosResponse> {
   const secondaryOptions = {
     ...options,
-    url: options.url!.replace(getBaseUrl(), getBaseUrl(SECONDARY_HOST_ADDRESS)),
+    url: options.url
+      ?.toString()
+      .replace(getBaseUrl(), getBaseUrl(SECONDARY_HOST_ADDRESS)),
   };
   // We race a connection between DNS/IP to metadata server. There are a couple
   // reasons for this:
