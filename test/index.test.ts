@@ -161,7 +161,7 @@ describe('unit test', () => {
   });
 
   it('should query the `universe` type', async () => {
-    const PROPERTY = 'universe_domain';
+    const PROPERTY = 'universe-domain';
     const VALUE = 'my-domain.com';
 
     const scope = nock(HOST)
@@ -284,7 +284,7 @@ describe('unit test', () => {
 
     const scopes = [
       nock(HOST)
-        .get(`${PATH}/universe/universe_domain`)
+        .get(`${PATH}/universe/universe-domain`)
         .reply(200, UNIVERSE_DOMAIN, HEADERS),
       nock(HOST).get(`${PATH}/instance`).reply(200, INSTANCE_VALUE, HEADERS),
     ];
@@ -294,12 +294,12 @@ describe('unit test', () => {
         metadataKey: 'instance',
       },
       {
-        metadataKey: 'universe/universe_domain',
+        metadataKey: 'universe/universe-domain',
       },
     ] as const);
 
     assert.deepEqual(data.instance, INSTANCE_VALUE);
-    assert.deepEqual(data['universe/universe_domain'], UNIVERSE_DOMAIN);
+    assert.deepEqual(data['universe/universe-domain'], UNIVERSE_DOMAIN);
 
     scopes.map(scope => scope.done());
   });
