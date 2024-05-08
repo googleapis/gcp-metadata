@@ -270,7 +270,7 @@ export function project<T = any>(options?: string | Options) {
  *
  * @example
  * ```
- * const universeDomain: string = await universe('universe_domain');
+ * const universeDomain: string = await universe('universe-domain');
  * ```
  */
 export function universe<T>(options?: string | Options) {
