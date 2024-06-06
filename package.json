@@ -41,7 +41,7 @@
     "json-bigint": "^1.0.0"
   },
   "devDependencies": {
-    "@compodoc/compodoc": "1.1.22",
+    "@compodoc/compodoc": "1.1.21",
     "@google-cloud/functions": "^3.0.0",
     "@types/json-bigint": "^1.0.0",
     "@types/mocha": "^9.0.0",
