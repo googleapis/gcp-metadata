@@ -17,7 +17,7 @@
     "presystem-test": "npm run compile",
     "system-test": "mocha build/system-test --timeout 600000",
     "test": "c8 mocha --timeout=5000 build/test",
-    "docs": "compodoc src/",
+    "docs": "jsdoc -c .jsdoc.js",
     "lint": "gts check",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
@@ -41,7 +41,6 @@
     "json-bigint": "^1.0.0"
   },
   "devDependencies": {
-    "@compodoc/compodoc": "1.1.19",
     "@google-cloud/functions": "^3.0.0",
     "@types/json-bigint": "^1.0.0",
     "@types/mocha": "^9.0.0",
@@ -56,6 +55,9 @@
     "gcx": "^1.0.0",
     "gts": "^5.0.0",
     "linkinator": "^3.0.0",
+    "jsdoc": "^4.0.0",
+    "jsdoc-fresh": "^3.0.0",
+    "jsdoc-region-tag": "^3.0.0",
     "mocha": "^8.0.0",
     "ncp": "^2.0.0",
     "nock": "^13.0.0",
