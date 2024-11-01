@@ -95,7 +95,8 @@ export class GCPResidencyUtil {
     delete customEnv.FUNCTION_NAME;
     delete customEnv.K_SERVICE;
 
-    // console.log(customEnv)
+    process.env = customEnv;
+    // // console.log(customEnv)
     // this.stubs.processEnv = await esmock('../../src/gcp-residency.js', {process: {
     //   env: customEnv,
     // }});
@@ -106,7 +107,6 @@ export class GCPResidencyUtil {
    * environment variables.
    */
   async setNonGCP() {
-    console.log('in set non gcp?')
     await this.removeServerlessEnvironmentVariables();
     await this.setGCENetworkInterface(false);
     await this.setGCELinuxBios(false);

@@ -18,53 +18,63 @@ import {strict as assert} from 'assert';
 
 import {beforeEach, describe, it} from 'mocha';
 
-// import * as gcpResidency from '../src/gcp-residency.js';
-import {GCPResidencyUtil} from './utils/gcp-residency.js';
+import * as gcpResidency from '../src/gcp-residency.js';
 import esmock from 'esmock';
 
+  /**
+   * Sets the environment as non-GCP by stubbing and setting/removing the
+   * environment variables.
+   */
+  async function setNonGCP() {
+    const customEnv = { ...process.env };
+
+    delete customEnv.CLOUD_RUN_JOB;
+    delete customEnv.FUNCTION_NAME;
+    delete customEnv.K_SERVICE;
+
+    process.env = customEnv;
+  }
+
 describe('gcp-residency', () => {
-  let residency: GCPResidencyUtil;
 
   beforeEach(() => {
-    residency = new GCPResidencyUtil();
 
     // Default to non-GCP
-    residency.setNonGCP();
+    setNonGCP();
   });
 
   afterEach(() => {
-    residency.setNonGCP();
+    setNonGCP();
   })
 
   describe('isGoogleCloudServerless', () => {
-    // it('should return `true` if `CLOUD_RUN_JOB` env is set', () => {
-    //   process.env.CLOUD_RUN_JOB = '1';
+    it('should return `true` if `CLOUD_RUN_JOB` env is set', () => {
+      process.env.CLOUD_RUN_JOB = '1';
 
-    //   assert(gcpResidency.isGoogleCloudServerless());
-    // });
+      assert(gcpResidency.isGoogleCloudServerless());
+    });
 
-    // it('should return `true` if `FUNCTION_NAME` env is set', () => {
-    //   process.env.FUNCTION_NAME = '1';
+    it('should return `true` if `FUNCTION_NAME` env is set', () => {
+      process.env.FUNCTION_NAME = '1';
 
-    //   assert(gcpResidency.isGoogleCloudServerless());
-    // });
+      assert(gcpResidency.isGoogleCloudServerless());
+    });
 
-    // it('should return `true` if `K_SERVICE` env is set', () => {
-    //   process.env.K_SERVICE = '1';
+    it('should return `true` if `K_SERVICE` env is set', () => {
+      process.env.K_SERVICE = '1';
 
-    //   assert(gcpResidency.isGoogleCloudServerless());
-    // });
+      assert(gcpResidency.isGoogleCloudServerless());
+    });
 
-    // it('should return `false` if none of the envs are set', () => {
-    //   assert.equal(gcpResidency.isGoogleCloudServerless(), false);
-    // });
+    it('should return `false` if none of the envs are set', () => {
+      assert.equal(gcpResidency.isGoogleCloudServerless(), false);
+    });
   });
 
   describe('isGoogleComputeEngine', async () => {
     it('should return `true` if on Linux and has the expected BIOS files', async () => {
       const {isGoogleComputeEngine} = await esmock('../src/gcp-residency.js', {
         os: {networkInterfaces: () => {
-          console.log('in here???')
           return {'test-interface': [{ mac: '00:00:00:00:00:00' }]}
         }, platform: () => {return 'linux'}},
         fs: {readFileSync: () => {return 'x Google x'}, statSync: () => {return undefined}}
@@ -74,10 +84,7 @@ describe('gcp-residency', () => {
       assert.equal(isGoogleComputeEngine(), true);
     });
 
-    it.only('should return `false` if on Linux and the expected BIOS files are not GCE', async () => {
-      residency.setGCENetworkInterface(false);
-      residency.setGCEPlatform('linux');
-      residency.setGCELinuxBios(false);
+    it('should return `false` if on Linux and the expected BIOS files are not GCE', async () => {
           const {isGoogleComputeEngine} = await esmock('../src/gcp-residency.js', {
             os: {networkInterfaces: () => {
               return {'test-interface': [{ mac: '00:00:00:00:00:00' }]}
@@ -88,61 +95,70 @@ describe('gcp-residency', () => {
       assert.equal(isGoogleComputeEngine(), false);
     });
 
-  //   it('should return `false` if on Linux and the BIOS files do not exist', () => {
-  //     residency.setGCENetworkInterface(false);
-  //     residency.setGCEPlatform('linux');
-  //     residency.setGCELinuxBios(null);
+    it('should return `false` if on Linux and the BIOS files do not exist', async() => {
+    const {isGoogleComputeEngine} = await esmock('../src/gcp-residency.js', {
+      os: {networkInterfaces: () => {
+        return {'test-interface': [{ mac: '00:00:00:00:00:00' }]}
+      }, platform: () => {return 'linux'}},
+      fs: {readFileSync: () => {throw new Error("File doesn't exist");}, statSync: () => {return undefined}}
+    });
+      assert.equal(isGoogleComputeEngine(), false);
+    });
 
-  //     assert.equal(gcpResidency.isGoogleComputeEngine(), false);
-  //   });
+    it('should return `true` if the host MAC address begins with `42:01`', async () => {
+      const {isGoogleComputeEngine} = await esmock('../src/gcp-residency.js', {
+        os: {networkInterfaces: () => {
+          return {'test-interface': [{ mac: '42:01:00:00:00:00' }]}
+        }, platform: () => {return 'win32'}},
+        fs: {readFileSync: () => {throw new Error("File doesn't exist")}, statSync: () => {return undefined}}
+      });
+      assert.equal(isGoogleComputeEngine(), true);
+    });
 
-  //   it('should return `true` if the host MAC address begins with `42:01`', () => {
-  //     residency.setGCENetworkInterface(true);
-  //     residency.setGCEPlatform('win32');
-  //     residency.setGCELinuxBios(null);
+    it('should return `false` if the host MAC address does not begin with `42:01` & is not Linux', async () => {
+    const {isGoogleComputeEngine} = await esmock('../src/gcp-residency.js', {
+      os: {networkInterfaces: () => {
+        return {'test-interface': [{ mac: '00:00:00:00:00:00' }]}
+      }, platform: () => {return 'win32'}},
+      fs: {readFileSync: () => {throw new Error("File doesn't exist")}, statSync: () => {return undefined}}
+    });
+      assert.equal(isGoogleComputeEngine(), false);
+    });
+  });
 
-  //     assert.equal(gcpResidency.isGoogleComputeEngine(), true);
-  //   });
+  describe('detectGCPResidency', () => {
+    it('should return `true` if `isGoogleCloudServerless`', async() => {
+      // `isGoogleCloudServerless` = true
+      process.env.K_SERVICE = '1';
 
-  //   it('should return `false` if the host MAC address does not begin with `42:01` & is not Linux', () => {
-  //     residency.setGCENetworkInterface(false);
-  //     residency.setGCEPlatform('win32');
-  //     residency.setGCELinuxBios(null);
+      // `isGoogleComputeEngine` = false
+      const {detectGCPResidency} = await esmock('../src/gcp-residency.js', {
+        os: {networkInterfaces: () => {
+          return {'test-interface': [{ mac: '00:00:00:00:00:00' }]}
+        }},
+      });
 
-  //     assert.equal(gcpResidency.isGoogleComputeEngine(), false);
-  //   });
-  // });
+      assert(detectGCPResidency());
+    });
 
-  // describe('detectGCPResidency', () => {
-  //   it('should return `true` if `isGoogleCloudServerless`', () => {
-  //     // `isGoogleCloudServerless` = true
-  //     process.env.K_SERVICE = '1';
+    it('should return `true` if `isGoogleComputeEngine`', async () => {
+      const {detectGCPResidency} = await esmock('../src/gcp-residency.js', {
+        os: {networkInterfaces: () => {
+          return {'test-interface': [{ mac: '42:01:00:00:00:00' }]}
+        }},
+      });
+      assert(detectGCPResidency());
+    });
 
-  //     // `isGoogleComputeEngine` = false
-  //     residency.setGCENetworkInterface(false);
+    it('should return `false` !`isGoogleCloudServerless` && !`isGoogleComputeEngine`', async () => {
+      const {detectGCPResidency} = await esmock('../src/gcp-residency.js', {
+        os: {networkInterfaces: () => {
+          return {'test-interface': [{ mac: '00:00:00:00:00:00' }]}
+        }},
+        fs: {statSync: () => {return undefined}}
+      });
 
-  //     assert(gcpResidency.detectGCPResidency());
-  //   });
-
-  //   it('should return `true` if `isGoogleComputeEngine`', () => {
-  //     // `isGoogleCloudServerless` = false
-  //     residency.removeServerlessEnvironmentVariables();
-
-  //     // `isGoogleComputeEngine` = true
-  //     residency.setGCENetworkInterface(true);
-
-  //     assert(gcpResidency.detectGCPResidency());
-  //   });
-
-  //   it('should return `false` !`isGoogleCloudServerless` && !`isGoogleComputeEngine`', () => {
-  //     // `isGoogleCloudServerless` = false
-  //     residency.removeServerlessEnvironmentVariables();
-
-  //     // `isGoogleComputeEngine` = false
-  //     residency.setGCENetworkInterface(false);
-  //     residency.setGCELinuxBios(false);
-
-  //     assert.equal(gcpResidency.detectGCPResidency(), false);
-  //   });
+      assert.equal(detectGCPResidency(), false);
+    });
   });
 });

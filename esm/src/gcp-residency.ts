@@ -62,8 +62,6 @@ export function isGoogleCloudServerless(): boolean {
  * @returns {boolean} `true` if the process is running on Linux GCE, `false` otherwise.
  */
 export function isGoogleComputeEngineLinux(): boolean {
-  console.log('platform')
-  console.log(platform())
   if (platform() !== 'linux') return false;
 
   try {
@@ -73,8 +71,6 @@ export function isGoogleComputeEngineLinux(): boolean {
     // ensure this file exist and matches
     const biosVendor = readFileSync(GCE_LINUX_BIOS_PATHS.BIOS_VENDOR, 'utf8');
 
-    console.log('biosVendor')
-    console.log(biosVendor)
     return /Google/.test(biosVendor);
   } catch {
     return false;
@@ -109,8 +105,6 @@ export function isGoogleComputeEngineMACAddress(): boolean {
  * @returns {boolean} `true` if the process is running on GCE, `false` otherwise.
  */
 export function isGoogleComputeEngine(): boolean {
-  console.log(isGoogleComputeEngineLinux())
-  console.log(isGoogleComputeEngineMACAddress())
   return isGoogleComputeEngineLinux() || isGoogleComputeEngineMACAddress();
 }
 

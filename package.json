@@ -44,7 +44,7 @@
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
     "prelint": "cd samples; npm link ../; npm install",
-    "babel": "babel esm --out-dir build/cjs --ignore \"esm/**/*.d.ts\" --extensions \".ts\" --out-file-extension .cjs --copy-files"
+    "babel": "babel esm --out-dir build/cjs --ignore \"esm/**/*.d.ts\" --extensions \".ts\" --out-file-extension .cjs --copy-files && node add-cjs-extension.cjs build/cjs/test/gcp-residency.test.cjs"
   },
   "keywords": [
     "google cloud platform",
