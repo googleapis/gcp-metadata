@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-import {ncp} from 'ncp';
+import ncp from 'ncp';
 import * as tmp from 'tmp';
 import {promisify} from 'util';
 import {execSync} from 'child_process';
 
 import {describe, it, after} from 'mocha';
+// @ts-ignore
+import pkg from '../../package.json' with { type: 'json' };
 
 describe('installation', () => {
   const ncpp = promisify(ncp);
   const keep = !!process.env.GCPM_KEEP_TEMPDIRS;
   const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
   const stagingPath = stagingDir.name;
-  const pkg = require('../../package.json'); // eslint-disable-line
+   // eslint-disable-line
 
   /**
    * Create a staging directory with temp fixtures used to test on a fresh

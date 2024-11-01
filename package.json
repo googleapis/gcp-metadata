@@ -3,27 +3,48 @@
   "version": "6.1.0",
   "description": "Get the metadata from a Google Cloud Platform environment",
   "repository": "googleapis/gcp-metadata",
-  "main": "./build/src/index.js",
-  "types": "./build/src/index.d.ts",
+  "main": "./build/cjs/src/index.js",
+  "type": "module",
+  "types": "./build/cjs/src/index.d.ts",
   "files": [
-    "build/src"
+    "build/esm",
+    "build/cjs",
+    "!build/esm/**/*.map",
+    "!build/cjs/**/*.map"
   ],
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/esm/src/index.d.ts",
+        "default": "./build/esm/src/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/src/index.d.ts",
+        "default": "./build/cjs/src/index.cjs"
+      }
+    }
+  },
   "scripts": {
-    "compile": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc -p .",
+    "compile:esm": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc -p ./tsconfig.esm.json",
+    "compile:cjs": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc -p ./tsconfig.json && npm run babel",
+    "compile": "npm run compile:esm && npm run compile:cjs",
     "fix": "gts fix",
     "pretest": "npm run compile",
     "prepare": "npm run compile",
     "samples-test": "npm link && cd samples/ && npm link ../ && npm test && cd ../",
     "presystem-test": "npm run compile",
-    "system-test": "mocha build/system-test --timeout 600000",
-    "test": "c8 mocha --timeout=5000 build/test",
+    "system-test:cjs": "mocha build/cjs/system-test --timeout 600000",
+    "system-test:esm": "mocha build/esm/system-test --timeout 600000",
+    "system-test": "npm run system-test:esm && npm run system-test:cjs",
+    "test:cjs": "c8 mocha --timeout=5000 build/cjs/test",
+    "test:esm": "c8 mocha build/esm/test --loader=esmock",
+    "test": "npm run test:esm && npm run test:cjs",
     "docs": "jsdoc -c .jsdoc.js",
     "lint": "gts check",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
     "prelint": "cd samples; npm link ../; npm install",
-    "clean": "gts clean",
-    "precompile": "gts clean"
+    "babel": "babel esm --out-dir build/cjs --ignore \"esm/**/*.d.ts\" --extensions \".ts\" --out-file-extension .cjs --copy-files"
   },
   "keywords": [
     "google cloud platform",
@@ -37,36 +58,46 @@
   "author": "Google LLC",
   "license": "Apache-2.0",
   "dependencies": {
+    "babel-plugin-replace-import-extension": "^1.1.4",
     "gaxios": "^6.1.1",
     "json-bigint": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.22.20",
+    "@babel/preset-typescript": "^7.23.0",
     "@google-cloud/functions": "^3.0.0",
     "@types/json-bigint": "^1.0.0",
     "@types/mocha": "^9.0.0",
     "@types/ncp": "^2.0.1",
     "@types/node": "^20.0.0",
+    "@types/proxyquire": "^1.3.31",
     "@types/sinon": "^17.0.0",
     "@types/tmp": "0.2.6",
     "@types/uuid": "^9.0.0",
     "c8": "^9.0.0",
     "cross-env": "^7.0.3",
+    "esm": "^3.2.25",
+    "esmock": "^2.6.9",
+    "gapic-tools": "^0.4.0",
     "gcbuild": "^1.3.4",
     "gcx": "^1.0.0",
-    "gts": "^5.0.0",
-    "linkinator": "^3.0.0",
+    "gts": "^6.0.0",
     "jsdoc": "^4.0.0",
     "jsdoc-fresh": "^3.0.0",
     "jsdoc-region-tag": "^3.0.0",
+    "linkinator": "^3.0.0",
     "mocha": "^8.0.0",
     "ncp": "^2.0.0",
     "nock": "^13.0.0",
-    "sinon": "^17.0.0",
+    "proxyquire": "^2.1.3",
+    "sinon": "^18.0.0",
     "tmp": "^0.2.0",
     "typescript": "^5.1.6",
     "uuid": "^9.0.0"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   }
 }

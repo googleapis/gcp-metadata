@@ -13,22 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-const gcpMetadata = require('gcp-metadata');
-
-async function main() {
-  const isAvailable = await gcpMetadata.isAvailable();
-  console.log(`isAvailable: ${isAvailable}`);
-  await gcpMetadata.instance('service-accounts/default/token');
-  const svc = await gcpMetadata.instance({
-    property: 'service-accounts/',
-    params: {recursive: 'true'},
-  });
-  console.log('serviceAccounts:');
-  console.log(JSON.stringify(svc).split('\n').join());
-}
-
-main().catch(e => {
-  console.error(e);
-  throw e;
-});
+export {};

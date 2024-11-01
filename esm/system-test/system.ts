@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {before, after, describe, it} from 'mocha';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
@@ -25,9 +25,10 @@ import {promisify} from 'util';
 import * as uuid from 'uuid';
 import {execSync} from 'child_process';
 import {request, GaxiosError} from 'gaxios';
+// @ts-ignore
+import pkg from '../../package.json' with { type: 'json' };
 
 const copy = promisify(fs.copyFile);
-const pkg = require('../../package.json'); // eslint-disable-line
 
 let gcf: CloudFunctionsServiceClient;
 let projectId: string;
