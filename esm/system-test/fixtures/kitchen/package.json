@@ -1,7 +1,6 @@
 {
   "name": "gcp-metadata-fixture",
   "version": "1.0.0",
-  "type": "commonjs",
   "description": "An app we're using to test the library. ",
   "scripts": {
     "check": "gts check",
