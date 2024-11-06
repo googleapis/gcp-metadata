@@ -24,9 +24,7 @@
     "esm/test/*.ts",
     "esm/test/**/*.ts",
     "esm/system-test/*.ts",
+    "esm/system-test/**/*.ts",
     "package.json"
-  ],
-  "exclude": [
-    "test/fixtures"
   ]
 }

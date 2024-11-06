@@ -34,7 +34,7 @@
     "samples-test": "npm link && cd samples/ && npm link ../ && npm test && cd ../",
     "presystem-test": "npm run compile",
     "system-test:cjs": "mocha build/cjs/system-test --timeout 600000",
-    "system-test:esm": "mocha build/esm/system-test --timeout 600000",
+    "system-test:esm": "mocha build/esm/system-test --timeout 600000 --experimental-modules",
     "system-test": "npm run system-test:esm && npm run system-test:cjs",
     "test:cjs": "c8 mocha --timeout=5000 build/cjs/test",
     "test:esm": "c8 mocha build/esm/test --loader=esmock",
@@ -44,7 +44,7 @@
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
     "prelint": "cd samples; npm link ../; npm install",
-    "babel": "babel esm --out-dir build/cjs --ignore \"esm/**/*.d.ts\" --extensions \".ts\" --out-file-extension .cjs --copy-files && node add-cjs-extension.cjs build/cjs/test/gcp-residency.test.cjs"
+    "babel": "babel esm --out-dir build/cjs --ignore \"esm/**/*.d.ts\" --extensions \".ts\" --out-file-extension .cjs --copy-files && node add-cjs-extension.cjs build/cjs/test/gcp-residency.test.cjs && node replace-import-statement.cjs build/cjs/system-test/fixtures/kitchen/src/index.cjs"
   },
   "keywords": [
     "google cloud platform",
@@ -70,6 +70,7 @@
     "@google-cloud/functions": "^3.0.0",
     "@types/json-bigint": "^1.0.0",
     "@types/mocha": "^9.0.0",
+    "@types/mv": "^2.1.4",
     "@types/ncp": "^2.0.1",
     "@types/node": "^20.0.0",
     "@types/proxyquire": "^1.3.31",
@@ -89,8 +90,10 @@
     "jsdoc-region-tag": "^3.0.0",
     "linkinator": "^3.0.0",
     "mocha": "^8.0.0",
+    "mv": "^2.1.1",
     "ncp": "^2.0.0",
     "nock": "^13.0.0",
+    "pack-n-play": "^2.0.3",
     "proxyquire": "^2.1.3",
     "sinon": "^18.0.0",
     "tmp": "^0.2.0",

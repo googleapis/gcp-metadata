@@ -13,20 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/* eslint-disable */
-
-import * as gcp from 'gcp-metadata';
-// uncomment the line below during development
-// import * as gcp from '../../../../src/index.js';
-
-const header = gcp.HEADER_NAME;
-const headers = gcp.HEADERS;
-
-async function main() {
-  const v = await gcp.instance('/somepath');
-}
-
-gcp.project('something').then(console.log);
-
-main().catch(console.error);
+export {};

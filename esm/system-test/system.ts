@@ -25,8 +25,11 @@ import {promisify} from 'util';
 import * as uuid from 'uuid';
 import {execSync} from 'child_process';
 import {request, GaxiosError} from 'gaxios';
+import {fileURLToPath} from 'url';
 // @ts-ignore
 import pkg from '../../package.json' with { type: 'json' };
+// @ts-ignore
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const copy = promisify(fs.copyFile);
 
@@ -82,10 +85,15 @@ describe('gcp metadata', () => {
   describe('cloud build', () => {
     it('should access the metadata service on GCB', async () => {
       try {
+        console.log('A PATH')
+        console.log(path.join(
+          dirname,
+          '../../../esm/fixtures/cloudbuild'
+        ))
         const result = await gcbuild.build({
           sourcePath: path.join(
-            __dirname,
-            '../../system-test/fixtures/cloudbuild'
+            dirname,
+            '../../../esm/fixtures/cloudbuild'
           ),
         });
         console.log(result.log);
@@ -136,7 +144,9 @@ async function pruneFunctions(sessionOnly: boolean) {
  * Deploy the hook app to GCF.
  */
 async function deployApp() {
-  const targetDir = path.join(__dirname, '../../system-test/fixtures/hook');
+  const targetDir = path.join(dirname, '../../../esm/system-test/fixtures/hook');
+  console.log('B PATH')
+  console.log(targetDir)
   await gcx.deploy({
     name: fullPrefix,
     entryPoint: 'getMetadata',
@@ -157,7 +167,7 @@ async function packModule() {
   const targets = ['hook', 'cloudbuild'];
   await Promise.all(
     targets.map(target => {
-      const to = `system-test/fixtures/${target}/${pkg.name}.tgz`;
+      const to = `esm/system-test/fixtures/${target}/${pkg.name}.tgz`;
       return copy(from, to);
     })
   );
