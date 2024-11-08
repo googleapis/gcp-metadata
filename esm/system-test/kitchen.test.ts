@@ -18,16 +18,20 @@ import ncp from 'ncp';
 import * as tmp from 'tmp';
 import {promisify} from 'util';
 import {execSync} from 'child_process';
+import path from 'path';
+import {fileURLToPath} from 'url';
 
 import {describe, it, after} from 'mocha';
 // @ts-ignore
-import pkg from '../../../package.json' with { type: 'json' };
+import pkg from '../../../package.json' with {type: 'json'};
 
 describe('installation', () => {
   const ncpp = promisify(ncp);
   const keep = !!process.env.GCPM_KEEP_TEMPDIRS;
   const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
   const stagingPath = stagingDir.name;
+  // @ts-ignore
+  const dirname = path.dirname(fileURLToPath(import.meta.url));
    // eslint-disable-line
 
   /**
@@ -35,12 +39,11 @@ describe('installation', () => {
    * application.
    */
   it('should be able to use the d.ts', async () => {
-    // console.log(`${__filename} staging area: ${stagingPath}`);
     execSync('npm pack', {stdio: 'inherit'});
     const tarball = `${pkg.name}-${pkg.version}.tgz`;
     await ncpp(tarball, `${stagingPath}/${pkg.name}.tgz`);
     await ncpp('esm/system-test/fixtures/kitchen', `${stagingPath}/`);
-    execSync('npm install', {cwd: `${stagingPath}/`, stdio: 'inherit'});
+    execSync('npm install', {cwd: `${stagingPath}`, stdio: 'inherit'});
   });
 
   /**

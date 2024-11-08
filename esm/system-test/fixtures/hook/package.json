@@ -1,7 +1,7 @@
 {
   "name": "gcf-kitchen-test",
   "private": true,
-  "main": "index.js",
+  "main": "index.cjs",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=10"

@@ -3,12 +3,16 @@
   "version": "6.1.0",
   "description": "Get the metadata from a Google Cloud Platform environment",
   "repository": "googleapis/gcp-metadata",
-  "main": "./build/cjs/src/index.js",
+  "main": "./build/cjs/src/index.cjs",
   "type": "module",
   "types": "./build/cjs/src/index.d.ts",
   "files": [
     "build/esm",
     "build/cjs",
+    "!build/cjs/system-test",
+    "!build/esm/system-test",
+    "!build/cjs/test",
+    "!build/esm/test",
     "!build/esm/**/*.map",
     "!build/cjs/**/*.map"
   ],

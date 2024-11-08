@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+// eslint-disable-next-line no-undef
 const {assert} = require('chai');
+// eslint-disable-next-line no-undef
 const {describe, it} = require('mocha');
+// eslint-disable-next-line no-undef
 const cp = require('child_process');
 
 const execSync = cmd => cp.execSync(cmd, {encoding: 'utf-8'});

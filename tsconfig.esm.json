@@ -21,6 +21,8 @@
         "esm/test/**/*.ts",
         "esm/system-test/*.ts",
         "esm/system-test/**/*.ts",
+        "esm/system-test/fixtures/**/*.ts",
+        "esm/system-test/fixtures/kitchen/package.json",
         "package.json"
       ]
 }

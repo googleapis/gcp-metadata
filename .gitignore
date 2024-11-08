@@ -9,4 +9,4 @@ gcp-metadata.tgz
 docs/
 __pycache__
 .DS_Store
-esm/**/*.d.ts
+**.d.ts

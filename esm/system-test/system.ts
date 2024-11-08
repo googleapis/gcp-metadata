@@ -27,7 +27,7 @@ import {execSync} from 'child_process';
 import {request, GaxiosError} from 'gaxios';
 import {fileURLToPath} from 'url';
 // @ts-ignore
-import pkg from '../../package.json' with { type: 'json' };
+import pkg from '../../package.json' with {type: 'json'};
 // @ts-ignore
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -85,21 +85,15 @@ describe('gcp metadata', () => {
   describe('cloud build', () => {
     it('should access the metadata service on GCB', async () => {
       try {
-        console.log('A PATH')
-        console.log(path.join(
-          dirname,
-          '../../../esm/fixtures/cloudbuild'
-        ))
         const result = await gcbuild.build({
           sourcePath: path.join(
             dirname,
-            '../../../esm/fixtures/cloudbuild'
+            '../../../esm/system-test/fixtures/cloudbuild',
           ),
         });
-        console.log(result.log);
         assert.ok(/isAvailable: true/.test(result.log));
         assert.ok(
-          result.log.includes('"default":{"aliases":["default"],"email"')
+          result.log.includes('"default":{"aliases":["default"],"email"'),
         );
       } catch (e) {
         console.error((e as gcbuild.BuildError).log);
@@ -136,7 +130,7 @@ async function pruneFunctions(sessionOnly: boolean) {
           console.error(`There was a problem deleting function ${fn.name}.`);
           console.error(e);
         });
-      })
+      }),
   );
 }
 
@@ -144,14 +138,15 @@ async function pruneFunctions(sessionOnly: boolean) {
  * Deploy the hook app to GCF.
  */
 async function deployApp() {
-  const targetDir = path.join(dirname, '../../../esm/system-test/fixtures/hook');
-  console.log('B PATH')
-  console.log(targetDir)
+  const targetDir = path.join(
+    dirname,
+    '../../../esm/system-test/fixtures/hook',
+  );
   await gcx.deploy({
     name: fullPrefix,
     entryPoint: 'getMetadata',
     triggerHTTP: true,
-    runtime: 'nodejs14',
+    runtime: 'nodejs18',
     region: 'us-central1',
     targetDir,
   });
@@ -169,6 +164,6 @@ async function packModule() {
     targets.map(target => {
       const to = `esm/system-test/fixtures/${target}/${pkg.name}.tgz`;
       return copy(from, to);
-    })
+    }),
   );
 }

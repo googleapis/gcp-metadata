@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const gcpMetadata = require('gcp-metadata');
+const gcpMetadata = require('gcp-metadata')
 
 exports.getMetadata = async (req, res) => {
   const isAvailable = await gcpMetadata.isAvailable();

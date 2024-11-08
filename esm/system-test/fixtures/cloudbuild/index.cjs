@@ -14,6 +14,7 @@
 //  * limitations under the License.
 //  */
 
+// eslint-disable-next-line no-undef
 const gcpMetadata = require('gcp-metadata');
 
 async function main() {

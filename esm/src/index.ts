@@ -100,7 +100,7 @@ function validate(options: Options) {
         break;
       case 'qs':
         throw new Error(
-          "'qs' is not a valid configuration option. Please use 'params' instead."
+          "'qs' is not a valid configuration option. Please use 'params' instead.",
         );
       default:
         throw new Error(`'${key}' is not a valid configuration option.`);
@@ -112,14 +112,14 @@ async function metadataAccessor<T>(
   type: string,
   options?: string | Options,
   noResponseRetries?: number,
-  fastFail?: boolean
+  fastFail?: boolean,
 ): Promise<T>;
 async function metadataAccessor<T>(metadata: MetadataAccessor): Promise<T>;
 async function metadataAccessor<T>(
   type: MetadataAccessor | string,
   options: string | Options = {},
   noResponseRetries = 3,
-  fastFail = false
+  fastFail = false,
 ): Promise<T> {
   let metadataKey = '';
   let params: {} = {};
@@ -162,7 +162,7 @@ async function metadataAccessor<T>(
   // NOTE: node.js converts all incoming headers to lower case.
   if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
     throw new Error(
-      `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`
+      `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`,
     );
   }
 
@@ -178,7 +178,7 @@ async function metadataAccessor<T>(
 }
 
 async function fastFailMetadataRequest<T>(
-  options: GaxiosOptions
+  options: GaxiosOptions,
 ): Promise<GaxiosResponse> {
   const secondaryOptions = {
     ...options,
@@ -314,7 +314,7 @@ export async function bulk<
 
         r[key] = res;
       })();
-    })
+    }),
   );
 
   return r as R;
@@ -342,8 +342,8 @@ export async function isAvailable() {
     if (!(value in METADATA_SERVER_DETECTION)) {
       throw new RangeError(
         `Unknown \`METADATA_SERVER_DETECTION\` env variable. Got \`${value}\`, but it should be \`${Object.keys(
-          METADATA_SERVER_DETECTION
-        ).join('`, `')}\`, or unset`
+          METADATA_SERVER_DETECTION,
+        ).join('`, `')}\`, or unset`,
       );
     }
 
@@ -372,7 +372,7 @@ export async function isAvailable() {
         // If the default HOST_ADDRESS has been overridden, we should not
         // make an effort to try SECONDARY_HOST_ADDRESS (as we are likely in
         // a non-GCP environment):
-        !(process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST)
+        !(process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST),
       );
     }
     await cachedIsAvailableResponse;
@@ -409,7 +409,7 @@ export async function isAvailable() {
         if (err.code) code = err.code;
         process.emitWarning(
           `received unexpected error = ${err.message} code = ${code}`,
-          'MetadataLookupWarning'
+          'MetadataLookupWarning',
         );
       }
 

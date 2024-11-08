@@ -1,10 +1,10 @@
 {
   "name": "gcb-test-fixtures",
   "private": true,
-  "main": "index.js",
+  "main": "index.cjs",
   "license": "Apache-2.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.cjs"
   },
   "engines": {
     "node": ">=10"
