@@ -16,7 +16,7 @@
 
 set -eo pipefail
 
-export NPM_CONFIG_PREFIX=${HOME}/.npm-global
+# export NPM_CONFIG_PREFIX=${HOME}/.npm-global
 
 echo $(npm -v)
 echo $(which npm)
