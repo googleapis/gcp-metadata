@@ -38,7 +38,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "json-bigint": "^1.0.0",
-    "gaxios": "^6.7.1",
+    "gaxios": "^6.7.1"
   },
   "devDependencies": {
     "@google-cloud/functions": "^3.6.0",
