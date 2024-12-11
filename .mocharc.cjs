@@ -16,10 +16,6 @@ const config = {
   "throw-deprecation": true,
   "timeout": 10000,
   "recursive": true,
-  "node-option": [
-    "experimental-specifier-resolution=node",
-    "loader=ts-node/esm"
-]
 }
 if (process.env.MOCHA_THROW_DEPRECATION === 'false') {
   delete config['throw-deprecation'];
