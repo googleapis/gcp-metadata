@@ -4,6 +4,17 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [7.0.0](https://github.com/googleapis/gcp-metadata/compare/v6.1.0...v7.0.0) (2024-12-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to node 18 ([#627](https://github.com/googleapis/gcp-metadata/issues/627))
+
+### Miscellaneous Chores
+
+* Upgrade to node 18 ([#627](https://github.com/googleapis/gcp-metadata/issues/627)) ([19359b6](https://github.com/googleapis/gcp-metadata/commit/19359b6fbea8ff2ed0793a86674b084bd781a91c))
+
 ## [6.1.0](https://github.com/googleapis/gcp-metadata/compare/v6.0.0...v6.1.0) (2023-11-10)
 
 
