@@ -457,8 +457,7 @@ describe('unit test', () => {
   });
 
   it('should fail on isAvailable if request times out', async () => {
-    // eslint disable-next-line
-    secondaryHostRequest(5000);
+    void secondaryHostRequest(5000);
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
@@ -473,8 +472,7 @@ describe('unit test', () => {
 
   it('should fail on isAvailable if GCE_METADATA_HOST times out', async () => {
     process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
-    // eslint disable-next-line
-    secondaryHostRequest(5000);
+    void secondaryHostRequest(5000);
     const primary = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
@@ -588,7 +586,7 @@ describe('unit test', () => {
   it('should only make one outbound request, if isAvailable() called in rapid succession', async () => {
     const secondary = secondaryHostRequest(500);
     const primary = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
-    await gcp.isAvailable();
+    void gcp.isAvailable();
     // because we haven't created additional mocks, we expect this to fail
     // if we were not caching the first isAvailable() call:
     const isGCE = await gcp.isAvailable();

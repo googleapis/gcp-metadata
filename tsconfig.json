@@ -19,6 +19,7 @@
     ]
   },
   "include": [
+<<<<<<< HEAD
     "esm/src/*.ts",
     "esm/test/*.ts",
     "esm/system-test/*.ts",
@@ -26,5 +27,11 @@
     "esm/system-test/fixtures/**/*.ts",
     "esm/system-test/fixtures/kitchen/package.json",
     "package.json"
+=======
+    "src/*.ts",
+    "test/*.ts",
+    "system-test/*.ts",
+    "test/**/*.ts"
+>>>>>>> main
   ],
 }
