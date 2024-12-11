@@ -54,7 +54,6 @@ body:
       description: >
         Screenshots can be provided in the issue body below.
       placeholder: |
-        1. Start the application in development (run `npm run start`)
         2. Click X
         3. Y will happen
     validations:

@@ -84,13 +84,13 @@ describe('gcp metadata', () => {
         const result = await gcbuild.build({
           sourcePath: path.join(
             __dirname,
-            '../../system-test/fixtures/cloudbuild'
+            '../../system-test/fixtures/cloudbuild',
           ),
         });
         console.log(result.log);
         assert.ok(/isAvailable: true/.test(result.log));
         assert.ok(
-          result.log.includes('"default":{"aliases":["default"],"email"')
+          result.log.includes('"default":{"aliases":["default"],"email"'),
         );
       } catch (e) {
         console.error((e as gcbuild.BuildError).log);
@@ -127,7 +127,7 @@ async function pruneFunctions(sessionOnly: boolean) {
           console.error(`There was a problem deleting function ${fn.name}.`);
           console.error(e);
         });
-      })
+      }),
   );
 }
 
@@ -158,6 +158,6 @@ async function packModule() {
     targets.map(target => {
       const to = `system-test/fixtures/${target}/${pkg.name}.tgz`;
       return copy(from, to);
-    })
+    }),
   );
 }

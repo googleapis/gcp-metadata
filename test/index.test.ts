@@ -179,7 +179,7 @@ describe('unit test', () => {
       .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
     await assert.rejects(
       gcp.instance(),
-      /Invalid response from metadata service: incorrect Metadata-Flavor header./
+      /Invalid response from metadata service: incorrect Metadata-Flavor header./,
     );
     scope.done();
   });
@@ -226,7 +226,7 @@ describe('unit test', () => {
     await assert.rejects(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       gcp.instance({qs: {one: 'two'}} as any),
-      /'qs' is not a valid configuration option. Please use 'params' instead\./
+      /'qs' is not a valid configuration option. Please use 'params' instead\./,
     );
   });
 
@@ -234,7 +234,7 @@ describe('unit test', () => {
     await assert.rejects(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       gcp.instance({fake: 'news'} as any),
-      /'fake' is not a valid/
+      /'fake' is not a valid/,
     );
   });
 
@@ -251,7 +251,7 @@ describe('unit test', () => {
 
   async function secondaryHostRequest(
     delay: number,
-    responseType = 'success'
+    responseType = 'success',
   ): Promise<void> {
     let secondary: nock.Scope;
     if (responseType === 'success') {
@@ -467,7 +467,7 @@ describe('unit test', () => {
   });
 
   it('should fail on isAvailable if request times out', async () => {
-    secondaryHostRequest(5000);
+    void secondaryHostRequest(5000);
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
@@ -482,7 +482,7 @@ describe('unit test', () => {
 
   it('should fail on isAvailable if GCE_METADATA_HOST times out', async () => {
     process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
-    secondaryHostRequest(5000);
+    void secondaryHostRequest(5000);
     const primary = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
@@ -540,7 +540,7 @@ describe('unit test', () => {
       process.on('warning', warning => {
         assert.strictEqual(
           warning.toString().includes('unexpected error'),
-          true
+          true,
         );
         return resolve();
       });
@@ -596,7 +596,7 @@ describe('unit test', () => {
   it('should only make one outbound request, if isAvailable() called in rapid succession', async () => {
     const secondary = secondaryHostRequest(500);
     const primary = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
-    gcp.isAvailable();
+    void gcp.isAvailable();
     // because we haven't created additional mocks, we expect this to fail
     // if we were not caching the first isAvailable() call:
     const isGCE = await gcp.isAvailable();
