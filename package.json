@@ -43,7 +43,7 @@
     "test:cjs": "c8 mocha --timeout=5000 build/cjs/test",
     "test:esm": "c8 mocha build/esm/test --loader=esmock",
     "test": "npm run test:esm && npm run test:cjs",
-    "docs": "jsdoc -c .jsdoc.js",
+    "docs": "jsdoc -c .jsdoc.json",
     "lint": "gts check",
     "docs-test": "linkinator docs",
     "predocs-test": "npm run docs",
