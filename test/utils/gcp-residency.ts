@@ -47,7 +47,7 @@ export class GCPResidencyUtil {
 
     this.stubs.osNetworkInterfaces ??= this.sandbox.stub(
       os,
-      'networkInterfaces'
+      'networkInterfaces',
     );
     this.stubs.osNetworkInterfaces.returns({
       'test-interface': [{mac} as os.NetworkInterfaceInfo],
