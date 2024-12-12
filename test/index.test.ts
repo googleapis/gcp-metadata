@@ -415,7 +415,7 @@ describe('unit test', () => {
       err = _err;
     };
 
-    const secondary = secondaryHostRequest(500);
+    const secondary = secondaryHostRequest(500, 'ENOTFOUND');
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .replyWithError({code: 'ENOTFOUND'});
@@ -424,7 +424,7 @@ describe('unit test', () => {
     primary.done();
     console.info = info;
     delete process.env.DEBUG_AUTH;
-    assert.strictEqual(/failed, reason/.test(err!.message), true);
+    assert.strictEqual(/All promises were rejected/.test(err!.message), true);
   });
 
   [
@@ -435,8 +435,8 @@ describe('unit test', () => {
     'ENOTFOUND',
     'ECONNREFUSED',
   ].forEach(errorCode => {
-    it(`should fail fast on isAvailable if ${errorCode} is returned`, async () => {
-      const secondary = secondaryHostRequest(500);
+    it(`should fail on isAvailable if ${errorCode} is returned for primary and secondary requests`, async () => {
+      const secondary = secondaryHostRequest(500, errorCode);
       const primary = nock(HOST)
         .get(`${PATH}/${TYPE}`)
         .replyWithError({code: errorCode});
@@ -447,13 +447,13 @@ describe('unit test', () => {
     });
   });
 
-  it('should fail fast on isAvailable if 404 status code is returned', async () => {
+  it('should return first successful response', async () => {
     const secondary = secondaryHostRequest(500);
     const primary = nock(HOST).get(`${PATH}/${TYPE}`).reply(404);
     const isGCE = await gcp.isAvailable();
     await secondary;
     primary.done();
-    assert.strictEqual(false, isGCE);
+    assert.strictEqual(true, isGCE);
   });
 
   it('should fail fast with GCE_METADATA_HOST 404 on isAvailable', async () => {
@@ -608,8 +608,8 @@ describe('unit test', () => {
   it('resets cache when resetIsAvailableCache() is called', async () => {
     // we will attempt to hit the secondary and primary server twice,
     // mock accordingly.
-    const secondary = secondaryHostRequest(250);
-    const secondary2 = secondaryHostRequest(500);
+    const secondary = secondaryHostRequest(250, 'ENOENT');
+    const secondary2 = secondaryHostRequest(500, 'ENOENT');
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .reply(200, {}, HEADERS)
