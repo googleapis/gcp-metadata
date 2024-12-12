@@ -18,20 +18,16 @@ import ncp from 'ncp';
 import * as tmp from 'tmp';
 import {promisify} from 'util';
 import {execSync} from 'child_process';
-import path from 'path';
-import {fileURLToPath} from 'url';
 
-import {describe, it, after} from 'mocha';
+import {describe, it} from 'mocha';
 // @ts-ignore
-import pkg from '../../../package.json' with {type: 'json'};
+import pkg from '../../package.json' with {type: 'json'};
 
-describe('installation', () => {
+describe('installation', async () => {
   const ncpp = promisify(ncp);
   const keep = !!process.env.GCPM_KEEP_TEMPDIRS;
   const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
   const stagingPath = stagingDir.name;
-  // @ts-ignore
-  const dirname = path.dirname(fileURLToPath(import.meta.url));
    // eslint-disable-line
 
   /**
