@@ -27,7 +27,7 @@ import {execSync} from 'child_process';
 import {request, GaxiosError} from 'gaxios';
 import {fileURLToPath} from 'url';
 // @ts-ignore
-import pkg from '../../package.json' with {type: 'json'};
+import pkg from '../../../package.json' with {type: 'json'};
 // @ts-ignore
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 

@@ -21,7 +21,7 @@ import {execSync} from 'child_process';
 
 import {describe, it} from 'mocha';
 // @ts-ignore
-import pkg from '../../package.json' with {type: 'json'};
+import pkg from '../../../package.json' with {type: 'json'};
 
 describe('installation', async () => {
   const ncpp = promisify(ncp);
@@ -35,11 +35,12 @@ describe('installation', async () => {
    * application.
    */
   it('should be able to use the d.ts', async () => {
+    console.log(`${__filename} staging area: ${stagingPath}`);
     execSync('npm pack', {stdio: 'inherit'});
     const tarball = `${pkg.name}-${pkg.version}.tgz`;
     await ncpp(tarball, `${stagingPath}/${pkg.name}.tgz`);
     await ncpp('esm/system-test/fixtures/kitchen', `${stagingPath}/`);
-    execSync('npm install', {cwd: `${stagingPath}`, stdio: 'inherit'});
+    execSync('npm install', {cwd: `${stagingPath}/`, stdio: 'inherit'});
   });
 
   /**
