@@ -27,7 +27,7 @@ import {execSync} from 'child_process';
 import {request, GaxiosError} from 'gaxios';
 import {fileURLToPath} from 'url';
 // @ts-ignore
-import pkg from '../../../package.json' with {type: 'json'};
+import pkg from '../../package.json' with {type: 'json'};
 // @ts-ignore
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -38,7 +38,7 @@ let projectId: string;
 const shortPrefix = 'gcloud-tests';
 const fullPrefix = `${shortPrefix}-${uuid.v4().split('-')[0]}`;
 
-describe('gcp metadata', () => {
+describe('gcp metadata', async () => {
   before(async () => {
     // pack up the gcp-metadata module and copy to the target dir
     await packModule();
@@ -82,7 +82,7 @@ describe('gcp metadata', () => {
     after(() => pruneFunctions(true));
   });
 
-  describe('cloud build', () => {
+  describe('cloud build', async () => {
     it('should access the metadata service on GCB', async () => {
       try {
         const result = await gcbuild.build({

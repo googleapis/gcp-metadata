@@ -16,7 +16,7 @@
 
 /* eslint-disable */
 
-import * as gcp from 'gcp-metadata';
+const gcp = require('gcp-metadata');
 // uncomment the line below during development
 // import * as gcp from '../../../../src/index.js';
 
