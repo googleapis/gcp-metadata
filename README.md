@@ -49,6 +49,7 @@ npm install gcp-metadata
 ### Using the client library
 
 ```javascript
+// eslint-disable-next-line no-undef
 const gcpMetadata = require('gcp-metadata');
 
 async function quickstart() {

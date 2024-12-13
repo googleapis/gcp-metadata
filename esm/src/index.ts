@@ -16,8 +16,8 @@
 
 import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
-import jsonBigint = require('json-bigint');
-import {detectGCPResidency} from './gcp-residency';
+import jsonBigint from 'json-bigint';
+import {detectGCPResidency} from './gcp-residency.js';
 
 export const BASE_PATH = '/computeMetadata/v1';
 export const HOST_ADDRESS = 'http://169.254.169.254';
@@ -469,4 +469,4 @@ export function requestTimeout(): number {
   return getGCPResidency() ? 0 : 3000;
 }
 
-export * from './gcp-residency';
+export * from './gcp-residency.js';

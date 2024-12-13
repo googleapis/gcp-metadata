@@ -14,39 +14,42 @@
  * limitations under the License.
  */
 
-import {ncp} from 'ncp';
+import ncp from 'ncp';
 import * as tmp from 'tmp';
 import {promisify} from 'util';
 import {execSync} from 'child_process';
 
-import {describe, it, after} from 'mocha';
+import {describe, it} from 'mocha';
+// @ts-ignore
+import pkg from '../../package.json' with {type: 'json'};
 
-describe('installation', () => {
+describe('installation', async () => {
+  console.log('starting installation for kitchen test')
   const ncpp = promisify(ncp);
   const keep = !!process.env.GCPM_KEEP_TEMPDIRS;
   const stagingDir = tmp.dirSync({keep, unsafeCleanup: true});
   const stagingPath = stagingDir.name;
-  const pkg = require('../../package.json'); // eslint-disable-line
-
+  console.log('finished installation for staging dirs')
+  console.log(stagingDir)
+  console.log(stagingPath)
   /**
    * Create a staging directory with temp fixtures used to test on a fresh
    * application.
    */
   it('should be able to use the d.ts', async () => {
-    console.log(`${__filename} staging area: ${stagingPath}`);
     execSync('npm pack', {stdio: 'inherit'});
     const tarball = `${pkg.name}-${pkg.version}.tgz`;
     await ncpp(tarball, `${stagingPath}/${pkg.name}.tgz`);
-    await ncpp('system-test/fixtures/kitchen', `${stagingPath}/`);
+    await ncpp('esm/system-test/fixtures/kitchen', `${stagingPath}/`);
     execSync('npm install', {cwd: `${stagingPath}/`, stdio: 'inherit'});
   });
 
   /**
    * CLEAN UP - remove the staging directory when done.
    */
-  after('cleanup staging', () => {
-    if (!keep) {
-      stagingDir.removeCallback();
-    }
-  });
+  // after('cleanup staging', () => {
+  //   if (!keep) {
+  //     stagingDir.removeCallback();
+  //   }
+  // });
 });

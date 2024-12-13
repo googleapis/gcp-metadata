@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {before, after, describe, it} from 'mocha';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
@@ -25,16 +25,20 @@ import {promisify} from 'util';
 import * as uuid from 'uuid';
 import {execSync} from 'child_process';
 import {request, GaxiosError} from 'gaxios';
+import {fileURLToPath} from 'url';
+// @ts-ignore
+import pkg from '../../package.json' with {type: 'json'};
+// @ts-ignore
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const copy = promisify(fs.copyFile);
-const pkg = require('../../package.json'); // eslint-disable-line
 
 let gcf: CloudFunctionsServiceClient;
 let projectId: string;
 const shortPrefix = 'gcloud-tests';
 const fullPrefix = `${shortPrefix}-${uuid.v4().split('-')[0]}`;
 
-describe('gcp metadata', () => {
+describe('gcp metadata', async () => {
   before(async () => {
     // pack up the gcp-metadata module and copy to the target dir
     await packModule();
@@ -78,16 +82,15 @@ describe('gcp metadata', () => {
     after(() => pruneFunctions(true));
   });
 
-  describe('cloud build', () => {
+  describe('cloud build', async () => {
     it('should access the metadata service on GCB', async () => {
       try {
         const result = await gcbuild.build({
           sourcePath: path.join(
-            __dirname,
-            '../../system-test/fixtures/cloudbuild',
+            dirname,
+            '../../../esm/system-test/fixtures/cloudbuild',
           ),
         });
-        console.log(result.log);
         assert.ok(/isAvailable: true/.test(result.log));
         assert.ok(
           result.log.includes('"default":{"aliases":["default"],"email"'),
@@ -135,12 +138,15 @@ async function pruneFunctions(sessionOnly: boolean) {
  * Deploy the hook app to GCF.
  */
 async function deployApp() {
-  const targetDir = path.join(__dirname, '../../system-test/fixtures/hook');
+  const targetDir = path.join(
+    dirname,
+    '../../../esm/system-test/fixtures/hook',
+  );
   await gcx.deploy({
     name: fullPrefix,
     entryPoint: 'getMetadata',
     triggerHTTP: true,
-    runtime: 'nodejs14',
+    runtime: 'nodejs18',
     region: 'us-central1',
     targetDir,
   });
@@ -156,7 +162,7 @@ async function packModule() {
   const targets = ['hook', 'cloudbuild'];
   await Promise.all(
     targets.map(target => {
-      const to = `system-test/fixtures/${target}/${pkg.name}.tgz`;
+      const to = `esm/system-test/fixtures/${target}/${pkg.name}.tgz`;
       return copy(from, to);
     }),
   );

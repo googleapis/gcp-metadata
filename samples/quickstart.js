@@ -18,6 +18,7 @@
 
 function main() {
   // [START gcpmetadata_quickstart]
+  // eslint-disable-next-line no-undef
   const gcpMetadata = require('gcp-metadata');
 
   async function quickstart() {

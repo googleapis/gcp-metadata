@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-const gcpMetadata = require('gcp-metadata');
+/* eslint-disable */
+
+const gcp = require('gcp-metadata');
+// uncomment the line below during development
+// import * as gcp from '../../../../src/index.js';
+
+const header = gcp.HEADER_NAME;
+const headers = gcp.HEADERS;
 
 async function main() {
-  const isAvailable = await gcpMetadata.isAvailable();
-  console.log(`isAvailable: ${isAvailable}`);
-  await gcpMetadata.instance('service-accounts/default/token');
-  const svc = await gcpMetadata.instance({
-    property: 'service-accounts/',
-    params: {recursive: 'true'},
-  });
-  console.log('serviceAccounts:');
-  console.log(JSON.stringify(svc).split('\n').join());
+  const v = await gcp.instance('/somepath');
 }
 
-main().catch(e => {
-  console.error(e);
-  throw e;
-});
+gcp.project('something').then(console.log);
+
+main().catch(console.error);
