@@ -117,6 +117,32 @@ describe('unit test', () => {
     scope.done();
   });
 
+  it('should throw a valuable error when headers do not match', async () => {
+    const scope = nock(HOST)
+      .get(`${PATH}/${TYPE}/${PROPERTY}`)
+      .reply(
+        200,
+        {},
+        {
+          [gcp.HEADER_NAME.toLowerCase()]: 'wrongHeader',
+        },
+      );
+
+    await assert.rejects(
+      async () => {
+        await gcp.instance({property: PROPERTY});
+      },
+      err => {
+        assert.strictEqual(
+          (err as any).message,
+          'Invalid response from metadata service: incorrect Metadata-Flavor header. Expected Google, got wrongHeader',
+        );
+        scope.done();
+        return true;
+      },
+    );
+  });
+
   it('should return large numbers as BigNumber values', async () => {
     const BIG_NUMBER_STRING = '3279739563200103600';
     const scope = nock(HOST)

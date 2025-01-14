@@ -37,8 +37,9 @@
   "author": "Google LLC",
   "license": "Apache-2.0",
   "dependencies": {
-    "json-bigint": "^1.0.0",
-    "gaxios": "^6.7.1"
+    "gaxios": "^6.7.1",
+    "google-logging-utils": "^0.0.2",
+    "json-bigint": "^1.0.0"
   },
   "devDependencies": {
     "@google-cloud/functions": "^3.6.0",
