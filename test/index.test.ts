@@ -133,8 +133,9 @@ describe('unit test', () => {
         await gcp.instance({property: PROPERTY});
       },
       err => {
+        assert(err instanceof Error);
         assert.strictEqual(
-          (err as any).message,
+          err.message,
           "Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got 'wrongHeader'",
         );
         scope.done();
