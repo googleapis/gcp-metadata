@@ -154,7 +154,7 @@ async function metadataAccessor<T>(
   }
 
   const requestMethod = fastFail ? fastFailMetadataRequest : request;
-  const req = {
+  const req: GaxiosOptions = {
     url: `${getBaseUrl()}/${metadataKey}`,
     headers: {...HEADERS, ...headers},
     retryConfig: {noResponseRetries},
