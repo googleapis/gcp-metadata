@@ -168,7 +168,7 @@ async function metadataAccessor<T>(
   // NOTE: node.js converts all incoming headers to lower case.
   if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
     throw new Error(
-      `Invalid response from metadata service: incorrect ${HEADER_NAME} header. Expected ${HEADER_VALUE}, got ${res.headers[HEADER_NAME.toLowerCase()]}`,
+      `Invalid response from metadata service: incorrect ${HEADER_NAME} header. Expected '${HEADER_VALUE}', got ${res.headers[HEADER_NAME.toLowerCase()] ? `'${res.headers[HEADER_NAME.toLowerCase()]}'` : 'no header'}`,
     );
   }
 
@@ -180,6 +180,7 @@ async function metadataAccessor<T>(
     }
   }
 
+  log.info('instance metadata is %s', res.data);
   return res.data;
 }
 

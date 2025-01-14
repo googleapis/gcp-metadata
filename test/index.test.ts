@@ -135,7 +135,25 @@ describe('unit test', () => {
       err => {
         assert.strictEqual(
           (err as any).message,
-          'Invalid response from metadata service: incorrect Metadata-Flavor header. Expected Google, got wrongHeader',
+          "Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got 'wrongHeader'",
+        );
+        scope.done();
+        return true;
+      },
+    );
+  });
+
+  it('should throw a valuable error when header does not exist', async () => {
+    const scope = nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {});
+
+    await assert.rejects(
+      async () => {
+        await gcp.instance({property: PROPERTY});
+      },
+      err => {
+        assert.strictEqual(
+          (err as any).message,
+          "Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header",
         );
         scope.done();
         return true;
