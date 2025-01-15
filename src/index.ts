@@ -18,6 +18,7 @@ import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
 import {detectGCPResidency} from './gcp-residency';
+import * as logger from 'google-logging-utils';
 
 export const BASE_PATH = '/computeMetadata/v1';
 export const HOST_ADDRESS = 'http://169.254.169.254';
@@ -26,6 +27,8 @@ export const SECONDARY_HOST_ADDRESS = 'http://metadata.google.internal.';
 export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
+
+const log = logger.log('gcp metadata');
 
 /**
  * Metadata server detection override options.
@@ -151,18 +154,22 @@ async function metadataAccessor<T>(
   }
 
   const requestMethod = fastFail ? fastFailMetadataRequest : request;
-  const res = await requestMethod<T>({
+  const req: GaxiosOptions = {
     url: `${getBaseUrl()}/${metadataKey}`,
     headers: {...HEADERS, ...headers},
     retryConfig: {noResponseRetries},
     params,
     responseType: 'text',
     timeout: requestTimeout(),
-  });
+  } as GaxiosOptions;
+  log.info('instance request %j', req);
+
+  const res = await requestMethod<T>(req);
+  log.info('instance metadata is %s', res.data);
   // NOTE: node.js converts all incoming headers to lower case.
   if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
     throw new Error(
-      `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`
+      `Invalid response from metadata service: incorrect ${HEADER_NAME} header. Expected '${HEADER_VALUE}', got ${res.headers[HEADER_NAME.toLowerCase()] ? `'${res.headers[HEADER_NAME.toLowerCase()]}'` : 'no header'}`,
     );
   }
 
