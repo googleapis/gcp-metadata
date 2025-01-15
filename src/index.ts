@@ -165,6 +165,7 @@ async function metadataAccessor<T>(
   log.info('instance request %j', req);
 
   const res = await requestMethod<T>(req);
+  log.info('instance metadata is %s', res.data);
   // NOTE: node.js converts all incoming headers to lower case.
   if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
     throw new Error(
@@ -180,7 +181,6 @@ async function metadataAccessor<T>(
     }
   }
 
-  log.info('instance metadata is %s', res.data);
   return res.data;
 }
 
