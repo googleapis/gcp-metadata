@@ -38,7 +38,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "gaxios": "^6.7.1",
-    "google-logging-utils": "^0.0.2",
+    "google-logging-utils": "^1.0.0",
     "json-bigint": "^1.0.0"
   },
   "devDependencies": {
