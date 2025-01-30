@@ -4,6 +4,29 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [7.0.0](https://github.com/googleapis/gcp-metadata/compare/v6.1.0...v7.0.0) (2025-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to node 18 ([#627](https://github.com/googleapis/gcp-metadata/issues/627))
+
+### Features
+
+* Release 6.2.0 ([#641](https://github.com/googleapis/gcp-metadata/issues/641)) ([cbad405](https://github.com/googleapis/gcp-metadata/commit/cbad405a1c862bcc3c4f9d64f6ce0e906b437397))
+
+
+### Bug Fixes
+
+* Add extra logging for incorrect headers ([#637](https://github.com/googleapis/gcp-metadata/issues/637)) ([c0f6f23](https://github.com/googleapis/gcp-metadata/commit/c0f6f230e64530aad0a2d1077ab15b1677d9aa16))
+* Add extra logging for incorrect headers ([#637](https://github.com/googleapis/gcp-metadata/issues/637)) ([06c2886](https://github.com/googleapis/gcp-metadata/commit/06c2886291d5ab764cc00641e3226f87f7e1c433))
+* **deps:** Update dependency google-logging-utils to v1 ([#638](https://github.com/googleapis/gcp-metadata/issues/638)) ([36a0f58](https://github.com/googleapis/gcp-metadata/commit/36a0f583cf5dd8f0a59c24e8b023d8cb1653d98c))
+
+
+### Miscellaneous Chores
+
+* Upgrade to node 18 ([#627](https://github.com/googleapis/gcp-metadata/issues/627)) ([19359b6](https://github.com/googleapis/gcp-metadata/commit/19359b6fbea8ff2ed0793a86674b084bd781a91c))
+
 ## [6.1.0](https://github.com/googleapis/gcp-metadata/compare/v6.0.0...v6.1.0) (2023-11-10)
 
 
