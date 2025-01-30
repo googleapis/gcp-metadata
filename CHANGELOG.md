@@ -4,6 +4,14 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [6.1.1](https://github.com/googleapis/gcp-metadata/compare/v6.1.0...v6.1.1) (2025-01-30)
+
+
+### Bug Fixes
+
+* Add extra logging for incorrect headers ([#637](https://github.com/googleapis/gcp-metadata/issues/637)) ([edafa87](https://github.com/googleapis/gcp-metadata/commit/edafa87e020ffe28983048de5da183ceb0483bfa))
+* Add extra logging for incorrect headers ([#637](https://github.com/googleapis/gcp-metadata/issues/637)) ([#647](https://github.com/googleapis/gcp-metadata/issues/647)) ([ccbb98e](https://github.com/googleapis/gcp-metadata/commit/ccbb98e3519496414ab654769072d3397153b4b2))
+
 ## [6.1.0](https://github.com/googleapis/gcp-metadata/compare/v6.0.0...v6.1.0) (2023-11-10)
 
 
