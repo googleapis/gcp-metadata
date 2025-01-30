@@ -14,7 +14,7 @@ branchProtectionRules:
       - cla/google
       - windows
       - OwlBot Post Processor
-  - pattern: backPortFix
+  - pattern: 6.x
     isAdminEnforced: true
     requiredApprovingReviewCount: 1
     requiresCodeOwnerReviews: true

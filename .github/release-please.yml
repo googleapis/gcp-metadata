@@ -3,4 +3,4 @@ releaseType: node
 branches:
   - handleGHRelease: true
     releaseType: node
-    branch: backPortFix
+    branch: 6.x
