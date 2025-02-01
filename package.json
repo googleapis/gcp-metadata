@@ -1,6 +1,6 @@
 {
   "name": "gcp-metadata",
-  "version": "6.1.0",
+  "version": "7.0.0-rc.0",
   "description": "Get the metadata from a Google Cloud Platform environment",
   "repository": "googleapis/gcp-metadata",
   "main": "./build/src/index.js",
