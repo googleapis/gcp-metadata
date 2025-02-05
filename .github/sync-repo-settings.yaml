@@ -5,12 +5,29 @@ branchProtectionRules:
     requiresCodeOwnerReviews: true
     requiresStrictStatusChecks: true
     requiredStatusCheckContexts:
+      - 'ci/kokoro: Samples test'
+      - 'ci/kokoro: System test'
+      - lint
+      - test (18)
+      - test (20)
+      - test (22)
+      - cla/google
+      - windows
+      - OwlBot Post Processor
+  - pattern: 6.x
+    isAdminEnforced: true
+    requiredApprovingReviewCount: 1
+    requiresCodeOwnerReviews: true
+    requiresStrictStatusChecks: true
+    requiredStatusCheckContexts:
+      - 'ci/kokoro: Samples test'
+      - 'ci/kokoro: System test'
       - "ci/kokoro: Samples test"
       - "ci/kokoro: System test"
       - lint
-      - test (14)
-      - test (16)
       - test (18)
+      - test (20)
+      - test (22)
       - cla/google
       - windows
       - OwlBot Post Processor

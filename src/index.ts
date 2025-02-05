@@ -1,14 +1,24 @@
 /**
  * Copyright 2018 Google LLC
  *
- * Distributed under MIT license.
- * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
 import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
 import {detectGCPResidency} from './gcp-residency';
+import * as logger from 'google-logging-utils';
 
 export const BASE_PATH = '/computeMetadata/v1';
 export const HOST_ADDRESS = 'http://169.254.169.254';
@@ -17,6 +27,8 @@ export const SECONDARY_HOST_ADDRESS = 'http://metadata.google.internal.';
 export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
+
+const log = logger.log('gcp metadata');
 
 /**
  * Metadata server detection override options.
@@ -91,7 +103,7 @@ function validate(options: Options) {
         break;
       case 'qs':
         throw new Error(
-          "'qs' is not a valid configuration option. Please use 'params' instead."
+          "'qs' is not a valid configuration option. Please use 'params' instead.",
         );
       default:
         throw new Error(`'${key}' is not a valid configuration option.`);
@@ -103,14 +115,14 @@ async function metadataAccessor<T>(
   type: string,
   options?: string | Options,
   noResponseRetries?: number,
-  fastFail?: boolean
+  fastFail?: boolean,
 ): Promise<T>;
 async function metadataAccessor<T>(metadata: MetadataAccessor): Promise<T>;
 async function metadataAccessor<T>(
   type: MetadataAccessor | string,
   options: string | Options = {},
   noResponseRetries = 3,
-  fastFail = false
+  fastFail = false,
 ): Promise<T> {
   let metadataKey = '';
   let params: {} = {};
@@ -141,47 +153,45 @@ async function metadataAccessor<T>(
     params = options.params || params;
   }
 
-  try {
-    const requestMethod = fastFail ? fastFailMetadataRequest : request;
-    const res = await requestMethod<T>({
-      url: `${getBaseUrl()}/${metadataKey}`,
-      headers: {...HEADERS, ...headers},
-      retryConfig: {noResponseRetries},
-      params,
-      responseType: 'text',
-      timeout: requestTimeout(),
-    });
-    // NOTE: node.js converts all incoming headers to lower case.
-    if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
-      throw new Error(
-        `Invalid response from metadata service: incorrect ${HEADER_NAME} header.`
-      );
-    } else if (!res.data) {
-      throw new Error('Invalid response from the metadata service');
-    }
-    if (typeof res.data === 'string') {
-      try {
-        return jsonBigint.parse(res.data);
-      } catch {
-        /* ignore */
-      }
-    }
-    return res.data;
-  } catch (e) {
-    const err = e as GaxiosError;
-    if (err.response && err.response.status !== 200) {
-      err.message = `Unsuccessful response status code. ${err.message}`;
-    }
-    throw e;
+  const requestMethod = fastFail ? fastFailMetadataRequest : request;
+  const req: GaxiosOptions = {
+    url: `${getBaseUrl()}/${metadataKey}`,
+    headers: {...HEADERS, ...headers},
+    retryConfig: {noResponseRetries},
+    params,
+    responseType: 'text',
+    timeout: requestTimeout(),
+  } as GaxiosOptions;
+  log.info('instance request %j', req);
+
+  const res = await requestMethod<T>(req);
+  log.info('instance metadata is %s', res.data);
+  // NOTE: node.js converts all incoming headers to lower case.
+  if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
+    throw new Error(
+      `Invalid response from metadata service: incorrect ${HEADER_NAME} header. Expected '${HEADER_VALUE}', got ${res.headers[HEADER_NAME.toLowerCase()] ? `'${res.headers[HEADER_NAME.toLowerCase()]}'` : 'no header'}`,
+    );
   }
+
+  if (typeof res.data === 'string') {
+    try {
+      return jsonBigint.parse(res.data);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return res.data;
 }
 
 async function fastFailMetadataRequest<T>(
-  options: GaxiosOptions
+  options: GaxiosOptions,
 ): Promise<GaxiosResponse> {
   const secondaryOptions = {
     ...options,
-    url: options.url!.replace(getBaseUrl(), getBaseUrl(SECONDARY_HOST_ADDRESS)),
+    url: options.url
+      ?.toString()
+      .replace(getBaseUrl(), getBaseUrl(SECONDARY_HOST_ADDRESS)),
   };
   // We race a connection between DNS/IP to metadata server. There are a couple
   // reasons for this:
@@ -240,7 +250,7 @@ export function project<T = any>(options?: string | Options) {
  *
  * @example
  * ```
- * const universeDomain: string = await universe('universe_domain');
+ * const universeDomain: string = await universe('universe-domain');
  * ```
  */
 export function universe<T>(options?: string | Options) {
@@ -284,7 +294,7 @@ export async function bulk<
 
         r[key] = res;
       })();
-    })
+    }),
   );
 
   return r as R;
@@ -312,8 +322,8 @@ export async function isAvailable() {
     if (!(value in METADATA_SERVER_DETECTION)) {
       throw new RangeError(
         `Unknown \`METADATA_SERVER_DETECTION\` env variable. Got \`${value}\`, but it should be \`${Object.keys(
-          METADATA_SERVER_DETECTION
-        ).join('`, `')}\`, or unset`
+          METADATA_SERVER_DETECTION,
+        ).join('`, `')}\`, or unset`,
       );
     }
 
@@ -342,7 +352,7 @@ export async function isAvailable() {
         // If the default HOST_ADDRESS has been overridden, we should not
         // make an effort to try SECONDARY_HOST_ADDRESS (as we are likely in
         // a non-GCP environment):
-        !(process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST)
+        !(process.env.GCE_METADATA_IP || process.env.GCE_METADATA_HOST),
       );
     }
     await cachedIsAvailableResponse;
@@ -379,7 +389,7 @@ export async function isAvailable() {
         if (err.code) code = err.code;
         process.emitWarning(
           `received unexpected error = ${err.message} code = ${code}`,
-          'MetadataLookupWarning'
+          'MetadataLookupWarning',
         );
       }
 

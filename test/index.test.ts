@@ -1,8 +1,17 @@
 /**
  * Copyright 2018 Google LLC
  *
- * Distributed under MIT license.
- * See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import * as assert from 'assert';
@@ -13,6 +22,7 @@ import {SinonSandbox, createSandbox} from 'sinon';
 
 import * as gcp from '../src';
 import {GCPResidencyUtil} from './utils/gcp-residency';
+import {GaxiosError} from 'gaxios';
 
 // the metadata IP entry:
 const HOST = gcp.HOST_ADDRESS;
@@ -107,6 +117,52 @@ describe('unit test', () => {
     scope.done();
   });
 
+  it('should throw a valuable error when headers do not match', async () => {
+    const scope = nock(HOST)
+      .get(`${PATH}/${TYPE}/${PROPERTY}`)
+      .reply(
+        200,
+        {},
+        {
+          [gcp.HEADER_NAME.toLowerCase()]: 'wrongHeader',
+        },
+      );
+
+    await assert.rejects(
+      async () => {
+        await gcp.instance({property: PROPERTY});
+      },
+      err => {
+        assert(err instanceof Error);
+        assert.strictEqual(
+          err.message,
+          "Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got 'wrongHeader'",
+        );
+        scope.done();
+        return true;
+      },
+    );
+  });
+
+  it('should throw a valuable error when header does not exist', async () => {
+    const scope = nock(HOST).get(`${PATH}/${TYPE}/${PROPERTY}`).reply(200, {});
+
+    await assert.rejects(
+      async () => {
+        await gcp.instance({property: PROPERTY});
+      },
+      err => {
+        assert(err instanceof Error);
+        assert.strictEqual(
+          err.message,
+          "Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header",
+        );
+        scope.done();
+        return true;
+      },
+    );
+  });
+
   it('should return large numbers as BigNumber values', async () => {
     const BIG_NUMBER_STRING = '3279739563200103600';
     const scope = nock(HOST)
@@ -151,7 +207,7 @@ describe('unit test', () => {
   });
 
   it('should query the `universe` type', async () => {
-    const PROPERTY = 'universe_domain';
+    const PROPERTY = 'universe-domain';
     const VALUE = 'my-domain.com';
 
     const scope = nock(HOST)
@@ -163,37 +219,29 @@ describe('unit test', () => {
     scope.done();
   });
 
-  it('should return the request error', async () => {
-    const scope = nock(HOST)
-      .get(`${PATH}/${TYPE}`)
-      .times(4)
-      .reply(500, undefined, HEADERS);
-    await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
-    scope.done();
-  });
-
-  it('should return error when res is empty', async () => {
-    const scope = nock(HOST)
-      .get(`${PATH}/${TYPE}`)
-      .reply(200, undefined, HEADERS);
-    await assert.rejects(gcp.instance());
-    scope.done();
-  });
-
   it('should return error when flavor header is incorrect', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .reply(200, {}, {[gcp.HEADER_NAME.toLowerCase()]: 'Hazelnut'});
     await assert.rejects(
       gcp.instance(),
-      /Invalid response from metadata service: incorrect Metadata-Flavor header./
+      /Invalid response from metadata service: incorrect Metadata-Flavor header./,
     );
     scope.done();
   });
 
-  it('should return error if statusCode is not 200', async () => {
-    const scope = nock(HOST).get(`${PATH}/${TYPE}`).reply(418, {}, HEADERS);
-    await assert.rejects(gcp.instance(), /Unsuccessful response status code/);
+  it('should return the request error', async () => {
+    const scope = nock(HOST)
+      .get(`${PATH}/${TYPE}`)
+      .reply(404, undefined, HEADERS);
+
+    try {
+      await gcp.instance();
+    } catch (err) {
+      assert(err instanceof GaxiosError);
+      assert.strictEqual(err.status, 404);
+    }
+
     scope.done();
   });
 
@@ -224,7 +272,7 @@ describe('unit test', () => {
     await assert.rejects(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       gcp.instance({qs: {one: 'two'}} as any),
-      /'qs' is not a valid configuration option. Please use 'params' instead\./
+      /'qs' is not a valid configuration option. Please use 'params' instead\./,
     );
   });
 
@@ -232,7 +280,7 @@ describe('unit test', () => {
     await assert.rejects(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       gcp.instance({fake: 'news'} as any),
-      /'fake' is not a valid/
+      /'fake' is not a valid/,
     );
   });
 
@@ -249,7 +297,7 @@ describe('unit test', () => {
 
   async function secondaryHostRequest(
     delay: number,
-    responseType = 'success'
+    responseType = 'success',
   ): Promise<void> {
     let secondary: nock.Scope;
     if (responseType === 'success') {
@@ -282,7 +330,7 @@ describe('unit test', () => {
 
     const scopes = [
       nock(HOST)
-        .get(`${PATH}/universe/universe_domain`)
+        .get(`${PATH}/universe/universe-domain`)
         .reply(200, UNIVERSE_DOMAIN, HEADERS),
       nock(HOST).get(`${PATH}/instance`).reply(200, INSTANCE_VALUE, HEADERS),
     ];
@@ -292,12 +340,12 @@ describe('unit test', () => {
         metadataKey: 'instance',
       },
       {
-        metadataKey: 'universe/universe_domain',
+        metadataKey: 'universe/universe-domain',
       },
     ] as const);
 
     assert.deepEqual(data.instance, INSTANCE_VALUE);
-    assert.deepEqual(data['universe/universe_domain'], UNIVERSE_DOMAIN);
+    assert.deepEqual(data['universe/universe-domain'], UNIVERSE_DOMAIN);
 
     scopes.map(scope => scope.done());
   });
@@ -465,7 +513,7 @@ describe('unit test', () => {
   });
 
   it('should fail on isAvailable if request times out', async () => {
-    secondaryHostRequest(5000);
+    void secondaryHostRequest(5000);
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
@@ -480,7 +528,7 @@ describe('unit test', () => {
 
   it('should fail on isAvailable if GCE_METADATA_HOST times out', async () => {
     process.env.GCE_METADATA_HOST = '127.0.0.1:8080';
-    secondaryHostRequest(5000);
+    void secondaryHostRequest(5000);
     const primary = nock(`http://${process.env.GCE_METADATA_HOST}`)
       .get(`${PATH}/${TYPE}`)
       .delayConnection(3500)
@@ -538,7 +586,7 @@ describe('unit test', () => {
       process.on('warning', warning => {
         assert.strictEqual(
           warning.toString().includes('unexpected error'),
-          true
+          true,
         );
         return resolve();
       });
@@ -594,7 +642,7 @@ describe('unit test', () => {
   it('should only make one outbound request, if isAvailable() called in rapid succession', async () => {
     const secondary = secondaryHostRequest(500);
     const primary = nock(HOST).get(`${PATH}/${TYPE}`).reply(200, {}, HEADERS);
-    gcp.isAvailable();
+    void gcp.isAvailable();
     // because we haven't created additional mocks, we expect this to fail
     // if we were not caching the first isAvailable() call:
     const isGCE = await gcp.isAvailable();
