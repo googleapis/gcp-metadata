@@ -206,41 +206,14 @@ async function fastFailMetadataRequest<T>(
   // 2. we can't just check the IP, which is tarpitted and slow to respond
   //    on a user's local machine.
   //
-  // Additional logic has been added to make sure that we don't create an
-  // unhandled rejection in scenarios where a failure happens sometime
-  // after a success.
+  // Returns first resolved promise or if all promises get rejected we return an AggregateError.
   //
   // Note, however, if a failure happens prior to a success, a rejection should
   // occur, this is for folks running locally.
   //
-  let responded = false;
-  const r1: Promise<GaxiosResponse> = request<T>(options)
-    .then(res => {
-      responded = true;
-      return res;
-    })
-    .catch(err => {
-      if (responded) {
-        return r2;
-      } else {
-        responded = true;
-        throw err;
-      }
-    });
-  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions)
-    .then(res => {
-      responded = true;
-      return res;
-    })
-    .catch(err => {
-      if (responded) {
-        return r1;
-      } else {
-        responded = true;
-        throw err;
-      }
-    });
-  return Promise.race([r1, r2]);
+  const r1: Promise<GaxiosResponse> = request<T>(options);
+  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions);
+  return Promise.any([r1, r2]);
 }
 
 /**
