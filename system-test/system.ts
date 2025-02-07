@@ -24,7 +24,7 @@ import * as path from 'path';
 import {promisify} from 'util';
 import * as uuid from 'uuid';
 import {execSync} from 'child_process';
-import {request, GaxiosError} from 'gaxios';
+import {request} from 'gaxios';
 
 const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json'); // eslint-disable-line
@@ -63,16 +63,9 @@ describe('gcp metadata', () => {
 
     it('should access the metadata service on GCF', async () => {
       const url = `https://us-central1-${projectId}.cloudfunctions.net/${fullPrefix}`;
-      try {
-        const res = await request({url});
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const metadata = res.data as any;
-        console.log(metadata);
-        assert.strictEqual(metadata.isAvailable, true);
-      } catch (e) {
-        console.error((e as GaxiosError).response!.data);
-        assert.fail('Request to the deployed cloud function failed.');
-      }
+      const res = await request<{isAvailable: boolean}>({url});
+      console.dir(res.data);
+      assert.strictEqual(res.data.isAvailable, true);
     });
 
     after(() => pruneFunctions(true));
@@ -80,22 +73,17 @@ describe('gcp metadata', () => {
 
   describe('cloud build', () => {
     it('should access the metadata service on GCB', async () => {
-      try {
-        const result = await gcbuild.build({
-          sourcePath: path.join(
-            __dirname,
-            '../../system-test/fixtures/cloudbuild',
-          ),
-        });
-        console.log(result.log);
-        assert.ok(/isAvailable: true/.test(result.log));
-        assert.ok(
-          result.log.includes('"default":{"aliases":["default"],"email"'),
-        );
-      } catch (e) {
-        console.error((e as gcbuild.BuildError).log);
-        throw e;
-      }
+      const result = await gcbuild.build({
+        sourcePath: path.join(
+          __dirname,
+          '../../system-test/fixtures/cloudbuild',
+        ),
+      });
+      console.log(result.log);
+      assert.ok(/isAvailable: true/.test(result.log));
+      assert.ok(
+        result.log.includes('"default":{"aliases":["default"],"email"'),
+      );
     });
   });
 });
@@ -140,7 +128,7 @@ async function deployApp() {
     name: fullPrefix,
     entryPoint: 'getMetadata',
     triggerHTTP: true,
-    runtime: 'nodejs14',
+    runtime: 'nodejs18',
     region: 'us-central1',
     targetDir,
   });
