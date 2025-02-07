@@ -23,8 +23,8 @@ const headers = gcp.HEADERS;
 
 async function main() {
   return Promise.allSettled([
-    gcp.instance('/somepath'),
-    gcp.project('something'),
+    gcp.project('project-id'),
+    gcp.universe('universe-domain'),
   ]);
 }
 
