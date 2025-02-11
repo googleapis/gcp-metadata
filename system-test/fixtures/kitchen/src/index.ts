@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-/* eslint-disable */
-
 import * as gcp from 'gcp-metadata';
 // uncomment the line below during development
-//import * as gcp from '../../../../build/src/index';
+// import * as gcp from '../../../../build/src/index';
 
 const header = gcp.HEADER_NAME;
 const headers = gcp.HEADERS;
 
 async function main() {
-  const v = await gcp.instance('/somepath');
+  return Promise.allSettled([
+    gcp.project('project-id'),
+    gcp.universe('universe-domain'),
+  ]);
 }
-
-gcp.project('something').then(console.log);
 
 main().catch(console.error);
