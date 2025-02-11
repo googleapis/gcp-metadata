@@ -43,6 +43,9 @@ export const METADATA_SERVER_DETECTION = Object.freeze({
   'ping-only': 'skip the BIOS probe, and go straight to pinging',
 });
 
+// TypeScript does not have `HeadersInit` outside of DOM types yet
+type HeadersInit = ConstructorParameters<typeof Headers>[0];
+
 export interface Options {
   params?: {[index: string]: string};
   property?: string;
