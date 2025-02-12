@@ -15,7 +15,6 @@
  */
 
 import {GaxiosError, GaxiosOptions, GaxiosResponse, request} from 'gaxios';
-import {OutgoingHttpHeaders} from 'http';
 import jsonBigint = require('json-bigint');
 import {detectGCPResidency} from './gcp-residency';
 import * as logger from 'google-logging-utils';
@@ -44,10 +43,13 @@ export const METADATA_SERVER_DETECTION = Object.freeze({
   'ping-only': 'skip the BIOS probe, and go straight to pinging',
 });
 
+// TypeScript does not have `HeadersInit` outside of DOM types yet
+type HeadersInit = ConstructorParameters<typeof Headers>[0];
+
 export interface Options {
   params?: {[index: string]: string};
   property?: string;
-  headers?: OutgoingHttpHeaders;
+  headers?: HeadersInit;
 }
 
 export interface MetadataAccessor {
@@ -124,16 +126,19 @@ async function metadataAccessor<T>(
   noResponseRetries = 3,
   fastFail = false,
 ): Promise<T> {
+  const headers = new Headers(HEADERS);
   let metadataKey = '';
   let params: {} = {};
-  let headers: OutgoingHttpHeaders = {};
 
   if (typeof type === 'object') {
     const metadataAccessor: MetadataAccessor = type;
 
+    new Headers(metadataAccessor.headers).forEach((value, key) =>
+      headers.set(key, value),
+    );
+
     metadataKey = metadataAccessor.metadataKey;
     params = metadataAccessor.params || params;
-    headers = metadataAccessor.headers || headers;
     noResponseRetries = metadataAccessor.noResponseRetries || noResponseRetries;
     fastFail = metadataAccessor.fastFail || fastFail;
   } else {
@@ -149,14 +154,16 @@ async function metadataAccessor<T>(
       metadataKey += `/${options.property}`;
     }
 
-    headers = options.headers || headers;
+    new Headers(options.headers).forEach((value, key) =>
+      headers.set(key, value),
+    );
     params = options.params || params;
   }
 
   const requestMethod = fastFail ? fastFailMetadataRequest : request;
   const req: GaxiosOptions = {
     url: `${getBaseUrl()}/${metadataKey}`,
-    headers: {...HEADERS, ...headers},
+    headers,
     retryConfig: {noResponseRetries},
     params,
     responseType: 'text',
@@ -166,10 +173,11 @@ async function metadataAccessor<T>(
 
   const res = await requestMethod<T>(req);
   log.info('instance metadata is %s', res.data);
-  // NOTE: node.js converts all incoming headers to lower case.
-  if (res.headers[HEADER_NAME.toLowerCase()] !== HEADER_VALUE) {
-    throw new Error(
-      `Invalid response from metadata service: incorrect ${HEADER_NAME} header. Expected '${HEADER_VALUE}', got ${res.headers[HEADER_NAME.toLowerCase()] ? `'${res.headers[HEADER_NAME.toLowerCase()]}'` : 'no header'}`,
+
+  const metadataFlavor = res.headers.get(HEADER_NAME);
+  if (metadataFlavor !== HEADER_VALUE) {
+    throw new RangeError(
+      `Invalid response from metadata service: incorrect ${HEADER_NAME} header. Expected '${HEADER_VALUE}', got ${metadataFlavor ? `'${metadataFlavor}'` : 'no header'}`,
     );
   }
 
@@ -197,45 +205,18 @@ async function fastFailMetadataRequest<T>(
   // reasons for this:
   //
   // 1. the DNS is slow in some GCP environments; by checking both, we might
-  //    detect the runtime environment signficantly faster.
+  //    detect the runtime environment significantly faster.
   // 2. we can't just check the IP, which is tarpitted and slow to respond
   //    on a user's local machine.
   //
-  // Additional logic has been added to make sure that we don't create an
-  // unhandled rejection in scenarios where a failure happens sometime
-  // after a success.
+  // Returns first resolved promise or if all promises get rejected we return an AggregateError.
   //
   // Note, however, if a failure happens prior to a success, a rejection should
   // occur, this is for folks running locally.
   //
-  let responded = false;
-  const r1: Promise<GaxiosResponse> = request<T>(options)
-    .then(res => {
-      responded = true;
-      return res;
-    })
-    .catch(err => {
-      if (responded) {
-        return r2;
-      } else {
-        responded = true;
-        throw err;
-      }
-    });
-  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions)
-    .then(res => {
-      responded = true;
-      return res;
-    })
-    .catch(err => {
-      if (responded) {
-        return r1;
-      } else {
-        responded = true;
-        throw err;
-      }
-    });
-  return Promise.race([r1, r2]);
+  const r1: Promise<GaxiosResponse> = request<T>(options);
+  const r2: Promise<GaxiosResponse> = request<T>(secondaryOptions);
+  return Promise.any([r1, r2]);
 }
 
 /**
