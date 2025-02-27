@@ -27,7 +27,7 @@ export const HEADER_NAME = 'Metadata-Flavor';
 export const HEADER_VALUE = 'Google';
 export const HEADERS = Object.freeze({[HEADER_NAME]: HEADER_VALUE});
 
-const log = logger.log('gcp metadata');
+const log = logger.log('gcp-metadata');
 
 /**
  * Metadata server detection override options.
