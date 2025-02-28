@@ -22,7 +22,6 @@ import * as gcx from 'gcx';
 import {CloudFunctionsServiceClient} from '@google-cloud/functions';
 import * as path from 'path';
 import {promisify} from 'util';
-import * as uuid from 'uuid';
 import {execSync} from 'child_process';
 import {request} from 'gaxios';
 
@@ -32,7 +31,9 @@ const pkg = require('../../package.json'); // eslint-disable-line
 let gcf: CloudFunctionsServiceClient;
 let projectId: string;
 const shortPrefix = 'gcloud-tests';
-const fullPrefix = `${shortPrefix}-${uuid.v4().split('-')[0]}`;
+const randomUUID = () =>
+  globalThis.crypto?.randomUUID() || require('crypto').randomUUID();
+const fullPrefix = `${shortPrefix}-${randomUUID().split('-')[0]}`;
 
 describe('gcp metadata', () => {
   before(async () => {
