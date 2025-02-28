@@ -18,12 +18,13 @@ import * as assert from 'assert';
 import {before, after, describe, it} from 'mocha';
 import * as fs from 'fs';
 import * as gcbuild from 'gcbuild';
-import * as gcx from 'gcx';
 import {CloudFunctionsServiceClient} from '@google-cloud/functions';
 import * as path from 'path';
 import {promisify} from 'util';
 import {execSync} from 'child_process';
 import {request} from 'gaxios';
+
+const loadGcx = () => import('gcx');
 
 const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json'); // eslint-disable-line
@@ -125,6 +126,7 @@ async function pruneFunctions(sessionOnly: boolean) {
  */
 async function deployApp() {
   const targetDir = path.join(__dirname, '../../system-test/fixtures/hook');
+  const gcx = await loadGcx();
   await gcx.deploy({
     name: fullPrefix,
     entryPoint: 'getMetadata',
