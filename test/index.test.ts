@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 
 import {beforeEach, afterEach, describe, it} from 'mocha';
-import * as nock from 'nock';
+import nock from 'nock';
 import {SinonSandbox, createSandbox} from 'sinon';
 
 import * as gcp from '../src';

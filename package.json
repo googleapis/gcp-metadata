@@ -5,6 +5,7 @@
   "repository": "googleapis/gcp-metadata",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
+  "module": "commonjs",
   "files": [
     "build/src"
   ],
