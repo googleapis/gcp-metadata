@@ -17,7 +17,7 @@
 import assert from 'assert';
 import {before, after, describe, it} from 'mocha';
 import fs from 'fs';
-import gcbuild from 'gcbuild';
+import * as gcbuild from 'gcbuild';
 import {CloudFunctionsServiceClient} from '@google-cloud/functions';
 import * as path from 'path';
 import {promisify} from 'util';
