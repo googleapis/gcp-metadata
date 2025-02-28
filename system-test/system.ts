@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {before, after, describe, it} from 'mocha';
-import * as fs from 'fs';
-import * as gcbuild from 'gcbuild';
+import fs from 'fs';
+import gcbuild from 'gcbuild';
 import {CloudFunctionsServiceClient} from '@google-cloud/functions';
 import * as path from 'path';
 import {promisify} from 'util';
