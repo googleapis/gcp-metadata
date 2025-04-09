@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {before, after, describe, it} from 'mocha';
-import * as fs from 'fs';
+import fs from 'fs';
 import * as gcbuild from 'gcbuild';
-import * as gcx from 'gcx';
 import {CloudFunctionsServiceClient} from '@google-cloud/functions';
 import * as path from 'path';
 import {promisify} from 'util';
-import * as uuid from 'uuid';
 import {execSync} from 'child_process';
 import {request} from 'gaxios';
+
+const loadGcx = () => import('gcx');
 
 const copy = promisify(fs.copyFile);
 const pkg = require('../../package.json'); // eslint-disable-line
@@ -32,7 +32,9 @@ const pkg = require('../../package.json'); // eslint-disable-line
 let gcf: CloudFunctionsServiceClient;
 let projectId: string;
 const shortPrefix = 'gcloud-tests';
-const fullPrefix = `${shortPrefix}-${uuid.v4().split('-')[0]}`;
+const randomUUID = () =>
+  globalThis.crypto?.randomUUID() || require('crypto').randomUUID();
+const fullPrefix = `${shortPrefix}-${randomUUID().split('-')[0]}`;
 
 describe('gcp metadata', () => {
   before(async () => {
@@ -124,6 +126,7 @@ async function pruneFunctions(sessionOnly: boolean) {
  */
 async function deployApp() {
   const targetDir = path.join(__dirname, '../../system-test/fixtures/hook');
+  const gcx = await loadGcx();
   await gcx.deploy({
     name: fullPrefix,
     entryPoint: 'getMetadata',
