@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 
 import {beforeEach, afterEach, describe, it} from 'mocha';
-import * as nock from 'nock';
+import nock from 'nock';
 import {SinonSandbox, createSandbox} from 'sinon';
 
 import * as gcp from '../src';
@@ -287,7 +287,7 @@ describe('unit test', () => {
   it('should retry on DNS errors', async () => {
     const scope = nock(HOST)
       .get(`${PATH}/${TYPE}`)
-      .replyWithError({code: 'ETIMEDOUT'})
+      .reply(500, {code: 'ETIMEDOUT'})
       .get(`${PATH}/${TYPE}`)
       .reply(200, {}, HEADERS);
     const data = await gcp.instance();
@@ -309,7 +309,7 @@ describe('unit test', () => {
       secondary = nock(SECONDARY_HOST)
         .get(`${PATH}/${TYPE}`)
         .delayConnection(delay)
-        .replyWithError({code: responseType});
+        .reply(500, {code: responseType});
     }
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -618,7 +618,7 @@ describe('unit test', () => {
     process.env.DETECT_GCP_RETRIES = '2';
     const primary = nock(HOST)
       .get(`${PATH}/${TYPE}`)
-      .replyWithError({code: 'ENETUNREACH'})
+      .reply(500, {code: 'ENETUNREACH'})
       .get(`${PATH}/${TYPE}`)
       .reply(200, {}, HEADERS);
     const isGCE = await gcp.isAvailable();

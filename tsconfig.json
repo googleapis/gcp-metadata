@@ -1,17 +1,12 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "lib": ["es2021", "dom"],
-    "rootDir": ".",
-    "outDir": "build"
+    "lib": ["ES2023", "dom"],
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "outDir": "build",
+    "rootDir": "."
   },
-  "include": [
-    "src/*.ts",
-    "test/*.ts",
-    "system-test/*.ts",
-    "test/**/*.ts"
-  ],
-  "exclude": [
-    "test/fixtures"
-  ]
+  "include": ["src/*.ts", "test/*.ts", "system-test/*.ts", "test/**/*.ts"],
+  "exclude": ["test/fixtures"]
 }
