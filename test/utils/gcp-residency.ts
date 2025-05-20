@@ -15,8 +15,8 @@
  */
 
 import {strict as assert} from 'assert';
-import * as fs from 'fs';
-import * as os from 'os';
+import fs from 'fs';
+import os from 'os';
 
 import {SinonSandbox, SinonStub} from 'sinon';
 
