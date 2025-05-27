@@ -391,10 +391,10 @@ export async function isAvailable() {
             'ENOENT',
             'ENOTFOUND',
             'ECONNREFUSED',
-          ].includes(err.code))
+          ].includes(err.code.toString()))
       ) {
         let code = 'UNKNOWN';
-        if (err.code) code = err.code;
+        if (err.code) code = err.code.toString();
         process.emitWarning(
           `received unexpected error = ${err.message} code = ${code}`,
           'MetadataLookupWarning',
