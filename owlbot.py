@@ -6,4 +6,4 @@ import synthtool.languages.node as node
 
 common_templates = gcp.CommonTemplates()
 templates = common_templates.node_library()
-s.copy(sources=templates, excludes=[".github/ISSUE_TEMPLATE", ".github/scripts", ".github/workflows/issues-no-repro.yaml", ".kokoro/samples-test.sh", ".github/release-please.yml", ".github/sync-repo-settings.yaml"])
+s.copy(sources=templates, excludes=[".kokoro/samples-test.sh", ".github/release-please.yml", ".github/sync-repo-settings.yaml"])
