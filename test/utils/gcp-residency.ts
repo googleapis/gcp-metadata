@@ -80,17 +80,12 @@ export class GCPResidencyUtil {
     this.stubs.fsStatSync
       .withArgs(gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_DATE)
       .callsFake(() => {
-        // assert.equal(path, gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_DATE);
-
         return undefined;
       });
 
     this.stubs.fsReadFileSync
       .withArgs(gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_VENDOR, 'utf8')
-      .callsFake((path, encoding) => {
-        // assert.equal(path, gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_VENDOR);
-        // assert.equal(encoding, 'utf8');
-
+      .callsFake(() => {
         if (isGCE === true) {
           return 'x Google x';
         } else if (isGCE === false) {
@@ -102,7 +97,6 @@ export class GCPResidencyUtil {
 
     this.stubs.fsStatSync.callThrough();
     this.stubs.fsReadFileSync.callThrough();
-
   }
 
   /**
