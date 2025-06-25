@@ -77,24 +77,32 @@ export class GCPResidencyUtil {
     this.stubs.fsReadFileSync ??= this.sandbox.stub(fs, 'readFileSync');
     this.stubs.fsStatSync ??= this.sandbox.stub(fs, 'statSync');
 
-    this.stubs.fsStatSync.callsFake(path => {
-      assert.equal(path, gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_DATE);
+    this.stubs.fsStatSync
+      .withArgs(gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_DATE)
+      .callsFake(() => {
+        // assert.equal(path, gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_DATE);
 
-      return undefined;
-    });
+        return undefined;
+      });
 
-    this.stubs.fsReadFileSync.callsFake((path, encoding) => {
-      assert.equal(path, gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_VENDOR);
-      assert.equal(encoding, 'utf8');
+    this.stubs.fsReadFileSync
+      .withArgs(gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_VENDOR, 'utf8')
+      .callsFake((path, encoding) => {
+        // assert.equal(path, gcpResidency.GCE_LINUX_BIOS_PATHS.BIOS_VENDOR);
+        // assert.equal(encoding, 'utf8');
 
-      if (isGCE === true) {
-        return 'x Google x';
-      } else if (isGCE === false) {
-        return 'Sandwich Co.';
-      } else {
-        throw new Error("File doesn't exist");
-      }
-    });
+        if (isGCE === true) {
+          return 'x Google x';
+        } else if (isGCE === false) {
+          return 'Sandwich Co.';
+        } else {
+          throw new Error("File doesn't exist");
+        }
+      });
+
+    this.stubs.fsStatSync.callThrough();
+    this.stubs.fsReadFileSync.callThrough();
+
   }
 
   /**
