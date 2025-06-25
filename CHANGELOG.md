@@ -4,6 +4,13 @@
 
 [1]: https://www.npmjs.com/package/gcp-metadata?activeTab=versions
 
+## [7.0.1](https://github.com/googleapis/gcp-metadata/compare/v7.0.0...v7.0.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* Update package.json to correct value ([4b72e08](https://github.com/googleapis/gcp-metadata/commit/4b72e08b117a1b1f044984c733edb79c076d6dd6))
+
 ## [7.0.0](https://github.com/googleapis/gcp-metadata/compare/v6.1.0...v7.0.0) (2025-06-10)
 
 
